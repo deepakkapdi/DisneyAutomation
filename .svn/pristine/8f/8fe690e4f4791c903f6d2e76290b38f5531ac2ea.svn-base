@@ -1,0 +1,1094 @@
+'use strict';
+
+var _defineProperty = require('babel-runtime/helpers/define-property')['default'];
+
+var _regeneratorRuntime = require('babel-runtime/regenerator')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+var _chai = require('chai');
+
+var _chai2 = _interopRequireDefault(_chai);
+
+var _chaiAsPromised = require('chai-as-promised');
+
+var _chaiAsPromised2 = _interopRequireDefault(_chaiAsPromised);
+
+var _sinon = require('sinon');
+
+var _sinon2 = _interopRequireDefault(_sinon);
+
+var _ = require('../../..');
+
+var _2 = _interopRequireDefault(_);
+
+var _libCommandsGeneral = require('../../../lib/commands/general');
+
+var _libAndroidHelpers = require('../../../lib/android-helpers');
+
+var _libAndroidHelpers2 = _interopRequireDefault(_libAndroidHelpers);
+
+var _appiumTestSupport = require('appium-test-support');
+
+var _appiumSupport = require('appium-support');
+
+var _appiumAndroidBootstrap = require('appium-android-bootstrap');
+
+var _appiumAndroidBootstrap2 = _interopRequireDefault(_appiumAndroidBootstrap);
+
+var _bluebird = require('bluebird');
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
+var _appiumAdb = require('appium-adb');
+
+var _appiumAdb2 = _interopRequireDefault(_appiumAdb);
+
+_chai2['default'].should();
+_chai2['default'].use(_chaiAsPromised2['default']);
+
+var driver = undefined;
+var sandbox = _sinon2['default'].sandbox.create();
+var expect = _chai2['default'].expect;
+
+describe('General', function () {
+  beforeEach(function () {
+    driver = new _2['default']();
+    driver.bootstrap = new _appiumAndroidBootstrap2['default']();
+    driver.adb = new _appiumAdb2['default']();
+    driver.caps = {};
+    driver.opts = {};
+  });
+  afterEach(function () {
+    sandbox.restore();
+  });
+  describe('keys', function () {
+    it('should send keys via setText bootstrap command', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.bootstrap, 'sendAction');
+            driver.opts.unicodeKeyboard = true;
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.keys('keys'));
+
+          case 4:
+            driver.bootstrap.sendAction.calledWithExactly('setText', { text: 'keys', replace: false, unicodeKeyboard: true }).should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should join keys if keys is array', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.bootstrap, 'sendAction');
+            driver.opts.unicodeKeyboard = false;
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.keys(['k', 'e', 'y', 's']));
+
+          case 4:
+            driver.bootstrap.sendAction.calledWithExactly('setText', { text: 'keys', replace: false }).should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getDeviceTime', function () {
+    it('should return device time', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'shell');
+            driver.adb.shell.returns(' 11:12 ');
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.getDeviceTime().should.become('11:12'));
+
+          case 4:
+            driver.adb.shell.calledWithExactly(['date']).should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should thorws error if shell command failed', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'shell').throws();
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getDeviceTime().should.be.rejectedWith('Could not capture'));
+
+          case 3:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getPageSource', function () {
+    it('should return page source', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.bootstrap, 'sendAction').withArgs('source').returns('sources');
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getPageSource());
+
+          case 3:
+            context$3$0.sent.should.be.equal('sources');
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('back', function () {
+    it('should press back', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.bootstrap, 'sendAction');
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.back());
+
+          case 3:
+            driver.bootstrap.sendAction.calledWithExactly('pressBack').should.be['true'];
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('isKeyboardShown', function () {
+    it('should return true if the keyboard is shown', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.isSoftKeyboardPresent = function () {
+              return { isKeyboardShown: true, canCloseKeyboard: true };
+            };
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.isKeyboardShown());
+
+          case 3:
+            context$3$0.sent.should.equal(true);
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return false if the keyboard is not shown', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.isSoftKeyboardPresent = function () {
+              return { isKeyboardShown: false, canCloseKeyboard: true };
+            };
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.isKeyboardShown());
+
+          case 3:
+            context$3$0.sent.should.equal(false);
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('hideKeyboard', function () {
+    it('should hide keyboard via back command', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver, 'back');
+            driver.adb.isSoftKeyboardPresent = function () {
+              return { isKeyboardShown: true, canCloseKeyboard: true };
+            };
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.hideKeyboard());
+
+          case 4:
+            driver.back.calledOnce.should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should not call back command if can\'t close keyboard', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver, 'back');
+            driver.adb.isSoftKeyboardPresent = function () {
+              return { isKeyboardShown: true, canCloseKeyboard: false };
+            };
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.hideKeyboard());
+
+          case 4:
+            driver.back.notCalled.should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should throw an error if no keyboard is present', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.isSoftKeyboardPresent = function () {
+              return false;
+            };
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.hideKeyboard().should.be.rejectedWith(/not present/));
+
+          case 3:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('openSettingsActivity', function () {
+    it('should open settings activity', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'getFocusedPackageAndActivity').returns({ appPackage: 'pkg', appActivity: 'act' });
+            sandbox.stub(driver.adb, 'shell');
+            sandbox.stub(driver.adb, 'waitForNotActivity');
+            context$3$0.next = 5;
+            return _regeneratorRuntime.awrap(driver.openSettingsActivity('set1'));
+
+          case 5:
+            driver.adb.shell.calledWithExactly(['am', 'start', '-a', 'android.settings.set1']).should.be['true'];
+            driver.adb.waitForNotActivity.calledWithExactly('pkg', 'act', 5000).should.be['true'];
+
+          case 7:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getWindowSize', function () {
+    it('should get window size', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.bootstrap, 'sendAction').withArgs('getDeviceSize').returns('size');
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getWindowSize());
+
+          case 3:
+            context$3$0.sent.should.be.equal('size');
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getWindowRect', function () {
+    it('should get window size', function callee$2$0() {
+      var rect;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.bootstrap, 'sendAction').withArgs('getDeviceSize').returns({ width: 300, height: 400 });
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getWindowRect());
+
+          case 3:
+            rect = context$3$0.sent;
+
+            rect.width.should.be.equal(300);
+            rect.height.should.be.equal(400);
+            rect.x.should.be.equal(0);
+            rect.y.should.be.equal(0);
+
+          case 8:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getCurrentActivity', function () {
+    it('should get current activity', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'getFocusedPackageAndActivity').returns({ appActivity: 'act' });
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getCurrentActivity().should.eventually.be.equal('act'));
+
+          case 3:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getCurrentPackage', function () {
+    it('should get current activity', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'getFocusedPackageAndActivity').returns({ appPackage: 'pkg' });
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getCurrentPackage().should.eventually.equal('pkg'));
+
+          case 3:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getLogTypes', function () {
+    it('should get log types', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(driver.getLogTypes());
+
+          case 2:
+            context$3$0.t0 = ['logcat'];
+            context$3$0.sent.should.be.deep.equal(context$3$0.t0);
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getLog', function () {
+    it('should get log types', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'getLogcatLogs').returns('logs');
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getLog('logcat'));
+
+          case 3:
+            context$3$0.sent.should.be.equal('logs');
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should throws exception if log type is unsupported', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(driver.getLog('unsupported_type').should.eventually.be.rejectedWith(/Unsupported log type unsupported_type/));
+
+          case 2:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('isAppInstalled', function () {
+    it('should return true if app is installed', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'isAppInstalled').withArgs('pkg').returns(true);
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.isAppInstalled('pkg'));
+
+          case 3:
+            context$3$0.sent.should.be['true'];
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('removeApp', function () {
+    it('should remove app', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'uninstallApk').withArgs('pkg').returns(true);
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.removeApp('pkg'));
+
+          case 3:
+            context$3$0.sent.should.be['true'];
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('installApp', function () {
+    it('should install app', function callee$2$0() {
+      var app;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            app = 'app.apk';
+
+            sandbox.stub(driver.helpers, 'configureApp').withArgs(app, '.apk').returns(app);
+            sandbox.stub(_appiumSupport.fs, 'rimraf').returns();
+            sandbox.stub(driver.adb, 'install').returns(true);
+            context$3$0.next = 6;
+            return _regeneratorRuntime.awrap(driver.installApp(app));
+
+          case 6:
+            driver.helpers.configureApp.calledOnce.should.be['true'];
+            _appiumSupport.fs.rimraf.notCalled.should.be['true'];
+            driver.adb.install.calledOnce.should.be['true'];
+
+          case 9:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should throw an error if APK does not exist', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(driver.installApp('non/existent/app.apk').should.be.rejectedWith(/does not exist or is not accessible/));
+
+          case 2:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('background', function () {
+    it('should bring app to background and back', function callee$2$0() {
+      var appPackage, appActivity, params;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            appPackage = 'wpkg';
+            appActivity = 'wacv';
+
+            driver.opts = { appPackage: appPackage, appActivity: appActivity, intentAction: 'act',
+              intentCategory: 'cat', intentFlags: 'flgs',
+              optionalIntentArguments: 'opt' };
+            params = { pkg: appPackage, activity: appActivity, action: 'act', category: 'cat',
+              flags: 'flgs',
+              optionalIntentArguments: 'opt', stopApp: false };
+
+            sandbox.stub(driver.adb, 'goToHome');
+            sandbox.stub(driver.adb, 'getFocusedPackageAndActivity').returns({ appPackage: appPackage, appActivity: appActivity });
+            sandbox.stub(_bluebird2['default'], 'delay');
+            sandbox.stub(driver.adb, 'startApp');
+            context$3$0.next = 10;
+            return _regeneratorRuntime.awrap(driver.background(10));
+
+          case 10:
+            driver.adb.getFocusedPackageAndActivity.calledOnce.should.be['true'];
+            driver.adb.goToHome.calledOnce.should.be['true'];
+            _bluebird2['default'].delay.calledWithExactly(10000).should.be['true'];
+            driver.adb.startApp.calledWithExactly(params).should.be['true'];
+
+          case 14:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should bring app to background and back if started after session init', function callee$2$0() {
+      var appPackage, appActivity, params;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            appPackage = 'newpkg';
+            appActivity = 'newacv';
+
+            driver.opts = { appPackage: 'pkg', appActivity: 'acv', intentAction: 'act',
+              intentCategory: 'cat', intentFlags: 'flgs',
+              optionalIntentArguments: 'opt' };
+            params = { pkg: appPackage, activity: appActivity, action: 'act', category: 'cat',
+              flags: 'flgs', waitPkg: 'wpkg', waitActivity: 'wacv',
+              optionalIntentArguments: 'opt', stopApp: false };
+
+            driver.opts.startActivityArgs = _defineProperty({}, appPackage + '/' + appActivity, params);
+            sandbox.stub(driver.adb, 'goToHome');
+            sandbox.stub(driver.adb, 'getFocusedPackageAndActivity').returns({ appPackage: appPackage, appActivity: appActivity });
+            sandbox.stub(_bluebird2['default'], 'delay');
+            sandbox.stub(driver.adb, 'startApp');
+            context$3$0.next = 11;
+            return _regeneratorRuntime.awrap(driver.background(10));
+
+          case 11:
+            driver.adb.getFocusedPackageAndActivity.calledOnce.should.be['true'];
+            driver.adb.goToHome.calledOnce.should.be['true'];
+            _bluebird2['default'].delay.calledWithExactly(10000).should.be['true'];
+            driver.adb.startApp.calledWithExactly(params).should.be['true'];
+
+          case 15:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should not bring app back if seconds are negative', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver.adb, 'goToHome');
+            sandbox.stub(driver.adb, 'startApp');
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.background(-1));
+
+          case 4:
+            driver.adb.goToHome.calledOnce.should.be['true'];
+            driver.adb.startApp.notCalled.should.be['true'];
+
+          case 6:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getStrings', (0, _appiumTestSupport.withMocks)({ helpers: _libAndroidHelpers2['default'] }, function (mocks) {
+    it('should return app strings', function callee$2$0() {
+      var strings;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.bootstrap.sendAction = function () {
+              return '';
+            };
+            mocks.helpers.expects("pushStrings").returns({ test: 'en_value' });
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.getStrings('en'));
+
+          case 4:
+            strings = context$3$0.sent;
+
+            strings.test.should.equal('en_value');
+            mocks.helpers.verify();
+
+          case 7:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return cached app strings for the specified language', function callee$2$0() {
+      var strings;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.getDeviceLanguage = function () {
+              return 'en';
+            };
+            driver.apkStrings.en = { test: 'en_value' };
+            driver.apkStrings.fr = { test: 'fr_value' };
+            context$3$0.next = 5;
+            return _regeneratorRuntime.awrap(driver.getStrings('fr'));
+
+          case 5:
+            strings = context$3$0.sent;
+
+            strings.test.should.equal('fr_value');
+
+          case 7:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return cached app strings for the device language', function callee$2$0() {
+      var strings;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.getDeviceLanguage = function () {
+              return 'en';
+            };
+            driver.apkStrings.en = { test: 'en_value' };
+            driver.apkStrings.fr = { test: 'fr_value' };
+            context$3$0.next = 5;
+            return _regeneratorRuntime.awrap(driver.getStrings());
+
+          case 5:
+            strings = context$3$0.sent;
+
+            strings.test.should.equal('en_value');
+
+          case 7:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  }));
+  describe('launchApp', function () {
+    it('should init and start app', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            sandbox.stub(driver, 'initAUT');
+            sandbox.stub(driver, 'startAUT');
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.launchApp());
+
+          case 4:
+            driver.initAUT.calledOnce.should.be['true'];
+            driver.startAUT.calledOnce.should.be['true'];
+
+          case 6:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('startActivity', function () {
+    var params = undefined;
+    beforeEach(function () {
+      params = { pkg: 'pkg', activity: 'act', waitPkg: 'wpkg', waitActivity: 'wact',
+        action: 'act', category: 'cat', flags: 'flgs', optionalIntentArguments: 'opt' };
+      sandbox.stub(driver.adb, 'startApp');
+    });
+    it('should start activity', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            params.optionalIntentArguments = 'opt';
+            params.stopApp = false;
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.startActivity('pkg', 'act', 'wpkg', 'wact', 'act', 'cat', 'flgs', 'opt', true));
+
+          case 4:
+            driver.adb.startApp.calledWithExactly(params).should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should use dontStopAppOnReset from opts if it is not passed as param', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.opts.dontStopAppOnReset = true;
+            params.stopApp = false;
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.startActivity('pkg', 'act', 'wpkg', 'wact', 'act', 'cat', 'flgs', 'opt'));
+
+          case 4:
+            driver.adb.startApp.calledWithExactly(params).should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should use appPackage and appActivity if appWaitPackage and appWaitActivity are undefined', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            params.waitPkg = 'pkg';
+            params.waitActivity = 'act';
+            params.stopApp = true;
+            context$3$0.next = 5;
+            return _regeneratorRuntime.awrap(driver.startActivity('pkg', 'act', null, null, 'act', 'cat', 'flgs', 'opt', false));
+
+          case 5:
+            driver.adb.startApp.calledWithExactly(params).should.be['true'];
+
+          case 6:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('reset', function () {
+    it('should reset app via reinstall if fullReset is true', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.opts.fullReset = true;
+            driver.opts.appPackage = 'pkg';
+            sandbox.stub(driver, 'startAUT').returns('aut');
+            sandbox.stub(_libAndroidHelpers2['default'], 'resetApp').returns(undefined);
+            context$3$0.next = 6;
+            return _regeneratorRuntime.awrap(driver.reset().should.eventually.be.equal('aut'));
+
+          case 6:
+            _libAndroidHelpers2['default'].resetApp.calledWith(driver.adb).should.be['true'];
+            driver.startAUT.calledOnce.should.be['true'];
+
+          case 8:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should do fast reset if fullReset is false', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.opts.fullReset = false;
+            driver.opts.appPackage = 'pkg';
+            sandbox.stub(_libAndroidHelpers2['default'], 'resetApp').returns(undefined);
+            sandbox.stub(driver, 'startAUT').returns('aut');
+            context$3$0.next = 6;
+            return _regeneratorRuntime.awrap(driver.reset().should.eventually.be.equal('aut'));
+
+          case 6:
+            _libAndroidHelpers2['default'].resetApp.calledWith(driver.adb).should.be['true'];
+            driver.startAUT.calledOnce.should.be['true'];
+            expect(driver.curContext).to.eql('NATIVE_APP');
+
+          case 9:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('startAUT', function () {
+    it('should start AUT', function callee$2$0() {
+      var params;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.opts = { appPackage: 'pkg', appActivity: 'act', intentAction: 'actn',
+              intentCategory: 'cat', intentFlags: 'flgs', appWaitPackage: 'wpkg',
+              appWaitActivity: 'wact', appWaitDuration: 'wdur',
+              optionalIntentArguments: 'opt' };
+            params = { pkg: 'pkg', activity: 'act', action: 'actn', category: 'cat',
+              flags: 'flgs', waitPkg: 'wpkg', waitActivity: 'wact',
+              waitDuration: 'wdur', optionalIntentArguments: 'opt', stopApp: false };
+
+            driver.opts.dontStopAppOnReset = true;
+            params.stopApp = false;
+            sandbox.stub(driver.adb, 'startApp');
+            context$3$0.next = 7;
+            return _regeneratorRuntime.awrap(driver.startAUT());
+
+          case 7:
+            driver.adb.startApp.calledWithExactly(params).should.be['true'];
+
+          case 8:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('setUrl', function () {
+    it('should set url', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.opts = { appPackage: 'pkg' };
+            sandbox.stub(driver.adb, 'startUri');
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.setUrl('url'));
+
+          case 4:
+            driver.adb.startUri.calledWithExactly('url', 'pkg').should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('closeApp', function () {
+    it('should close app', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.opts = { appPackage: 'pkg' };
+            sandbox.stub(driver.adb, 'forceStop');
+            context$3$0.next = 4;
+            return _regeneratorRuntime.awrap(driver.closeApp());
+
+          case 4:
+            driver.adb.forceStop.calledWithExactly('pkg').should.be['true'];
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getDisplayDensity', function () {
+    it('should return the display density of a device', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.shell = function () {
+              return '123';
+            };
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getDisplayDensity());
+
+          case 3:
+            context$3$0.sent.should.equal(123);
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return the display density of an emulator', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.shell = function (cmd) {
+              var joinedCmd = cmd.join(' ');
+              if (joinedCmd.indexOf('ro.sf') !== -1) {
+                // device property look up
+                return '';
+              } else if (joinedCmd.indexOf('qemu.sf') !== -1) {
+                // emulator property look up
+                return '456';
+              }
+              return '';
+            };
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getDisplayDensity());
+
+          case 3:
+            context$3$0.sent.should.equal(456);
+
+          case 4:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should throw an error if the display density property can\'t be found', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.shell = function () {
+              return '';
+            };
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getDisplayDensity().should.be.rejectedWith(/Failed to get display density property/));
+
+          case 3:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should throw and error if the display density is not a number', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver.adb.shell = function () {
+              return 'abc';
+            };
+            context$3$0.next = 3;
+            return _regeneratorRuntime.awrap(driver.getDisplayDensity().should.be.rejectedWith(/Failed to get display density property/));
+
+          case 3:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('parseSurfaceLine', function () {
+    it('should return visible true if the surface is visible', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            (0, _libCommandsGeneral.parseSurfaceLine)('shown=true rect=1 1 1 1').should.be.eql({
+              visible: true,
+              x: 1,
+              y: 1,
+              width: 1,
+              height: 1
+            });
+
+          case 1:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return visible false if the surface is not visible', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            (0, _libCommandsGeneral.parseSurfaceLine)('shown=false rect=1 1 1 1').should.be.eql({
+              visible: false,
+              x: 1,
+              y: 1,
+              width: 1,
+              height: 1
+            });
+
+          case 1:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return the parsed surface bounds', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            (0, _libCommandsGeneral.parseSurfaceLine)('shown=true rect=(1.0,2.0) 3.0 x 4.0').should.be.eql({
+              visible: true,
+              x: 1,
+              y: 2,
+              width: 3,
+              height: 4
+            });
+
+          case 1:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+
+  // these are used for both parseWindows and getSystemBars tests
+  var validWindowOutput = ['  Window #1 Derp', '    stuff', '      Surface: derp shown=false lalalala rect=(9.0,8.0) 7.0 x 6.0', '    more stuff', '  Window #2 StatusBar', '    blah blah blah', '      Surface: blah blah shown=true blah blah rect=(1.0,2.0) 3.0 x 4.0', '    blah blah blah', '  Window #3 NavigationBar', '    womp womp', '      Surface: blah blah shown=false womp womp rect=(5.0,6.0) 50.0 x 60.0', '    qwerty asd zxc'].join('\n');
+  var validSystemBars = {
+    statusBar: { visible: true, x: 1, y: 2, width: 3, height: 4 },
+    navigationBar: { visible: false, x: 5, y: 6, width: 50, height: 60 }
+  };
+
+  describe('parseWindows', function () {
+    it('should throw an error if the status bar info wasn\'t found', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            expect(function () {
+              (0, _libCommandsGeneral.parseWindows)('');
+            }).to['throw'](Error, /Failed to parse status bar information./);
+
+          case 1:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should throw an error if the navigation bar info wasn\'t found', function callee$2$0() {
+      var windowOutput;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            windowOutput = ['  Window #1 StatusBar', '    blah blah blah', '      Surface: blah blah shown=true blah blah rect=(1.0,2.0) 3.0 x 4.0', '    blah blah blah'].join('\n');
+
+            expect(function () {
+              (0, _libCommandsGeneral.parseWindows)(windowOutput);
+            }).to['throw'](Error, /Failed to parse navigation bar information./);
+
+          case 2:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return status and navigation bar info when both are given', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            (0, _libCommandsGeneral.parseWindows)(validWindowOutput).should.be.eql(validSystemBars);
+
+          case 1:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+  describe('getSystemBars', function () {
+    it('should throw an error if there\'s no window manager output', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver = new _2['default']();
+            driver.adb = {};
+            driver.adb.shell = function () {
+              return '';
+            };
+            context$3$0.next = 5;
+            return _regeneratorRuntime.awrap(driver.getSystemBars().should.be.rejectedWith(/Did not get window manager output./));
+
+          case 5:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should return the parsed system bar info', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            driver = new _2['default']();
+            driver.adb = {};
+            driver.adb.shell = function () {
+              return validWindowOutput;
+            };
+            context$3$0.next = 5;
+            return _regeneratorRuntime.awrap(driver.getSystemBars());
+
+          case 5:
+            context$3$0.t0 = validSystemBars;
+            context$3$0.sent.should.be.eql(context$3$0.t0);
+
+          case 7:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+});
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInRlc3QvdW5pdC9jb21tYW5kcy9nZW5lcmFsLXNwZWNzLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7O29CQUFpQixNQUFNOzs7OzhCQUNJLGtCQUFrQjs7OztxQkFDM0IsT0FBTzs7OztnQkFDQyxVQUFVOzs7O2tDQUNXLCtCQUErQjs7aUNBQzFELDhCQUE4Qjs7OztpQ0FDeEIscUJBQXFCOzs2QkFDNUIsZ0JBQWdCOztzQ0FDYiwwQkFBMEI7Ozs7d0JBQ2xDLFVBQVU7Ozs7eUJBQ1IsWUFBWTs7OztBQUU1QixrQkFBSyxNQUFNLEVBQUUsQ0FBQztBQUNkLGtCQUFLLEdBQUcsNkJBQWdCLENBQUM7O0FBRXpCLElBQUksTUFBTSxZQUFBLENBQUM7QUFDWCxJQUFJLE9BQU8sR0FBRyxtQkFBTSxPQUFPLENBQUMsTUFBTSxFQUFFLENBQUM7QUFDckMsSUFBSSxNQUFNLEdBQUcsa0JBQUssTUFBTSxDQUFDOztBQUV6QixRQUFRLENBQUMsU0FBUyxFQUFFLFlBQVk7QUFDOUIsWUFBVSxDQUFDLFlBQVk7QUFDckIsVUFBTSxHQUFHLG1CQUFtQixDQUFDO0FBQzdCLFVBQU0sQ0FBQyxTQUFTLEdBQUcseUNBQWUsQ0FBQztBQUNuQyxVQUFNLENBQUMsR0FBRyxHQUFHLDRCQUFTLENBQUM7QUFDdkIsVUFBTSxDQUFDLElBQUksR0FBRyxFQUFFLENBQUM7QUFDakIsVUFBTSxDQUFDLElBQUksR0FBRyxFQUFFLENBQUM7R0FDbEIsQ0FBQyxDQUFDO0FBQ0gsV0FBUyxDQUFDLFlBQVk7QUFDcEIsV0FBTyxDQUFDLE9BQU8sRUFBRSxDQUFDO0dBQ25CLENBQUMsQ0FBQztBQUNILFVBQVEsQ0FBQyxNQUFNLEVBQUUsWUFBWTtBQUMzQixNQUFFLENBQUMsZ0RBQWdELEVBQUU7Ozs7QUFDbkQsbUJBQU8sQ0FBQyxJQUFJLENBQUMsTUFBTSxDQUFDLFNBQVMsRUFBRSxZQUFZLENBQUMsQ0FBQztBQUM3QyxrQkFBTSxDQUFDLElBQUksQ0FBQyxlQUFlLEdBQUcs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TSxDQUFDLEdBQUcsQ0FBQyxLQUFLLEdBQUcsWUFBTTtBQUFFLHFCQUFPLGlCQUFpQixDQUFDO2FBQUUsQ0FBQzs7NkNBQ2hELE1BQU0sQ0FBQyxhQUFhLEVBQUU7Ozs2QkFBZ0IsZUFBZTs2QkFBN0IsTUFBTSxDQUFDLEVBQUUsQ0FBQyxHQUFHOzs7Ozs7O0tBQzdDLENBQUMsQ0FBQztHQUNKLENBQUMsQ0FBQztDQUNKLENBQUMsQ0FBQyIsImZpbGUiOiJ0ZXN0L3VuaXQvY29tbWFuZHMvZ2VuZXJhbC1zcGVjcy5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBjaGFpIGZyb20gJ2NoYWknO1xuaW1wb3J0IGNoYWlBc1Byb21pc2VkIGZyb20gJ2NoYWktYXMtcHJvbWlzZWQnO1xuaW1wb3J0IHNpbm9uIGZyb20gJ3Npbm9uJztcbmltcG9ydCBBbmRyb2lkRHJpdmVyIGZyb20gJy4uLy4uLy4uJztcbmltcG9ydCB7IHBhcnNlU3VyZmFjZUxpbmUsIHBhcnNlV2luZG93cyB9IGZyb20gJy4uLy4uLy4uL2xpYi9jb21tYW5kcy9nZW5lcmFsJztcbmltcG9ydCBoZWxwZXJzIGZyb20gJy4uLy4uLy4uL2xpYi9hbmRyb2lkLWhlbHBlcnMnO1xuaW1wb3J0IHsgd2l0aE1vY2tzIH0gZnJvbSAnYXBwaXVtLXRlc3Qtc3VwcG9ydCc7XG5pbXBvcnQgeyBmcyB9IGZyb20gJ2FwcGl1bS1zdXBwb3J0JztcbmltcG9ydCBCb290c3RyYXAgZnJvbSAnYXBwaXVtLWFuZHJvaWQtYm9vdHN0cmFwJztcbmltcG9ydCBCIGZyb20gJ2JsdWViaXJkJztcbmltcG9ydCBBREIgZnJvbSAnYXBwaXVtLWFkYic7XG5cbmNoYWkuc2hvdWxkKCk7XG5jaGFpLnVzZShjaGFpQXNQcm9taXNlZCk7XG5cbmxldCBkcml2ZXI7XG5sZXQgc2FuZGJveCA9IHNpbm9uLnNhbmRib3guY3JlYXRlKCk7XG5sZXQgZXhwZWN0ID0gY2hhaS5leHBlY3Q7XG5cbmRlc2NyaWJlKCdHZW5lcmFsJywgZnVuY3Rpb24gKCkge1xuICBiZWZvcmVFYWNoKGZ1bmN0aW9uICgpIHtcbiAgICBkcml2ZXIgPSBuZXcgQW5kcm9pZERyaXZlcigpO1xuICAgIGRyaXZlci5ib290c3RyYXAgPSBuZXcgQm9vdHN0cmFwKCk7XG4gICAgZHJpdmVyLmFkYiA9IG5ldyBBREIoKTtcbiAgICBkcml2ZXIuY2FwcyA9IHt9O1xuICAgIGRyaXZlci5vcHRzID0ge307XG4gIH0pO1xuICBhZnRlckVhY2goZnVuY3Rpb24gKCkge1xuICAgIHNhbmRib3gucmVzdG9yZSgpO1xuICB9KTtcbiAgZGVzY3JpYmUoJ2tleXMnLCBmdW5jdGlvbiAoKSB7XG4gICAgaXQoJ3Nob3VsZCBzZW5kIGtleXMgdmlhIHNldFRleHQgYm9vdHN0cmFwIGNvbW1hbmQnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmJvb3RzdHJhcCwgJ3NlbmRBY3Rpb24nKTtcbiAgICAgIGRyaXZlci5vcHRzLnVuaWNvZGVLZXlib2FyZCA9IHRydWU7XG4gICAgICBhd2FpdCBkcml2ZXIua2V5cygna2V5cycpO1xuICAgICAgZHJpdmVyLmJvb3RzdHJhcC5zZW5kQWN0aW9uXG4gICAgICAgIC5jYWxsZWRXaXRoRXhhY3RseSgnc2V0VGV4dCcsXG4gICAgICAgICAge3RleHQ6ICdrZXlzJywgcmVwbGFjZTogZmFsc2UsIHVuaWNvZGVLZXlib2FyZDogdHJ1ZX0pXG4gICAgICAgIC5zaG91bGQuYmUudHJ1ZTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIGpvaW4ga2V5cyBpZiBrZXlzIGlzIGFycmF5JywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5ib290c3RyYXAsICdzZW5kQWN0aW9uJyk7XG4gICAgICBkcml2ZXIub3B0cy51bmljb2RlS2V5Ym9hcmQgPSBmYWxzZTtcbiAgICAgIGF3YWl0IGRyaXZlci5rZXlzKFsnaycsICdlJywgJ3knLCAncyddKTtcbiAgICAgIGRyaXZlci5ib290c3RyYXAuc2VuZEFjdGlvblxuICAgICAgICAuY2FsbGVkV2l0aEV4YWN0bHkoJ3NldFRleHQnLCB7dGV4dDogJ2tleXMnLCByZXBsYWNlOiBmYWxzZX0pXG4gICAgICAgIC5zaG91bGQuYmUudHJ1ZTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdnZXREZXZpY2VUaW1lJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgcmV0dXJuIGRldmljZSB0aW1lJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5hZGIsICdzaGVsbCcpO1xuICAgICAgZHJpdmVyLmFkYi5zaGVsbC5yZXR1cm5zKCcgMTE6MTIgJyk7XG4gICAgICBhd2FpdCBkcml2ZXIuZ2V0RGV2aWNlVGltZSgpLnNob3VsZC5iZWNvbWUoJzExOjEyJyk7XG4gICAgICBkcml2ZXIuYWRiLnNoZWxsLmNhbGxlZFdpdGhFeGFjdGx5KFsnZGF0ZSddKS5zaG91bGQuYmUudHJ1ZTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHRob3J3cyBlcnJvciBpZiBzaGVsbCBjb21tYW5kIGZhaWxlZCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAnc2hlbGwnKS50aHJvd3MoKTtcbiAgICAgIGF3YWl0IGRyaXZlci5nZXREZXZpY2VUaW1lKCkuc2hvdWxkLmJlLnJlamVjdGVkV2l0aCgnQ291bGQgbm90IGNhcHR1cmUnKTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdnZXRQYWdlU291cmNlJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgcmV0dXJuIHBhZ2Ugc291cmNlJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5ib290c3RyYXAsICdzZW5kQWN0aW9uJykud2l0aEFyZ3MoJ3NvdXJjZScpLnJldHVybnMoJ3NvdXJjZXMnKTtcbiAgICAgIChhd2FpdCBkcml2ZXIuZ2V0UGFnZVNvdXJjZSgpKS5zaG91bGQuYmUuZXF1YWwoJ3NvdXJjZXMnKTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdiYWNrJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgcHJlc3MgYmFjaycsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYm9vdHN0cmFwLCAnc2VuZEFjdGlvbicpO1xuICAgICAgYXdhaXQgZHJpdmVyLmJhY2soKTtcbiAgICAgIGRyaXZlci5ib290c3RyYXAuc2VuZEFjdGlvbi5jYWxsZWRXaXRoRXhhY3RseSgncHJlc3NCYWNrJykuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gIH0pO1xuICBkZXNjcmliZSgnaXNLZXlib2FyZFNob3duJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgcmV0dXJuIHRydWUgaWYgdGhlIGtleWJvYXJkIGlzIHNob3duJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgZHJpdmVyLmFkYi5pc1NvZnRLZXlib2FyZFByZXNlbnQgPSAoKSA9PiB7IHJldHVybiB7aXNLZXlib2FyZFNob3duOiB0cnVlLCBjYW5DbG9zZUtleWJvYXJkOiB0cnVlfTsgfTtcbiAgICAgIChhd2FpdCBkcml2ZXIuaXNLZXlib2FyZFNob3duKCkpLnNob3VsZC5lcXVhbCh0cnVlKTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHJldHVybiBmYWxzZSBpZiB0aGUga2V5Ym9hcmQgaXMgbm90IHNob3duJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgZHJpdmVyLmFkYi5pc1NvZnRLZXlib2FyZFByZXNlbnQgPSAoKSA9PiB7IHJldHVybiB7aXNLZXlib2FyZFNob3duOiBmYWxzZSwgY2FuQ2xvc2VLZXlib2FyZDogdHJ1ZX07IH07XG4gICAgICAoYXdhaXQgZHJpdmVyLmlzS2V5Ym9hcmRTaG93bigpKS5zaG91bGQuZXF1YWwoZmFsc2UpO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ2hpZGVLZXlib2FyZCcsIGZ1bmN0aW9uICgpIHtcbiAgICBpdCgnc2hvdWxkIGhpZGUga2V5Ym9hcmQgdmlhIGJhY2sgY29tbWFuZCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIsICdiYWNrJyk7XG4gICAgICBkcml2ZXIuYWRiLmlzU29mdEtleWJvYXJkUHJlc2VudCA9ICgpID0+IHsgcmV0dXJuIHtpc0tleWJvYXJkU2hvd246IHRydWUsIGNhbkNsb3NlS2V5Ym9hcmQ6IHRydWV9OyB9O1xuICAgICAgYXdhaXQgZHJpdmVyLmhpZGVLZXlib2FyZCgpO1xuICAgICAgZHJpdmVyLmJhY2suY2FsbGVkT25jZS5zaG91bGQuYmUudHJ1ZTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIG5vdCBjYWxsIGJhY2sgY29tbWFuZCBpZiBjYW5cXCd0IGNsb3NlIGtleWJvYXJkJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlciwgJ2JhY2snKTtcbiAgICAgIGRyaXZlci5hZGIuaXNTb2Z0S2V5Ym9hcmRQcmVzZW50ID0gKCkgPT4geyByZXR1cm4ge2lzS2V5Ym9hcmRTaG93bjogdHJ1ZSwgY2FuQ2xvc2VLZXlib2FyZDogZmFsc2V9OyB9O1xuICAgICAgYXdhaXQgZHJpdmVyLmhpZGVLZXlib2FyZCgpO1xuICAgICAgZHJpdmVyLmJhY2subm90Q2FsbGVkLnNob3VsZC5iZS50cnVlO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgdGhyb3cgYW4gZXJyb3IgaWYgbm8ga2V5Ym9hcmQgaXMgcHJlc2VudCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGRyaXZlci5hZGIuaXNTb2Z0S2V5Ym9hcmRQcmVzZW50ID0gKCkgPT4geyByZXR1cm4gZmFsc2U7IH07XG4gICAgICBhd2FpdCBkcml2ZXIuaGlkZUtleWJvYXJkKCkuc2hvdWxkLmJlLnJlamVjdGVkV2l0aCgvbm90IHByZXNlbnQvKTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdvcGVuU2V0dGluZ3NBY3Rpdml0eScsIGZ1bmN0aW9uICgpIHtcbiAgICBpdCgnc2hvdWxkIG9wZW4gc2V0dGluZ3MgYWN0aXZpdHknLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ2dldEZvY3VzZWRQYWNrYWdlQW5kQWN0aXZpdHknKVxuICAgICAgICAucmV0dXJucyh7YXBwUGFja2FnZTogJ3BrZycsIGFwcEFjdGl2aXR5OiAnYWN0J30pO1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5hZGIsICdzaGVsbCcpO1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5hZGIsICd3YWl0Rm9yTm90QWN0aXZpdHknKTtcbiAgICAgIGF3YWl0IGRyaXZlci5vcGVuU2V0dGluZ3NBY3Rpdml0eSgnc2V0MScpO1xuICAgICAgZHJpdmVyLmFkYi5zaGVsbC5jYWxsZWRXaXRoRXhhY3RseShbJ2FtJywgJ3N0YXJ0JywgJy1hJywgJ2FuZHJvaWQuc2V0dGluZ3Muc2V0MSddKVxuICAgICAgICAuc2hvdWxkLmJlLnRydWU7XG4gICAgICBkcml2ZXIuYWRiLndhaXRGb3JOb3RBY3Rpdml0eS5jYWxsZWRXaXRoRXhhY3RseSgncGtnJywgJ2FjdCcsIDUwMDApXG4gICAgICAgIC5zaG91bGQuYmUudHJ1ZTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdnZXRXaW5kb3dTaXplJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgZ2V0IHdpbmRvdyBzaXplJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5ib290c3RyYXAsICdzZW5kQWN0aW9uJylcbiAgICAgICAgLndpdGhBcmdzKCdnZXREZXZpY2VTaXplJykucmV0dXJucygnc2l6ZScpO1xuICAgICAgKGF3YWl0IGRyaXZlci5nZXRXaW5kb3dTaXplKCkpLnNob3VsZC5iZS5lcXVhbCgnc2l6ZScpO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ2dldFdpbmRvd1JlY3QnLCBmdW5jdGlvbiAoKSB7XG4gICAgaXQoJ3Nob3VsZCBnZXQgd2luZG93IHNpemUnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmJvb3RzdHJhcCwgJ3NlbmRBY3Rpb24nKVxuICAgICAgICAud2l0aEFyZ3MoJ2dldERldmljZVNpemUnKS5yZXR1cm5zKHt3aWR0aDogMzAwLCBoZWlnaHQ6IDQwMH0pO1xuICAgICAgY29uc3QgcmVjdCA9IGF3YWl0IGRyaXZlci5nZXRXaW5kb3dSZWN0KCk7XG4gICAgICByZWN0LndpZHRoLnNob3VsZC5iZS5lcXVhbCgzMDApO1xuICAgICAgcmVjdC5oZWlnaHQuc2hvdWxkLmJlLmVxdWFsKDQwMCk7XG4gICAgICByZWN0Lnguc2hvdWxkLmJlLmVxdWFsKDApO1xuICAgICAgcmVjdC55LnNob3VsZC5iZS5lcXVhbCgwKTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdnZXRDdXJyZW50QWN0aXZpdHknLCBmdW5jdGlvbiAoKSB7XG4gICAgaXQoJ3Nob3VsZCBnZXQgY3VycmVudCBhY3Rpdml0eScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAnZ2V0Rm9jdXNlZFBhY2thZ2VBbmRBY3Rpdml0eScpXG4gICAgICAgIC5yZXR1cm5zKHthcHBBY3Rpdml0eTogJ2FjdCd9KTtcbiAgICAgIGF3YWl0IGRyaXZlci5nZXRDdXJyZW50QWN0aXZpdHkoKS5zaG91bGQuZXZlbnR1YWxseS5iZS5lcXVhbCgnYWN0Jyk7XG4gICAgfSk7XG4gIH0pO1xuICBkZXNjcmliZSgnZ2V0Q3VycmVudFBhY2thZ2UnLCBmdW5jdGlvbiAoKSB7XG4gICAgaXQoJ3Nob3VsZCBnZXQgY3VycmVudCBhY3Rpdml0eScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAnZ2V0Rm9jdXNlZFBhY2thZ2VBbmRBY3Rpdml0eScpXG4gICAgICAgIC5yZXR1cm5zKHthcHBQYWNrYWdlOiAncGtnJ30pO1xuICAgICAgYXdhaXQgZHJpdmVyLmdldEN1cnJlbnRQYWNrYWdlKCkuc2hvdWxkLmV2ZW50dWFsbHkuZXF1YWwoJ3BrZycpO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ2dldExvZ1R5cGVzJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgZ2V0IGxvZyB0eXBlcycsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIChhd2FpdCBkcml2ZXIuZ2V0TG9nVHlwZXMoKSkuc2hvdWxkLmJlLmRlZXAuZXF1YWwoWydsb2djYXQnXSk7XG4gICAgfSk7XG4gIH0pO1xuICBkZXNjcmliZSgnZ2V0TG9nJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgZ2V0IGxvZyB0eXBlcycsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAnZ2V0TG9nY2F0TG9ncycpLnJldHVybnMoJ2xvZ3MnKTtcbiAgICAgIChhd2FpdCBkcml2ZXIuZ2V0TG9nKCdsb2djYXQnKSkuc2hvdWxkLmJlLmVxdWFsKCdsb2dzJyk7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCB0aHJvd3MgZXhjZXB0aW9uIGlmIGxvZyB0eXBlIGlzIHVuc3VwcG9ydGVkJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgYXdhaXQgZHJpdmVyLmdldExvZygndW5zdXBwb3J0ZWRfdHlwZScpLnNob3VsZC5ldmVudHVhbGx5XG4gICAgICAgIC5iZS5yZWplY3RlZFdpdGgoL1Vuc3VwcG9ydGVkIGxvZyB0eXBlIHVuc3VwcG9ydGVkX3R5cGUvKTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdpc0FwcEluc3RhbGxlZCcsIGZ1bmN0aW9uICgpIHtcbiAgICBpdCgnc2hvdWxkIHJldHVybiB0cnVlIGlmIGFwcCBpcyBpbnN0YWxsZWQnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ2lzQXBwSW5zdGFsbGVkJykud2l0aEFyZ3MoJ3BrZycpLnJldHVybnModHJ1ZSk7XG4gICAgICAoYXdhaXQgZHJpdmVyLmlzQXBwSW5zdGFsbGVkKCdwa2cnKSkuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gIH0pO1xuICBkZXNjcmliZSgncmVtb3ZlQXBwJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgcmVtb3ZlIGFwcCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAndW5pbnN0YWxsQXBrJykud2l0aEFyZ3MoJ3BrZycpLnJldHVybnModHJ1ZSk7XG4gICAgICAoYXdhaXQgZHJpdmVyLnJlbW92ZUFwcCgncGtnJykpLnNob3VsZC5iZS50cnVlO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ2luc3RhbGxBcHAnLCBmdW5jdGlvbiAoKSB7XG4gICAgaXQoJ3Nob3VsZCBpbnN0YWxsIGFwcCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGxldCBhcHAgPSAnYXBwLmFwayc7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmhlbHBlcnMsICdjb25maWd1cmVBcHAnKS53aXRoQXJncyhhcHAsICcuYXBrJylcbiAgICAgICAgLnJldHVybnMoYXBwKTtcbiAgICAgIHNhbmRib3guc3R1YihmcywgJ3JpbXJhZicpLnJldHVybnMoKTtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAnaW5zdGFsbCcpLnJldHVybnModHJ1ZSk7XG4gICAgICBhd2FpdCBkcml2ZXIuaW5zdGFsbEFwcChhcHApO1xuICAgICAgZHJpdmVyLmhlbHBlcnMuY29uZmlndXJlQXBwLmNhbGxlZE9uY2Uuc2hvdWxkLmJlLnRydWU7XG4gICAgICBmcy5yaW1yYWYubm90Q2FsbGVkLnNob3VsZC5iZS50cnVlO1xuICAgICAgZHJpdmVyLmFkYi5pbnN0YWxsLmNhbGxlZE9uY2Uuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCB0aHJvdyBhbiBlcnJvciBpZiBBUEsgZG9lcyBub3QgZXhpc3QnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBhd2FpdCBkcml2ZXIuaW5zdGFsbEFwcCgnbm9uL2V4aXN0ZW50L2FwcC5hcGsnKS5zaG91bGQuYmVcbiAgICAgICAgLnJlamVjdGVkV2l0aCgvZG9lcyBub3QgZXhpc3Qgb3IgaXMgbm90IGFjY2Vzc2libGUvKTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdiYWNrZ3JvdW5kJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgYnJpbmcgYXBwIHRvIGJhY2tncm91bmQgYW5kIGJhY2snLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBjb25zdCBhcHBQYWNrYWdlID0gJ3dwa2cnO1xuICAgICAgY29uc3QgYXBwQWN0aXZpdHkgPSAnd2Fjdic7XG4gICAgICBkcml2ZXIub3B0cyA9IHthcHBQYWNrYWdlLCBhcHBBY3Rpdml0eSwgaW50ZW50QWN0aW9uOiAnYWN0JyxcbiAgICAgICAgICAgICAgICAgICAgIGludGVudENhdGVnb3J5OiAnY2F0JywgaW50ZW50RmxhZ3M6ICdmbGdzJyxcbiAgICAgICAgICAgICAgICAgICAgIG9wdGlvbmFsSW50ZW50QXJndW1lbnRzOiAnb3B0J307XG4gICAgICBsZXQgcGFyYW1zID0ge3BrZzogYXBwUGFja2FnZSwgYWN0aXZpdHk6IGFwcEFjdGl2aXR5LCBhY3Rpb246ICdhY3QnLCBjYXRlZ29yeTogJ2NhdCcsXG4gICAgICAgICAgICAgICAgICAgIGZsYWdzOiAnZmxncycsXG4gICAgICAgICAgICAgICAgICAgIG9wdGlvbmFsSW50ZW50QXJndW1lbnRzOiAnb3B0Jywgc3RvcEFwcDogZmFsc2V9O1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5hZGIsICdnb1RvSG9tZScpO1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5hZGIsICdnZXRGb2N1c2VkUGFja2FnZUFuZEFjdGl2aXR5JylcbiAgICAgICAgLnJldHVybnMoe2FwcFBhY2thZ2UsIGFwcEFjdGl2aXR5fSk7XG4gICAgICBzYW5kYm94LnN0dWIoQiwgJ2RlbGF5Jyk7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ3N0YXJ0QXBwJyk7XG4gICAgICBhd2FpdCBkcml2ZXIuYmFja2dyb3VuZCgxMCk7XG4gICAgICBkcml2ZXIuYWRiLmdldEZvY3VzZWRQYWNrYWdlQW5kQWN0aXZpdHkuY2FsbGVkT25jZS5zaG91bGQuYmUudHJ1ZTtcbiAgICAgIGRyaXZlci5hZGIuZ29Ub0hvbWUuY2FsbGVkT25jZS5zaG91bGQuYmUudHJ1ZTtcbiAgICAgIEIuZGVsYXkuY2FsbGVkV2l0aEV4YWN0bHkoMTAwMDApLnNob3VsZC5iZS50cnVlO1xuICAgICAgZHJpdmVyLmFkYi5zdGFydEFwcC5jYWxsZWRXaXRoRXhhY3RseShwYXJhbXMpLnNob3VsZC5iZS50cnVlO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgYnJpbmcgYXBwIHRvIGJhY2tncm91bmQgYW5kIGJhY2sgaWYgc3RhcnRlZCBhZnRlciBzZXNzaW9uIGluaXQnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBjb25zdCBhcHBQYWNrYWdlID0gJ25ld3BrZyc7XG4gICAgICBjb25zdCBhcHBBY3Rpdml0eSA9ICduZXdhY3YnO1xuICAgICAgZHJpdmVyLm9wdHMgPSB7YXBwUGFja2FnZTogJ3BrZycsIGFwcEFjdGl2aXR5OiAnYWN2JywgaW50ZW50QWN0aW9uOiAnYWN0JyxcbiAgICAgICAgICAgICAgICAgICAgIGludGVudENhdGVnb3J5OiAnY2F0JywgaW50ZW50RmxhZ3M6ICdmbGdzJyxcbiAgICAgICAgICAgICAgICAgICAgIG9wdGlvbmFsSW50ZW50QXJndW1lbnRzOiAnb3B0J307XG4gICAgICBsZXQgcGFyYW1zID0ge3BrZzogYXBwUGFja2FnZSwgYWN0aXZpdHk6IGFwcEFjdGl2aXR5LCBhY3Rpb246ICdhY3QnLCBjYXRlZ29yeTogJ2NhdCcsXG4gICAgICAgICAgICAgICAgICAgIGZsYWdzOiAnZmxncycsIHdhaXRQa2c6ICd3cGtnJywgd2FpdEFjdGl2aXR5OiAnd2FjdicsXG4gICAgICAgICAgICAgICAgICAgIG9wdGlvbmFsSW50ZW50QXJndW1lbnRzOiAnb3B0Jywgc3RvcEFwcDogZmFsc2V9O1xuICAgICAgZHJpdmVyLm9wdHMuc3RhcnRBY3Rpdml0eUFyZ3MgPSB7W2Ake2FwcFBhY2thZ2V9LyR7YXBwQWN0aXZpdHl9YF06IHBhcmFtc307XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ2dvVG9Ib21lJyk7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ2dldEZvY3VzZWRQYWNrYWdlQW5kQWN0aXZpdHknKVxuICAgICAgICAucmV0dXJucyh7YXBwUGFja2FnZSwgYXBwQWN0aXZpdHl9KTtcbiAgICAgIHNhbmRib3guc3R1YihCLCAnZGVsYXknKTtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAnc3RhcnRBcHAnKTtcbiAgICAgIGF3YWl0IGRyaXZlci5iYWNrZ3JvdW5kKDEwKTtcbiAgICAgIGRyaXZlci5hZGIuZ2V0Rm9jdXNlZFBhY2thZ2VBbmRBY3Rpdml0eS5jYWxsZWRPbmNlLnNob3VsZC5iZS50cnVlO1xuICAgICAgZHJpdmVyLmFkYi5nb1RvSG9tZS5jYWxsZWRPbmNlLnNob3VsZC5iZS50cnVlO1xuICAgICAgQi5kZWxheS5jYWxsZWRXaXRoRXhhY3RseSgxMDAwMCkuc2hvdWxkLmJlLnRydWU7XG4gICAgICBkcml2ZXIuYWRiLnN0YXJ0QXBwLmNhbGxlZFdpdGhFeGFjdGx5KHBhcmFtcykuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCBub3QgYnJpbmcgYXBwIGJhY2sgaWYgc2Vjb25kcyBhcmUgbmVnYXRpdmUnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ2dvVG9Ib21lJyk7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ3N0YXJ0QXBwJyk7XG4gICAgICBhd2FpdCBkcml2ZXIuYmFja2dyb3VuZCgtMSk7XG4gICAgICBkcml2ZXIuYWRiLmdvVG9Ib21lLmNhbGxlZE9uY2Uuc2hvdWxkLmJlLnRydWU7XG4gICAgICBkcml2ZXIuYWRiLnN0YXJ0QXBwLm5vdENhbGxlZC5zaG91bGQuYmUudHJ1ZTtcbiAgICB9KTtcbiAgfSk7XG4gIGRlc2NyaWJlKCdnZXRTdHJpbmdzJywgd2l0aE1vY2tzKHtoZWxwZXJzfSwgKG1vY2tzKSA9PiB7XG4gICAgaXQoJ3Nob3VsZCByZXR1cm4gYXBwIHN0cmluZ3MnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIuYm9vdHN0cmFwLnNlbmRBY3Rpb24gPSAoKSA9PiB7IHJldHVybiAnJzsgfTtcbiAgICAgIG1vY2tzLmhlbHBlcnMuZXhwZWN0cyhcInB1c2hTdHJpbmdzXCIpXG4gICAgICAgICAgLnJldHVybnMoe3Rlc3Q6ICdlbl92YWx1ZSd9KTtcbiAgICAgIGxldCBzdHJpbmdzID0gYXdhaXQgZHJpdmVyLmdldFN0cmluZ3MoJ2VuJyk7XG4gICAgICBzdHJpbmdzLnRlc3Quc2hvdWxkLmVxdWFsKCdlbl92YWx1ZScpO1xuICAgICAgbW9ja3MuaGVscGVycy52ZXJpZnkoKTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHJldHVybiBjYWNoZWQgYXBwIHN0cmluZ3MgZm9yIHRoZSBzcGVjaWZpZWQgbGFuZ3VhZ2UnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIuYWRiLmdldERldmljZUxhbmd1YWdlID0gKCkgPT4geyByZXR1cm4gJ2VuJzsgfTtcbiAgICAgIGRyaXZlci5hcGtTdHJpbmdzLmVuID0ge3Rlc3Q6ICdlbl92YWx1ZSd9O1xuICAgICAgZHJpdmVyLmFwa1N0cmluZ3MuZnIgPSB7dGVzdDogJ2ZyX3ZhbHVlJ307XG4gICAgICBsZXQgc3RyaW5ncyA9IGF3YWl0IGRyaXZlci5nZXRTdHJpbmdzKCdmcicpO1xuICAgICAgc3RyaW5ncy50ZXN0LnNob3VsZC5lcXVhbCgnZnJfdmFsdWUnKTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHJldHVybiBjYWNoZWQgYXBwIHN0cmluZ3MgZm9yIHRoZSBkZXZpY2UgbGFuZ3VhZ2UnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIuYWRiLmdldERldmljZUxhbmd1YWdlID0gKCkgPT4geyByZXR1cm4gJ2VuJzsgfTtcbiAgICAgIGRyaXZlci5hcGtTdHJpbmdzLmVuID0ge3Rlc3Q6ICdlbl92YWx1ZSd9O1xuICAgICAgZHJpdmVyLmFwa1N0cmluZ3MuZnIgPSB7dGVzdDogJ2ZyX3ZhbHVlJ307XG4gICAgICBsZXQgc3RyaW5ncyA9IGF3YWl0IGRyaXZlci5nZXRTdHJpbmdzKCk7XG4gICAgICBzdHJpbmdzLnRlc3Quc2hvdWxkLmVxdWFsKCdlbl92YWx1ZScpO1xuICAgIH0pO1xuICB9KSk7XG4gIGRlc2NyaWJlKCdsYXVuY2hBcHAnLCBmdW5jdGlvbiAoKSB7XG4gICAgaXQoJ3Nob3VsZCBpbml0IGFuZCBzdGFydCBhcHAnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLCAnaW5pdEFVVCcpO1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlciwgJ3N0YXJ0QVVUJyk7XG4gICAgICBhd2FpdCBkcml2ZXIubGF1bmNoQXBwKCk7XG4gICAgICBkcml2ZXIuaW5pdEFVVC5jYWxsZWRPbmNlLnNob3VsZC5iZS50cnVlO1xuICAgICAgZHJpdmVyLnN0YXJ0QVVULmNhbGxlZE9uY2Uuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gIH0pO1xuICBkZXNjcmliZSgnc3RhcnRBY3Rpdml0eScsIGZ1bmN0aW9uICgpIHtcbiAgICBsZXQgcGFyYW1zO1xuICAgIGJlZm9yZUVhY2goZnVuY3Rpb24gKCkge1xuICAgICAgcGFyYW1zID0ge3BrZzogJ3BrZycsIGFjdGl2aXR5OiAnYWN0Jywgd2FpdFBrZzogJ3dwa2cnLCB3YWl0QWN0aXZpdHk6ICd3YWN0JyxcbiAgICAgICAgICAgICAgICBhY3Rpb246ICdhY3QnLCBjYXRlZ29yeTogJ2NhdCcsIGZsYWdzOiAnZmxncycsIG9wdGlvbmFsSW50ZW50QXJndW1lbnRzOiAnb3B0J307XG4gICAgICBzYW5kYm94LnN0dWIoZHJpdmVyLmFkYiwgJ3N0YXJ0QXBwJyk7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCBzdGFydCBhY3Rpdml0eScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHBhcmFtcy5vcHRpb25hbEludGVudEFyZ3VtZW50cyA9ICdvcHQnO1xuICAgICAgcGFyYW1zLnN0b3BBcHAgPSBmYWxzZTtcbiAgICAgIGF3YWl0IGRyaXZlci5zdGFydEFjdGl2aXR5KCdwa2cnLCAnYWN0JywgJ3dwa2cnLCAnd2FjdCcsICdhY3QnLFxuICAgICAgICAnY2F0JywgJ2ZsZ3MnLCAnb3B0JywgdHJ1ZSk7XG4gICAgICBkcml2ZXIuYWRiLnN0YXJ0QXBwLmNhbGxlZFdpdGhFeGFjdGx5KHBhcmFtcykuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCB1c2UgZG9udFN0b3BBcHBPblJlc2V0IGZyb20gb3B0cyBpZiBpdCBpcyBub3QgcGFzc2VkIGFzIHBhcmFtJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgZHJpdmVyLm9wdHMuZG9udFN0b3BBcHBPblJlc2V0ID0gdHJ1ZTtcbiAgICAgIHBhcmFtcy5zdG9wQXBwID0gZmFsc2U7XG4gICAgICBhd2FpdCBkcml2ZXIuc3RhcnRBY3Rpdml0eSgncGtnJywgJ2FjdCcsICd3cGtnJywgJ3dhY3QnLCAnYWN0JywgJ2NhdCcsICdmbGdzJywgJ29wdCcpO1xuICAgICAgZHJpdmVyLmFkYi5zdGFydEFwcC5jYWxsZWRXaXRoRXhhY3RseShwYXJhbXMpLnNob3VsZC5iZS50cnVlO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgdXNlIGFwcFBhY2thZ2UgYW5kIGFwcEFjdGl2aXR5IGlmIGFwcFdhaXRQYWNrYWdlIGFuZCBhcHBXYWl0QWN0aXZpdHkgYXJlIHVuZGVmaW5lZCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIHBhcmFtcy53YWl0UGtnID0gJ3BrZyc7XG4gICAgICBwYXJhbXMud2FpdEFjdGl2aXR5ID0gJ2FjdCc7XG4gICAgICBwYXJhbXMuc3RvcEFwcCA9IHRydWU7XG4gICAgICBhd2FpdCBkcml2ZXIuc3RhcnRBY3Rpdml0eSgncGtnJywgJ2FjdCcsIG51bGwsIG51bGwsICdhY3QnLCAnY2F0JywgJ2ZsZ3MnLCAnb3B0JywgZmFsc2UpO1xuICAgICAgZHJpdmVyLmFkYi5zdGFydEFwcC5jYWxsZWRXaXRoRXhhY3RseShwYXJhbXMpLnNob3VsZC5iZS50cnVlO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ3Jlc2V0JywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgcmVzZXQgYXBwIHZpYSByZWluc3RhbGwgaWYgZnVsbFJlc2V0IGlzIHRydWUnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIub3B0cy5mdWxsUmVzZXQgPSB0cnVlO1xuICAgICAgZHJpdmVyLm9wdHMuYXBwUGFja2FnZSA9ICdwa2cnO1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlciwgJ3N0YXJ0QVVUJykucmV0dXJucygnYXV0Jyk7XG4gICAgICBzYW5kYm94LnN0dWIoaGVscGVycywgJ3Jlc2V0QXBwJykucmV0dXJucyh1bmRlZmluZWQpO1xuICAgICAgYXdhaXQgZHJpdmVyLnJlc2V0KCkuc2hvdWxkLmV2ZW50dWFsbHkuYmUuZXF1YWwoJ2F1dCcpO1xuICAgICAgaGVscGVycy5yZXNldEFwcC5jYWxsZWRXaXRoKGRyaXZlci5hZGIpLnNob3VsZC5iZS50cnVlO1xuICAgICAgZHJpdmVyLnN0YXJ0QVVULmNhbGxlZE9uY2Uuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCBkbyBmYXN0IHJlc2V0IGlmIGZ1bGxSZXNldCBpcyBmYWxzZScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGRyaXZlci5vcHRzLmZ1bGxSZXNldCA9IGZhbHNlO1xuICAgICAgZHJpdmVyLm9wdHMuYXBwUGFja2FnZSA9ICdwa2cnO1xuICAgICAgc2FuZGJveC5zdHViKGhlbHBlcnMsICdyZXNldEFwcCcpLnJldHVybnModW5kZWZpbmVkKTtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIsICdzdGFydEFVVCcpLnJldHVybnMoJ2F1dCcpO1xuICAgICAgYXdhaXQgZHJpdmVyLnJlc2V0KCkuc2hvdWxkLmV2ZW50dWFsbHkuYmUuZXF1YWwoJ2F1dCcpO1xuICAgICAgaGVscGVycy5yZXNldEFwcC5jYWxsZWRXaXRoKGRyaXZlci5hZGIpLnNob3VsZC5iZS50cnVlO1xuICAgICAgZHJpdmVyLnN0YXJ0QVVULmNhbGxlZE9uY2Uuc2hvdWxkLmJlLnRydWU7XG4gICAgICBleHBlY3QoZHJpdmVyLmN1ckNvbnRleHQpLnRvLmVxbCgnTkFUSVZFX0FQUCcpO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ3N0YXJ0QVVUJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgc3RhcnQgQVVUJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgZHJpdmVyLm9wdHMgPSB7YXBwUGFja2FnZTogJ3BrZycsIGFwcEFjdGl2aXR5OiAnYWN0JywgaW50ZW50QWN0aW9uOiAnYWN0bicsXG4gICAgICAgICAgICAgICAgICAgICBpbnRlbnRDYXRlZ29yeTogJ2NhdCcsIGludGVudEZsYWdzOiAnZmxncycsIGFwcFdhaXRQYWNrYWdlOiAnd3BrZycsXG4gICAgICAgICAgICAgICAgICAgICBhcHBXYWl0QWN0aXZpdHk6ICd3YWN0JywgYXBwV2FpdER1cmF0aW9uOiAnd2R1cicsXG4gICAgICAgICAgICAgICAgICAgICBvcHRpb25hbEludGVudEFyZ3VtZW50czogJ29wdCd9O1xuICAgICAgbGV0IHBhcmFtcyA9IHtwa2c6ICdwa2cnLCBhY3Rpdml0eTogJ2FjdCcsIGFjdGlvbjogJ2FjdG4nLCBjYXRlZ29yeTogJ2NhdCcsXG4gICAgICAgICAgICAgICAgICAgIGZsYWdzOiAnZmxncycsIHdhaXRQa2c6ICd3cGtnJywgd2FpdEFjdGl2aXR5OiAnd2FjdCcsXG4gICAgICAgICAgICAgICAgICAgIHdhaXREdXJhdGlvbjogJ3dkdXInLCBvcHRpb25hbEludGVudEFyZ3VtZW50czogJ29wdCcsIHN0b3BBcHA6IGZhbHNlfTtcbiAgICAgIGRyaXZlci5vcHRzLmRvbnRTdG9wQXBwT25SZXNldCA9IHRydWU7XG4gICAgICBwYXJhbXMuc3RvcEFwcCA9IGZhbHNlO1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5hZGIsICdzdGFydEFwcCcpO1xuICAgICAgYXdhaXQgZHJpdmVyLnN0YXJ0QVVUKCk7XG4gICAgICBkcml2ZXIuYWRiLnN0YXJ0QXBwLmNhbGxlZFdpdGhFeGFjdGx5KHBhcmFtcykuc2hvdWxkLmJlLnRydWU7XG4gICAgfSk7XG4gIH0pO1xuICBkZXNjcmliZSgnc2V0VXJsJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgc2V0IHVybCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGRyaXZlci5vcHRzID0ge2FwcFBhY2thZ2U6ICdwa2cnfTtcbiAgICAgIHNhbmRib3guc3R1Yihkcml2ZXIuYWRiLCAnc3RhcnRVcmknKTtcbiAgICAgIGF3YWl0IGRyaXZlci5zZXRVcmwoJ3VybCcpO1xuICAgICAgZHJpdmVyLmFkYi5zdGFydFVyaS5jYWxsZWRXaXRoRXhhY3RseSgndXJsJywgJ3BrZycpLnNob3VsZC5iZS50cnVlO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ2Nsb3NlQXBwJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgY2xvc2UgYXBwJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgZHJpdmVyLm9wdHMgPSB7YXBwUGFja2FnZTogJ3BrZyd9O1xuICAgICAgc2FuZGJveC5zdHViKGRyaXZlci5hZGIsICdmb3JjZVN0b3AnKTtcbiAgICAgIGF3YWl0IGRyaXZlci5jbG9zZUFwcCgpO1xuICAgICAgZHJpdmVyLmFkYi5mb3JjZVN0b3AuY2FsbGVkV2l0aEV4YWN0bHkoJ3BrZycpLnNob3VsZC5iZS50cnVlO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ2dldERpc3BsYXlEZW5zaXR5JywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgcmV0dXJuIHRoZSBkaXNwbGF5IGRlbnNpdHkgb2YgYSBkZXZpY2UnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIuYWRiLnNoZWxsID0gKCkgPT4geyByZXR1cm4gJzEyMyc7IH07XG4gICAgICAoYXdhaXQgZHJpdmVyLmdldERpc3BsYXlEZW5zaXR5KCkpLnNob3VsZC5lcXVhbCgxMjMpO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgcmV0dXJuIHRoZSBkaXNwbGF5IGRlbnNpdHkgb2YgYW4gZW11bGF0b3InLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIuYWRiLnNoZWxsID0gKGNtZCkgPT4ge1xuICAgICAgICBsZXQgam9pbmVkQ21kID0gY21kLmpvaW4oJyAnKTtcbiAgICAgICAgaWYgKGpvaW5lZENtZC5pbmRleE9mKCdyby5zZicpICE9PSAtMSkge1xuICAgICAgICAgIC8vIGRldmljZSBwcm9wZXJ0eSBsb29rIHVwXG4gICAgICAgICAgcmV0dXJuICcnO1xuICAgICAgICB9IGVsc2UgaWYgKGpvaW5lZENtZC5pbmRleE9mKCdxZW11LnNmJykgIT09IC0xKSB7XG4gICAgICAgICAgLy8gZW11bGF0b3IgcHJvcGVydHkgbG9vayB1cFxuICAgICAgICAgIHJldHVybiAnNDU2JztcbiAgICAgICAgfVxuICAgICAgICByZXR1cm4gJyc7XG4gICAgICB9O1xuICAgICAgKGF3YWl0IGRyaXZlci5nZXREaXNwbGF5RGVuc2l0eSgpKS5zaG91bGQuZXF1YWwoNDU2KTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHRocm93IGFuIGVycm9yIGlmIHRoZSBkaXNwbGF5IGRlbnNpdHkgcHJvcGVydHkgY2FuXFwndCBiZSBmb3VuZCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGRyaXZlci5hZGIuc2hlbGwgPSAoKSA9PiB7IHJldHVybiAnJzsgfTtcbiAgICAgIGF3YWl0IGRyaXZlci5nZXREaXNwbGF5RGVuc2l0eSgpLnNob3VsZC5iZS5yZWplY3RlZFdpdGgoL0ZhaWxlZCB0byBnZXQgZGlzcGxheSBkZW5zaXR5IHByb3BlcnR5Lyk7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCB0aHJvdyBhbmQgZXJyb3IgaWYgdGhlIGRpc3BsYXkgZGVuc2l0eSBpcyBub3QgYSBudW1iZXInLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIuYWRiLnNoZWxsID0gKCkgPT4geyByZXR1cm4gJ2FiYyc7IH07XG4gICAgICBhd2FpdCBkcml2ZXIuZ2V0RGlzcGxheURlbnNpdHkoKS5zaG91bGQuYmUucmVqZWN0ZWRXaXRoKC9GYWlsZWQgdG8gZ2V0IGRpc3BsYXkgZGVuc2l0eSBwcm9wZXJ0eS8pO1xuICAgIH0pO1xuICB9KTtcbiAgZGVzY3JpYmUoJ3BhcnNlU3VyZmFjZUxpbmUnLCBmdW5jdGlvbiAoKSB7XG4gICAgaXQoJ3Nob3VsZCByZXR1cm4gdmlzaWJsZSB0cnVlIGlmIHRoZSBzdXJmYWNlIGlzIHZpc2libGUnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBwYXJzZVN1cmZhY2VMaW5lKCdzaG93bj10cnVlIHJlY3Q9MSAxIDEgMScpLnNob3VsZC5iZS5lcWwoe1xuICAgICAgICB2aXNpYmxlOiB0cnVlLFxuICAgICAgICB4OiAxLFxuICAgICAgICB5OiAxLFxuICAgICAgICB3aWR0aDogMSxcbiAgICAgICAgaGVpZ2h0OiAxXG4gICAgICB9KTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHJldHVybiB2aXNpYmxlIGZhbHNlIGlmIHRoZSBzdXJmYWNlIGlzIG5vdCB2aXNpYmxlJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgcGFyc2VTdXJmYWNlTGluZSgnc2hvd249ZmFsc2UgcmVjdD0xIDEgMSAxJykuc2hvdWxkLmJlLmVxbCh7XG4gICAgICAgIHZpc2libGU6IGZhbHNlLFxuICAgICAgICB4OiAxLFxuICAgICAgICB5OiAxLFxuICAgICAgICB3aWR0aDogMSxcbiAgICAgICAgaGVpZ2h0OiAxXG4gICAgICB9KTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHJldHVybiB0aGUgcGFyc2VkIHN1cmZhY2UgYm91bmRzJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgcGFyc2VTdXJmYWNlTGluZSgnc2hvd249dHJ1ZSByZWN0PSgxLjAsMi4wKSAzLjAgeCA0LjAnKS5zaG91bGQuYmUuZXFsKHtcbiAgICAgICAgdmlzaWJsZTogdHJ1ZSxcbiAgICAgICAgeDogMSxcbiAgICAgICAgeTogMixcbiAgICAgICAgd2lkdGg6IDMsXG4gICAgICAgIGhlaWdodDogNFxuICAgICAgfSk7XG4gICAgfSk7XG4gIH0pO1xuXG4gIC8vIHRoZXNlIGFyZSB1c2VkIGZvciBib3RoIHBhcnNlV2luZG93cyBhbmQgZ2V0U3lzdGVtQmFycyB0ZXN0c1xuICBsZXQgdmFsaWRXaW5kb3dPdXRwdXQgPSBbXG4gICAgJyAgV2luZG93ICMxIERlcnAnLFxuICAgICcgICAgc3R1ZmYnLFxuICAgICcgICAgICBTdXJmYWNlOiBkZXJwIHNob3duPWZhbHNlIGxhbGFsYWxhIHJlY3Q9KDkuMCw4LjApIDcuMCB4IDYuMCcsXG4gICAgJyAgICBtb3JlIHN0dWZmJyxcbiAgICAnICBXaW5kb3cgIzIgU3RhdHVzQmFyJyxcbiAgICAnICAgIGJsYWggYmxhaCBibGFoJyxcbiAgICAnICAgICAgU3VyZmFjZTogYmxhaCBibGFoIHNob3duPXRydWUgYmxhaCBibGFoIHJlY3Q9KDEuMCwyLjApIDMuMCB4IDQuMCcsXG4gICAgJyAgICBibGFoIGJsYWggYmxhaCcsXG4gICAgJyAgV2luZG93ICMzIE5hdmlnYXRpb25CYXInLFxuICAgICcgICAgd29tcCB3b21wJyxcbiAgICAnICAgICAgU3VyZmFjZTogYmxhaCBibGFoIHNob3duPWZhbHNlIHdvbXAgd29tcCByZWN0PSg1LjAsNi4wKSA1MC4wIHggNjAuMCcsXG4gICAgJyAgICBxd2VydHkgYXNkIHp4YydcbiAgXS5qb2luKCdcXG4nKTtcbiAgbGV0IHZhbGlkU3lzdGVtQmFycyA9IHtcbiAgICBzdGF0dXNCYXI6IHt2aXNpYmxlOiB0cnVlLCB4OiAxLCB5OiAyLCB3aWR0aDogMywgaGVpZ2h0OiA0fSxcbiAgICBuYXZpZ2F0aW9uQmFyOiB7dmlzaWJsZTogZmFsc2UsIHg6IDUsIHk6IDYsIHdpZHRoOiA1MCwgaGVpZ2h0OiA2MH1cbiAgfTtcblxuICBkZXNjcmliZSgncGFyc2VXaW5kb3dzJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgdGhyb3cgYW4gZXJyb3IgaWYgdGhlIHN0YXR1cyBiYXIgaW5mbyB3YXNuXFwndCBmb3VuZCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGV4cGVjdCgoKSA9PiB7IHBhcnNlV2luZG93cygnJyk7IH0pXG4gICAgICAgIC50by50aHJvdyhFcnJvciwgL0ZhaWxlZCB0byBwYXJzZSBzdGF0dXMgYmFyIGluZm9ybWF0aW9uLi8pO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgdGhyb3cgYW4gZXJyb3IgaWYgdGhlIG5hdmlnYXRpb24gYmFyIGluZm8gd2FzblxcJ3QgZm91bmQnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBsZXQgd2luZG93T3V0cHV0ID0gW1xuICAgICAgICAnICBXaW5kb3cgIzEgU3RhdHVzQmFyJyxcbiAgICAgICAgJyAgICBibGFoIGJsYWggYmxhaCcsXG4gICAgICAgICcgICAgICBTdXJmYWNlOiBibGFoIGJsYWggc2hvd249dHJ1ZSBibGFoIGJsYWggcmVjdD0oMS4wLDIuMCkgMy4wIHggNC4wJyxcbiAgICAgICAgJyAgICBibGFoIGJsYWggYmxhaCdcbiAgICAgIF0uam9pbignXFxuJyk7XG4gICAgICBleHBlY3QoKCkgPT4geyBwYXJzZVdpbmRvd3Mod2luZG93T3V0cHV0KTsgfSlcbiAgICAgICAgLnRvLnRocm93KEVycm9yLCAvRmFpbGVkIHRvIHBhcnNlIG5hdmlnYXRpb24gYmFyIGluZm9ybWF0aW9uLi8pO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgcmV0dXJuIHN0YXR1cyBhbmQgbmF2aWdhdGlvbiBiYXIgaW5mbyB3aGVuIGJvdGggYXJlIGdpdmVuJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgcGFyc2VXaW5kb3dzKHZhbGlkV2luZG93T3V0cHV0KS5zaG91bGQuYmUuZXFsKHZhbGlkU3lzdGVtQmFycyk7XG4gICAgfSk7XG4gIH0pO1xuICBkZXNjcmliZSgnZ2V0U3lzdGVtQmFycycsIGZ1bmN0aW9uICgpIHtcbiAgICBpdCgnc2hvdWxkIHRocm93IGFuIGVycm9yIGlmIHRoZXJlXFwncyBubyB3aW5kb3cgbWFuYWdlciBvdXRwdXQnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIgPSBuZXcgQW5kcm9pZERyaXZlcigpO1xuICAgICAgZHJpdmVyLmFkYiA9IHt9O1xuICAgICAgZHJpdmVyLmFkYi5zaGVsbCA9ICgpID0+IHsgcmV0dXJuICcnOyB9O1xuICAgICAgYXdhaXQgZHJpdmVyLmdldFN5c3RlbUJhcnMoKS5zaG91bGQuYmUucmVqZWN0ZWRXaXRoKC9EaWQgbm90IGdldCB3aW5kb3cgbWFuYWdlciBvdXRwdXQuLyk7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCByZXR1cm4gdGhlIHBhcnNlZCBzeXN0ZW0gYmFyIGluZm8nLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBkcml2ZXIgPSBuZXcgQW5kcm9pZERyaXZlcigpO1xuICAgICAgZHJpdmVyLmFkYiA9IHt9O1xuICAgICAgZHJpdmVyLmFkYi5zaGVsbCA9ICgpID0+IHsgcmV0dXJuIHZhbGlkV2luZG93T3V0cHV0OyB9O1xuICAgICAgKGF3YWl0IGRyaXZlci5nZXRTeXN0ZW1CYXJzKCkpLnNob3VsZC5iZS5lcWwodmFsaWRTeXN0ZW1CYXJzKTtcbiAgICB9KTtcbiAgfSk7XG59KTtcbiJdLCJzb3VyY2VSb290IjoiLi4vLi4vLi4vLi4ifQ==

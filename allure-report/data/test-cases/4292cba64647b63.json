@@ -1,0 +1,116 @@
+{
+  "uid" : "4292cba64647b63",
+  "name" : "Login test case",
+  "fullName" : "Testing_Photopass_Link_Photos_Functionality.Login test case",
+  "historyId" : "3b71cd13462c82791b007bce9916aacd",
+  "time" : {
+    "start" : 1520339781242,
+    "stop" : 1520339871303,
+    "duration" : 90061
+  },
+  "description" : "",
+  "descriptionHtml" : "",
+  "status" : "broken",
+  "statusMessage" : "element (\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") still not existing after 40000ms",
+  "statusTrace" : "Error: element (\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") still not existing after 40000ms\n                    at elements(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\isExisting.js:46:17\n                    at isExisting(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\waitForExist.js:67:22",
+  "flaky" : false,
+  "beforeStages" : [ ],
+  "testStage" : {
+    "status" : "broken",
+    "statusMessage" : "element (\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") still not existing after 40000ms",
+    "statusTrace" : "Error: element (\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") still not existing after 40000ms\n                    at elements(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\isExisting.js:46:17\n                    at isExisting(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\waitForExist.js:67:22",
+    "steps" : [ {
+      "name" : "Launching Application",
+      "time" : {
+        "start" : 1520339782243,
+        "stop" : 1520339822246,
+        "duration" : 40003
+      },
+      "status" : "broken",
+      "statusMessage" : "Error: element (\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") still not existing after 40000ms\n                    at elements(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\isExisting.js:46:17\n                    at isExisting(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\waitForExist.js:67:22",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : true,
+      "stepsCount" : 0,
+      "hasContent" : true
+    }, {
+      "name" : "Tap on PullDown Image",
+      "time" : {
+        "start" : 1520339823248,
+        "stop" : 1520339863251,
+        "duration" : 40003
+      },
+      "status" : "broken",
+      "statusMessage" : "Error: element (\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") still not existing after 40000ms\n                    at elements(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\isExisting.js:46:17\n                    at isExisting(\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") - node_modules\\webdriverio\\build\\lib\\commands\\waitForExist.js:67:22",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : true,
+      "stepsCount" : 0,
+      "hasContent" : true
+    }, {
+      "name" : "Attached Screenshot",
+      "time" : {
+        "start" : 1520339863254,
+        "stop" : 1520339871302,
+        "duration" : 8048
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ {
+        "uid" : "c6aa27a612d32668",
+        "name" : "Screenshot",
+        "source" : "c6aa27a612d32668.jpeg",
+        "type" : "image/jpeg",
+        "size" : 164472
+      } ],
+      "parameters" : [ ],
+      "attachmentsCount" : 1,
+      "shouldDisplayMessage" : false,
+      "stepsCount" : 0,
+      "hasContent" : true
+    } ],
+    "attachments" : [ ],
+    "parameters" : [ ],
+    "attachmentsCount" : 1,
+    "shouldDisplayMessage" : true,
+    "stepsCount" : 3,
+    "hasContent" : true
+  },
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "suite",
+    "value" : "Testing_Photopass_Link_Photos_Functionality"
+  }, {
+    "name" : "testClass",
+    "value" : "Testing_Photopass_Link_Photos_Functionality"
+  }, {
+    "name" : "testMethod",
+    "value" : "Login test case"
+  }, {
+    "name" : "package",
+    "value" : "Testing_Photopass_Link_Photos_Functionality"
+  }, {
+    "name" : "resultFormat",
+    "value" : "allure1"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : false,
+  "retry" : false,
+  "extra" : {
+    "severity" : "normal",
+    "retries" : [ ],
+    "categories" : [ {
+      "name" : "Test defects",
+      "matchedStatuses" : [ ],
+      "flaky" : false
+    } ],
+    "tags" : [ ]
+  },
+  "source" : "4292cba64647b63.json",
+  "parameterValues" : [ ]
+}

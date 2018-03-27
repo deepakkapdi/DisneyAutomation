@@ -1,0 +1,1038 @@
+'use strict';
+
+var _get = require('babel-runtime/helpers/get')['default'];
+
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
+
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
+
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
+
+var _slicedToArray = require('babel-runtime/helpers/sliced-to-array')['default'];
+
+var _getIterator = require('babel-runtime/core-js/get-iterator')['default'];
+
+var _regeneratorRuntime = require('babel-runtime/regenerator')['default'];
+
+var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _appiumBaseDriver = require('appium-base-driver');
+
+var _desiredCaps = require('./desired-caps');
+
+var _desiredCaps2 = _interopRequireDefault(_desiredCaps);
+
+var _commandsIndex = require('./commands/index');
+
+var _commandsIndex2 = _interopRequireDefault(_commandsIndex);
+
+var _androidHelpers = require('./android-helpers');
+
+var _androidHelpers2 = _interopRequireDefault(_androidHelpers);
+
+var _logger = require('./logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _appiumAdb = require('appium-adb');
+
+var _appiumSupport = require('appium-support');
+
+var _asyncbox = require('asyncbox');
+
+var _sharedPreferencesBuilder = require('shared-preferences-builder');
+
+var APP_EXTENSION = '.apk';
+var DEVICE_PORT = 4724;
+
+// This is a set of methods and paths that we never want to proxy to
+// Chromedriver
+var NO_PROXY = [['POST', new RegExp('^/session/[^/]+/context')], ['GET', new RegExp('^/session/[^/]+/context')], ['POST', new RegExp('^/session/[^/]+/appium')], ['GET', new RegExp('^/session/[^/]+/appium')], ['POST', new RegExp('^/session/[^/]+/touch/perform')], ['POST', new RegExp('^/session/[^/]+/touch/multi/perform')], ['POST', new RegExp('^/session/[^/]+/orientation')], ['GET', new RegExp('^/session/[^/]+/orientation')]];
+
+var AndroidDriver = (function (_BaseDriver) {
+  _inherits(AndroidDriver, _BaseDriver);
+
+  function AndroidDriver() {
+    var opts = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    var shouldValidateCaps = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
+    _classCallCheck(this, AndroidDriver);
+
+    _get(Object.getPrototypeOf(AndroidDriver.prototype), 'constructor', this).call(this, opts, shouldValidateCaps);
+
+    this.locatorStrategies = ['xpath', 'id', 'class name', 'accessibility id', '-android uiautomator'];
+    this.desiredCapConstraints = _desiredCaps2['default'];
+    this.sessionChromedrivers = {};
+    this.jwpProxyActive = false;
+    this.jwpProxyAvoid = _lodash2['default'].clone(NO_PROXY);
+    this.settings = new _appiumBaseDriver.DeviceSettings({ ignoreUnimportantViews: false }, this.onSettingsUpdate.bind(this));
+    this.chromedriver = null;
+    this.apkStrings = {};
+    this.bootstrapPort = opts.bootstrapPort || DEVICE_PORT;
+    this.unlocker = _androidHelpers2['default'].unlocker;
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = _getIterator(_lodash2['default'].toPairs(_commandsIndex2['default'])), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var _step$value = _slicedToArray(_step.value, 2);
+
+        var cmd = _step$value[0];
+        var fn = _step$value[1];
+
+        AndroidDriver.prototype[cmd] = fn;
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator['return']) {
+          _iterator['return']();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+  }
+
+  _createClass(AndroidDriver, [{
+    key: 'createSession',
+    value: function createSession() {
+      var _len,
+          args,
+          _key,
+          _ref,
+          _ref2,
+          sessionId,
+          caps,
+          serverDetails,
+          defaultOpts,
+          _helpers$getChromePkg,
+          pkg,
+          activity,
+          _ref3,
+
+      // get device udid for this session
+      udid,
+          emPort,
+          networkSpeed,
+          args$2$0 = arguments;
+
+      return _regeneratorRuntime.async(function createSession$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            context$2$0.prev = 0;
+
+            for (_len = args$2$0.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = args$2$0[_key];
+            }
+
+            context$2$0.next = 4;
+            return _regeneratorRuntime.awrap(_get(Object.getPrototypeOf(AndroidDriver.prototype), 'createSession', this).apply(this, args));
+
+          case 4:
+            _ref = context$2$0.sent;
+            _ref2 = _slicedToArray(_ref, 2);
+            sessionId = _ref2[0];
+            caps = _ref2[1];
+            serverDetails = { platform: 'LINUX',
+              webStorageEnabled: false,
+              takesScreenshot: true,
+              javascriptEnabled: true,
+              databaseEnabled: false,
+              networkConnectionEnabled: true,
+              locationContextEnabled: false,
+              warnings: {},
+              desired: this.caps };
+
+            this.caps = _Object$assign(serverDetails, this.caps);
+
+            // assigning defaults
+            context$2$0.next = 12;
+            return _regeneratorRuntime.awrap(_appiumSupport.tempDir.staticDir());
+
+          case 12:
+            context$2$0.t0 = context$2$0.sent;
+            context$2$0.t1 = _appiumAdb.DEFAULT_ADB_PORT;
+            defaultOpts = {
+              action: "android.intent.action.MAIN",
+              category: "android.intent.category.LAUNCHER",
+              flags: "0x10200000",
+              disableAndroidWatchers: false,
+              tmpDir: context$2$0.t0,
+              fullReset: false,
+              autoLaunch: true,
+              adbPort: context$2$0.t1,
+              androidInstallTimeout: 90000
+            };
+
+            _lodash2['default'].defaults(this.opts, defaultOpts);
+
+            if (this.opts.javaVersion) {
+              context$2$0.next = 20;
+              break;
+            }
+
+            context$2$0.next = 19;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].getJavaVersion());
+
+          case 19:
+            this.opts.javaVersion = context$2$0.sent;
+
+          case 20:
+            this.useUnlockHelperApp = _lodash2['default'].isUndefined(this.caps.unlockType);
+
+            // not user visible via caps
+            if (this.opts.noReset === true) {
+              this.opts.fullReset = false;
+            }
+            if (this.opts.fullReset === true) {
+              this.opts.noReset = false;
+            }
+            this.opts.fastReset = !this.opts.fullReset && !this.opts.noReset;
+            this.opts.skipUninstall = this.opts.fastReset || this.opts.noReset;
+
+            this.curContext = this.defaultContextName();
+
+            if (this.isChromeSession) {
+              _logger2['default'].info("We're going to run a Chrome-based session");
+              _helpers$getChromePkg = _androidHelpers2['default'].getChromePkg(this.opts.browserName);
+              pkg = _helpers$getChromePkg.pkg;
+              activity = _helpers$getChromePkg.activity;
+
+              this.opts.appPackage = pkg;
+              this.opts.appActivity = activity;
+              _logger2['default'].info('Chrome-type package and activity are ' + pkg + ' and ' + activity);
+            }
+
+            if (this.opts.nativeWebScreenshot) {
+              this.jwpProxyAvoid.push(['GET', new RegExp('^/session/[^/]+/screenshot')]);
+            }
+
+            if (this.opts.reboot) {
+              this.setAvdFromCapabilities(caps);
+            }context$2$0.next = 31;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].getDeviceInfoFromCaps(this.opts));
+
+          case 31:
+            _ref3 = context$2$0.sent;
+            udid = _ref3.udid;
+            emPort = _ref3.emPort;
+
+            this.opts.udid = udid;
+            this.opts.emPort = emPort;
+
+            // set up an instance of ADB
+            context$2$0.next = 38;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].createADB(this.opts.javaVersion, this.opts.udid, this.opts.emPort, this.opts.adbPort, this.opts.suppressKillServer, this.opts.remoteAdbHost, this.opts.clearDeviceLogsOnStart));
+
+          case 38:
+            this.adb = context$2$0.sent;
+
+            if (this.helpers.isPackageOrBundle(this.opts.app)) {
+              // user provided package instead of app for 'app' capability, massage options
+              this.opts.appPackage = this.opts.app;
+              this.opts.app = null;
+            }
+
+            if (!this.opts.app) {
+              context$2$0.next = 49;
+              break;
+            }
+
+            context$2$0.next = 43;
+            return _regeneratorRuntime.awrap(this.helpers.configureApp(this.opts.app, APP_EXTENSION));
+
+          case 43:
+            this.opts.app = context$2$0.sent;
+
+            this.opts.appIsTemp = caps.app !== this.opts.app; // did we make a temporary copy?
+            context$2$0.next = 47;
+            return _regeneratorRuntime.awrap(this.checkAppPresent());
+
+          case 47:
+            context$2$0.next = 53;
+            break;
+
+          case 49:
+            if (!this.appOnDevice) {
+              context$2$0.next = 53;
+              break;
+            }
+
+            // the app isn't an actual app file but rather something we want to
+            // assume is on the device and just launch via the appPackage
+            _logger2['default'].info('App file was not listed, instead we\'re going to run ' + (this.opts.appPackage + ' directly on the device'));
+            context$2$0.next = 53;
+            return _regeneratorRuntime.awrap(this.checkPackagePresent());
+
+          case 53:
+            if (!_appiumSupport.util.hasValue(this.opts.networkSpeed)) {
+              context$2$0.next = 61;
+              break;
+            }
+
+            if (this.isEmulator()) {
+              context$2$0.next = 58;
+              break;
+            }
+
+            _logger2['default'].warn("Sorry, networkSpeed capability is only available for emulators");
+            context$2$0.next = 61;
+            break;
+
+          case 58:
+            networkSpeed = _androidHelpers2['default'].ensureNetworkSpeed(this.adb, this.opts.networkSpeed);
+            context$2$0.next = 61;
+            return _regeneratorRuntime.awrap(this.adb.networkSpeed(networkSpeed));
+
+          case 61:
+            if (!_appiumSupport.util.hasValue(this.opts.gpsEnabled)) {
+              context$2$0.next = 69;
+              break;
+            }
+
+            if (!this.isEmulator()) {
+              context$2$0.next = 68;
+              break;
+            }
+
+            _logger2['default'].info('Trying to ' + (this.opts.gpsEnabled ? "enable" : "disable") + ' gps location provider');
+            context$2$0.next = 66;
+            return _regeneratorRuntime.awrap(this.adb.toggleGPSLocationProvider(this.opts.gpsEnabled));
+
+          case 66:
+            context$2$0.next = 69;
+            break;
+
+          case 68:
+            _logger2['default'].warn('Sorry! gpsEnabled capability is only available for emulators');
+
+          case 69:
+            context$2$0.next = 71;
+            return _regeneratorRuntime.awrap(this.startAndroidSession(this.opts));
+
+          case 71:
+            return context$2$0.abrupt('return', [sessionId, this.caps]);
+
+          case 74:
+            context$2$0.prev = 74;
+            context$2$0.t2 = context$2$0['catch'](0);
+            context$2$0.prev = 76;
+            context$2$0.next = 79;
+            return _regeneratorRuntime.awrap(this.deleteSession());
+
+          case 79:
+            context$2$0.next = 83;
+            break;
+
+          case 81:
+            context$2$0.prev = 81;
+            context$2$0.t3 = context$2$0['catch'](76);
+
+          case 83:
+            throw context$2$0.t2;
+
+          case 84:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this, [[0, 74], [76, 81]]);
+    }
+  }, {
+    key: 'isEmulator',
+    value: function isEmulator() {
+      return !!(this.opts.avd || /emulator/.test(this.opts.udid));
+    }
+  }, {
+    key: 'setAvdFromCapabilities',
+    value: function setAvdFromCapabilities(caps) {
+      if (this.opts.avd) {
+        _logger2['default'].info('avd name defined, ignoring device name and platform version');
+      } else {
+        if (!caps.deviceName) {
+          _logger2['default'].errorAndThrow('avd or deviceName should be specified when reboot option is enables');
+        }
+        if (!caps.platformVersion) {
+          _logger2['default'].errorAndThrow('avd or platformVersion should be specified when reboot option is enabled');
+        }
+        var avdDevice = caps.deviceName.replace(/[^a-zA-Z0-9_.]/g, "-");
+        this.opts.avd = avdDevice + '__' + caps.platformVersion;
+      }
+    }
+  }, {
+    key: 'onSettingsUpdate',
+    value: function onSettingsUpdate(key, value) {
+      return _regeneratorRuntime.async(function onSettingsUpdate$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            if (!(key === "ignoreUnimportantViews")) {
+              context$2$0.next = 3;
+              break;
+            }
+
+            context$2$0.next = 3;
+            return _regeneratorRuntime.awrap(this.setCompressedLayoutHierarchy(value));
+
+          case 3:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this);
+    }
+  }, {
+    key: 'startAndroidSession',
+    value: function startAndroidSession() {
+      return _regeneratorRuntime.async(function startAndroidSession$(context$2$0) {
+        var _this = this;
+
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            _logger2['default'].info('Starting Android session');
+            // set up the device to run on (real or emulator, etc)
+            context$2$0.next = 3;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].initDevice(this.adb, this.opts));
+
+          case 3:
+            this.defaultIME = context$2$0.sent;
+
+            // set actual device name, udid, platform version, screen size, model and manufacturer details
+            this.caps.deviceName = this.adb.curDeviceId;
+            this.caps.deviceUDID = this.opts.udid;
+            context$2$0.next = 8;
+            return _regeneratorRuntime.awrap(this.adb.getPlatformVersion());
+
+          case 8:
+            this.caps.platformVersion = context$2$0.sent;
+            context$2$0.next = 11;
+            return _regeneratorRuntime.awrap(this.adb.getScreenSize());
+
+          case 11:
+            this.caps.deviceScreenSize = context$2$0.sent;
+            context$2$0.next = 14;
+            return _regeneratorRuntime.awrap(this.adb.getModel());
+
+          case 14:
+            this.caps.deviceModel = context$2$0.sent;
+            context$2$0.next = 17;
+            return _regeneratorRuntime.awrap(this.adb.getManufacturer());
+
+          case 17:
+            this.caps.deviceManufacturer = context$2$0.sent;
+
+            if (!this.opts.autoLaunch) {
+              context$2$0.next = 21;
+              break;
+            }
+
+            context$2$0.next = 21;
+            return _regeneratorRuntime.awrap(this.initAUT());
+
+          case 21:
+            // start UiAutomator
+            this.bootstrap = new _androidHelpers2['default'].bootstrap(this.adb, this.bootstrapPort, this.opts.websocket);
+            context$2$0.next = 24;
+            return _regeneratorRuntime.awrap(this.bootstrap.start(this.opts.appPackage, this.opts.disableAndroidWatchers, this.opts.acceptSslCerts));
+
+          case 24:
+            // handling unexpected shutdown
+            this.bootstrap.onUnexpectedShutdown['catch'](function callee$2$0(err) {
+              return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+                while (1) switch (context$3$0.prev = context$3$0.next) {
+                  case 0:
+                    if (this.bootstrap.ignoreUnexpectedShutdown) {
+                      context$3$0.next = 3;
+                      break;
+                    }
+
+                    context$3$0.next = 3;
+                    return _regeneratorRuntime.awrap(this.startUnexpectedShutdown(err));
+
+                  case 3:
+                  case 'end':
+                    return context$3$0.stop();
+                }
+              }, null, _this);
+            });
+
+            if (this.opts.skipUnlock) {
+              context$2$0.next = 28;
+              break;
+            }
+
+            context$2$0.next = 28;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].unlock(this, this.adb, this.caps));
+
+          case 28:
+            if (!this.opts.ignoreUnimportantViews) {
+              context$2$0.next = 31;
+              break;
+            }
+
+            context$2$0.next = 31;
+            return _regeneratorRuntime.awrap(this.settings.update({ ignoreUnimportantViews: this.opts.ignoreUnimportantViews }));
+
+          case 31:
+            if (!this.isChromeSession) {
+              context$2$0.next = 36;
+              break;
+            }
+
+            context$2$0.next = 34;
+            return _regeneratorRuntime.awrap(this.startChromeSession());
+
+          case 34:
+            context$2$0.next = 39;
+            break;
+
+          case 36:
+            if (!this.opts.autoLaunch) {
+              context$2$0.next = 39;
+              break;
+            }
+
+            context$2$0.next = 39;
+            return _regeneratorRuntime.awrap(this.startAUT());
+
+          case 39:
+            if (!_appiumSupport.util.hasValue(this.opts.orientation)) {
+              context$2$0.next = 43;
+              break;
+            }
+
+            _logger2['default'].debug('Setting initial orientation to \'' + this.opts.orientation + '\'');
+            context$2$0.next = 43;
+            return _regeneratorRuntime.awrap(this.setOrientation(this.opts.orientation));
+
+          case 43:
+            context$2$0.next = 45;
+            return _regeneratorRuntime.awrap(this.initAutoWebview());
+
+          case 45:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this);
+    }
+  }, {
+    key: 'initAutoWebview',
+    value: function initAutoWebview() {
+      return _regeneratorRuntime.async(function initAutoWebview$(context$2$0) {
+        var _this3 = this;
+
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            if (!this.opts.autoWebview) {
+              context$2$0.next = 3;
+              break;
+            }
+
+            context$2$0.next = 3;
+            return _regeneratorRuntime.awrap((function callee$2$0() {
+              var viewName, timeout;
+              return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+                var _this2 = this;
+
+                while (1) switch (context$3$0.prev = context$3$0.next) {
+                  case 0:
+                    viewName = this.defaultWebviewName();
+                    timeout = this.opts.autoWebviewTimeout || 2000;
+
+                    _logger2['default'].info('Setting auto webview to context \'' + viewName + '\' with timeout ' + timeout + 'ms');
+
+                    // try every 500ms until timeout is over
+                    context$3$0.next = 5;
+                    return _regeneratorRuntime.awrap((0, _asyncbox.retryInterval)(timeout / 500, 500, function callee$3$0() {
+                      return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                        while (1) switch (context$4$0.prev = context$4$0.next) {
+                          case 0:
+                            context$4$0.next = 2;
+                            return _regeneratorRuntime.awrap(this.setContext(viewName));
+
+                          case 2:
+                          case 'end':
+                            return context$4$0.stop();
+                        }
+                      }, null, _this2);
+                    }));
+
+                  case 5:
+                  case 'end':
+                    return context$3$0.stop();
+                }
+              }, null, _this3);
+            })());
+
+          case 3:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this);
+    }
+  }, {
+    key: 'initAUT',
+    value: function initAUT() {
+      var launchInfo;
+      return _regeneratorRuntime.async(function initAUT$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            context$2$0.next = 2;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].getLaunchInfo(this.adb, this.opts));
+
+          case 2:
+            launchInfo = context$2$0.sent;
+
+            _Object$assign(this.opts, launchInfo);
+            _Object$assign(this.caps, launchInfo);
+            // install app
+
+            if (this.opts.app) {
+              context$2$0.next = 12;
+              break;
+            }
+
+            if (this.opts.fullReset) {
+              _logger2['default'].errorAndThrow('Full reset requires an app capability, use fastReset if app is not provided');
+            }
+            _logger2['default'].debug('No app capability. Assuming it is already on the device');
+
+            if (!this.opts.fastReset) {
+              context$2$0.next = 11;
+              break;
+            }
+
+            context$2$0.next = 11;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].resetApp(this.adb, this.opts));
+
+          case 11:
+            return context$2$0.abrupt('return');
+
+          case 12:
+            if (this.opts.skipUninstall) {
+              context$2$0.next = 15;
+              break;
+            }
+
+            context$2$0.next = 15;
+            return _regeneratorRuntime.awrap(this.adb.uninstallApk(this.opts.appPackage));
+
+          case 15:
+            context$2$0.next = 17;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].installApk(this.adb, this.opts));
+
+          case 17:
+            context$2$0.next = 19;
+            return _regeneratorRuntime.awrap(_androidHelpers2['default'].pushStrings(this.opts.language, this.adb, this.opts));
+
+          case 19:
+            this.apkStrings[this.opts.language] = context$2$0.sent;
+
+            if (_lodash2['default'].isUndefined(this.opts.sharedPreferences)) {
+              context$2$0.next = 23;
+              break;
+            }
+
+            context$2$0.next = 23;
+            return _regeneratorRuntime.awrap(this.setSharedPreferences(this.opts));
+
+          case 23:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this);
+    }
+  }, {
+    key: 'checkAppPresent',
+    value: function checkAppPresent() {
+      return _regeneratorRuntime.async(function checkAppPresent$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            _logger2['default'].debug("Checking whether app is actually present");
+            context$2$0.next = 3;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.exists(this.opts.app));
+
+          case 3:
+            if (context$2$0.sent) {
+              context$2$0.next = 5;
+              break;
+            }
+
+            _logger2['default'].errorAndThrow('Could not find app apk at ' + this.opts.app);
+
+          case 5:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this);
+    }
+  }, {
+    key: 'checkPackagePresent',
+    value: function checkPackagePresent() {
+      return _regeneratorRuntime.async(function checkPackagePresent$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            _logger2['default'].debug("Checking whether package is present on the device");
+            context$2$0.next = 3;
+            return _regeneratorRuntime.awrap(this.adb.shell(['pm', 'list', 'packages', this.opts.appPackage]));
+
+          case 3:
+            if (context$2$0.sent) {
+              context$2$0.next = 5;
+              break;
+            }
+
+            _logger2['default'].errorAndThrow('Could not find package ' + this.opts.appPackage + ' on the device');
+
+          case 5:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this);
+    }
+
+    // Set CompressedLayoutHierarchy on the device
+  }, {
+    key: 'setCompressedLayoutHierarchy',
+    value: function setCompressedLayoutHierarchy(compress) {
+      return _regeneratorRuntime.async(function setCompressedLayoutHierarchy$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            context$2$0.next = 2;
+            return _regeneratorRuntime.awrap(this.bootstrap.sendAction("compressedLayoutHierarchy", { compressLayout: compress }));
+
+          case 2:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this);
+    }
+  }, {
+    key: 'deleteSession',
+    value: function deleteSession() {
+      var avdName;
+      return _regeneratorRuntime.async(function deleteSession$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            _logger2['default'].debug("Shutting down Android driver");
+            context$2$0.next = 3;
+            return _regeneratorRuntime.awrap(_get(Object.getPrototypeOf(AndroidDriver.prototype), 'deleteSession', this).call(this));
+
+          case 3:
+            if (!this.bootstrap) {
+              context$2$0.next = 23;
+              break;
+            }
+
+            context$2$0.next = 6;
+            return _regeneratorRuntime.awrap(this.stopChromedriverProxies());
+
+          case 6:
+            if (!(this.opts.unicodeKeyboard && this.opts.resetKeyboard && this.defaultIME)) {
+              context$2$0.next = 10;
+              break;
+            }
+
+            _logger2['default'].debug('Resetting IME to ' + this.defaultIME);
+            context$2$0.next = 10;
+            return _regeneratorRuntime.awrap(this.adb.setIME(this.defaultIME));
+
+          case 10:
+            if (this.isChromeSession) {
+              context$2$0.next = 13;
+              break;
+            }
+
+            context$2$0.next = 13;
+            return _regeneratorRuntime.awrap(this.adb.forceStop(this.opts.appPackage));
+
+          case 13:
+            context$2$0.next = 15;
+            return _regeneratorRuntime.awrap(this.adb.goToHome());
+
+          case 15:
+            if (!(this.opts.fullReset && !this.opts.skipUninstall && !this.appOnDevice)) {
+              context$2$0.next = 18;
+              break;
+            }
+
+            context$2$0.next = 18;
+            return _regeneratorRuntime.awrap(this.adb.uninstallApk(this.opts.appPackage));
+
+          case 18:
+            context$2$0.next = 20;
+            return _regeneratorRuntime.awrap(this.bootstrap.shutdown());
+
+          case 20:
+            this.bootstrap = null;
+            context$2$0.next = 24;
+            break;
+
+          case 23:
+            _logger2['default'].debug("Called deleteSession but bootstrap wasn't active");
+
+          case 24:
+            context$2$0.next = 26;
+            return _regeneratorRuntime.awrap(this.adb.stopLogcat());
+
+          case 26:
+            if (!this.useUnlockHelperApp) {
+              context$2$0.next = 29;
+              break;
+            }
+
+            context$2$0.next = 29;
+            return _regeneratorRuntime.awrap(this.adb.forceStop('io.appium.unlock'));
+
+          case 29:
+            if (!this.opts.reboot) {
+              context$2$0.next = 34;
+              break;
+            }
+
+            avdName = this.opts.avd.replace('@', '');
+
+            _logger2['default'].debug('closing emulator \'' + avdName + '\'');
+            context$2$0.next = 34;
+            return _regeneratorRuntime.awrap(this.adb.killEmulator(avdName));
+
+          case 34:
+            if (!this.opts.clearSystemFiles) {
+              context$2$0.next = 50;
+              break;
+            }
+
+            if (!this.opts.appIsTemp) {
+              context$2$0.next = 47;
+              break;
+            }
+
+            _logger2['default'].debug('Temporary copy of app was made: deleting \'' + this.opts.app + '\'');
+            context$2$0.prev = 37;
+            context$2$0.next = 40;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.rimraf(this.opts.app));
+
+          case 40:
+            context$2$0.next = 45;
+            break;
+
+          case 42:
+            context$2$0.prev = 42;
+            context$2$0.t0 = context$2$0['catch'](37);
+
+            _logger2['default'].warn('Unable to delete temporary app: ' + context$2$0.t0.message);
+
+          case 45:
+            context$2$0.next = 48;
+            break;
+
+          case 47:
+            _logger2['default'].debug('App was not copied, so not deleting');
+
+          case 48:
+            context$2$0.next = 51;
+            break;
+
+          case 50:
+            _logger2['default'].debug('Not cleaning generated files. Add `clearSystemFiles` capability if wanted.');
+
+          case 51:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this, [[37, 42]]);
+    }
+  }, {
+    key: 'setSharedPreferences',
+    value: function setSharedPreferences() {
+      var sharedPrefs, name, remotePath, remoteFile, localPath, builder;
+      return _regeneratorRuntime.async(function setSharedPreferences$(context$2$0) {
+        while (1) switch (context$2$0.prev = context$2$0.next) {
+          case 0:
+            sharedPrefs = this.opts.sharedPreferences;
+
+            _logger2['default'].info("Trying to set shared preferences");
+            name = sharedPrefs.name;
+
+            if (!_lodash2['default'].isUndefined(name)) {
+              context$2$0.next = 6;
+              break;
+            }
+
+            _logger2['default'].warn('Skipping setting Shared preferences, name is undefined: ' + JSON.stringify(sharedPrefs));
+            return context$2$0.abrupt('return', false);
+
+          case 6:
+            remotePath = '/data/data/' + this.opts.appPackage + '/shared_prefs';
+            remoteFile = remotePath + '/' + name + '.xml';
+            localPath = '/tmp/' + name + '.xml';
+            builder = this.getPrefsBuilder();
+
+            builder.build(sharedPrefs.prefs);
+            _logger2['default'].info('Creating temporary shared preferences: ' + localPath);
+            builder.toFile(localPath);
+            _logger2['default'].info('Creating shared_prefs remote folder: ' + remotePath);
+            context$2$0.next = 16;
+            return _regeneratorRuntime.awrap(this.adb.shell(['mkdir', '-p', remotePath]));
+
+          case 16:
+            _logger2['default'].info('Pushing shared_prefs to ' + remoteFile);
+            context$2$0.next = 19;
+            return _regeneratorRuntime.awrap(this.adb.push(localPath, remoteFile));
+
+          case 19:
+            context$2$0.prev = 19;
+
+            _logger2['default'].info('Trying to remove shared preferences temporary file');
+            context$2$0.next = 23;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.exists(localPath));
+
+          case 23:
+            if (!context$2$0.sent) {
+              context$2$0.next = 26;
+              break;
+            }
+
+            context$2$0.next = 26;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.unlink(localPath));
+
+          case 26:
+            context$2$0.next = 31;
+            break;
+
+          case 28:
+            context$2$0.prev = 28;
+            context$2$0.t0 = context$2$0['catch'](19);
+
+            _logger2['default'].warn('Error trying to remove temporary file ' + localPath);
+
+          case 31:
+            return context$2$0.abrupt('return', true);
+
+          case 32:
+          case 'end':
+            return context$2$0.stop();
+        }
+      }, null, this, [[19, 28]]);
+    }
+  }, {
+    key: 'getPrefsBuilder',
+    value: function getPrefsBuilder() {
+      /* Add this method to create a new SharedPrefsBuilder instead of
+       * directly creating the object on setSharedPreferences for testing purposes
+      */
+      return new _sharedPreferencesBuilder.SharedPrefsBuilder();
+    }
+  }, {
+    key: 'validateDesiredCaps',
+    value: function validateDesiredCaps(caps) {
+      // check with the base class, and return if it fails
+      var res = _get(Object.getPrototypeOf(AndroidDriver.prototype), 'validateDesiredCaps', this).call(this, caps);
+      if (!res) return res; // eslint-disable-line curly
+
+      // make sure that the capabilities have one of `app`, `appPackage` or `browser`
+      if ((!caps.browserName || !_androidHelpers2['default'].isChromeBrowser(caps.browserName)) && !caps.app && !caps.appPackage) {
+        var msg = 'The desired capabilities must include either an app, appPackage or browserName';
+        _logger2['default'].errorAndThrow(msg);
+      }
+      // warn if the capabilities have both `app` and `browser, although this
+      // is common with selenium grid
+      if (caps.browserName && caps.app) {
+        var msg = 'The desired capabilities should generally not include both an app and a browserName';
+        _logger2['default'].warn(msg);
+      }
+    }
+  }, {
+    key: 'proxyActive',
+    value: function proxyActive(sessionId) {
+      _get(Object.getPrototypeOf(AndroidDriver.prototype), 'proxyActive', this).call(this, sessionId);
+
+      return this.jwpProxyActive;
+    }
+  }, {
+    key: 'getProxyAvoidList',
+    value: function getProxyAvoidList(sessionId) {
+      _get(Object.getPrototypeOf(AndroidDriver.prototype), 'getProxyAvoidList', this).call(this, sessionId);
+
+      return this.jwpProxyAvoid;
+    }
+  }, {
+    key: 'canProxy',
+    value: function canProxy(sessionId) {
+      _get(Object.getPrototypeOf(AndroidDriver.prototype), 'canProxy', this).call(this, sessionId);
+
+      // this will change depending on ChromeDriver status
+      return _lodash2['default'].isFunction(this.proxyReqRes);
+    }
+  }, {
+    key: 'appOnDevice',
+    get: function get() {
+      return this.helpers.isPackageOrBundle(this.opts.app) || !this.opts.app && this.helpers.isPackageOrBundle(this.opts.appPackage);
+    }
+  }, {
+    key: 'isChromeSession',
+    get: function get() {
+      return _androidHelpers2['default'].isChromeBrowser(this.opts.browserName);
+    }
+  }]);
+
+  return AndroidDriver;
+})(_appiumBaseDriver.BaseDriver);
+
+exports['default'] = AndroidDriver;
+module.exports = exports['default'];
+
+// the whole createSession flow is surrounded in a try-catch statement
+// if creating a session fails at any point, we teardown everything we
+// set up before throwing the error.
+
+// find and copy, or download and unzip an app url or path
+
+// Some cloud services using appium launch the avd themselves, so we ensure netspeed
+// is set for emulators by calling adb.networkSpeed before running the app
+
+// check if we have to enable/disable gps before running the application
+
+// ignoring delete session exception if any and throw the real error
+// that happened while creating the session.
+
+// If the user sets autoLaunch to false, they are responsible for initAUT() and startAUT()
+
+// set up app under test
+// eslint-disable-line promise/prefer-await-to-callbacks
+
+// Let's try to unlock the device
+
+// Set CompressedLayoutHierarchy on the device based on current settings object
+// this has to happen _after_ bootstrap is initialized
+
+// start a chromedriver session and proxy to it
+
+// start app
+
+// populate appPackage, appActivity, appWaitPackage, appWaitActivity,
+// and the device being used
+// in the opts and caps (so it gets back to the user on session creation)
+
+// This must run after installing the apk, otherwise it would cause the
+// install to fail. And before running the app.
+
+// certain cleanup we only care to do if the bootstrap was ever run
+
+// some cleanup we want to do regardless, in case we are shutting down
+// mid-startup
+//# sourceMappingURL=data:application/json;charset=utf8;base64,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QSthQSxTQUFTLEVBQUU7OztBQUcxQixhQUFPLG9CQUFFLFVBQVUsQ0FBQyxJQUFJLENBQUMsV0FBVyxDQUFDLENBQUM7S0FDdkM7OztTQW5RZSxlQUFHO0FBQ2pCLGFBQU8sSUFBSSxDQUFDLE9BQU8sQ0FBQyxpQkFBaUIsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLEdBQUcsQ0FBQyxJQUFLLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxHQUFHLElBQ2hFLElBQUksQ0FBQyxPQUFPLENBQUMsaUJBQWlCLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsQUFBQyxDQUFDO0tBQzlEOzs7U0FFbUIsZUFBRztBQUNyQixhQUFPLDRCQUFRLGVBQWUsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLFdBQVcsQ0FBQyxDQUFDO0tBQ3ZEOzs7U0F2TEcsYUFBYTs7O3FCQXNiSixhQUFhIiwiZmlsZSI6ImxpYi9kcml2ZXIuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBCYXNlRHJpdmVyLCBEZXZpY2VTZXR0aW5ncyB9IGZyb20gJ2FwcGl1bS1iYXNlLWRyaXZlcic7XG5pbXBvcnQgZGVzaXJlZENvbnN0cmFpbnRzIGZyb20gJy4vZGVzaXJlZC1jYXBzJztcbmltcG9ydCBjb21tYW5kcyBmcm9tICcuL2NvbW1hbmRzL2luZGV4JztcbmltcG9ydCBoZWxwZXJzIGZyb20gJy4vYW5kcm9pZC1oZWxwZXJzJztcbmltcG9ydCBsb2cgZnJvbSAnLi9sb2dnZXInO1xuaW1wb3J0IF8gZnJvbSAnbG9kYXNoJztcbmltcG9ydCB7IERFRkFVTFRfQURCX1BPUlQgfSBmcm9tICdhcHBpdW0tYWRiJztcbmltcG9ydCB7IGZzLCB0ZW1wRGlyLCB1dGlsIH0gZnJvbSAnYXBwaXVtLXN1cHBvcnQnO1xuaW1wb3J0IHsgcmV0cnlJbnRlcnZhbCB9IGZyb20gJ2FzeW5jYm94JztcbmltcG9ydCB7IFNoYXJlZFByZWZzQnVpbGRlciB9IGZyb20gJ3NoYXJlZC1wcmVmZXJlbmNlcy1idWlsZGVyJztcblxuY29uc3QgQVBQX0VYVEVOU0lPTiA9ICcuYXBrJztcbmNvbnN0IERFVklDRV9QT1JUID0gNDcyNDtcblxuLy8gVGhpcyBpcyBhIHNldCBvZiBtZXRob2RzIGFuZCBwYXRocyB0aGF0IHdlIG5ldmVyIHdhbnQgdG8gcHJveHkgdG9cbi8vIENocm9tZWRyaXZlclxuY29uc3QgTk9fUFJPWFkgPSBbXG4gIFsnUE9TVCcsIG5ldyBSZWdFeHAoJ14vc2Vzc2lvbi9bXi9dKy9jb250ZXh0JyldLFxuICBbJ0dFVCcsIG5ldyBSZWdFeHAoJ14vc2Vzc2lvbi9bXi9dKy9jb250ZXh0JyldLFxuICBbJ1BPU1QnLCBuZXcgUmVnRXhwKCdeL3Nlc3Npb24vW14vXSsvYXBwaXVtJyldLFxuICBbJ0dFVCcsIG5ldyBSZWdFeHAoJ14vc2Vzc2lvbi9bXi9dKy9hcHBpdW0nKV0sXG4gIFsnUE9TVCcsIG5ldyBSZWdFeHAoJ14vc2Vzc2lvbi9bXi9dKy90b3VjaC9wZXJmb3JtJyldLFxuICBbJ1BPU1QnLCBuZXcgUmVnRXhwKCdeL3Nlc3Npb24vW14vXSsvdG91Y2gvbXVsdGkvcGVyZm9ybScpXSxcbiAgWydQT1NUJywgbmV3IFJlZ0V4cCgnXi9zZXNzaW9uL1teL10rL29yaWVudGF0aW9uJyldLFxuICBbJ0dFVCcsIG5ldyBSZWdFeHAoJ14vc2Vzc2lvbi9bXi9dKy9vcmllbnRhdGlvbicpXSxcbl07XG5cbmNsYXNzIEFuZHJvaWREcml2ZXIgZXh0ZW5kcyBCYXNlRHJpdmVyIHtcbiAgY29uc3RydWN0b3IgKG9wdHMgPSB7fSwgc2hvdWxkVmFsaWRhdGVDYXBzID0gdHJ1ZSkge1xuICAgIHN1cGVyKG9wdHMsIHNob3VsZFZhbGlkYXRlQ2Fwcyk7XG5cbiAgICB0aGlzLmxvY2F0b3JTdHJhdGVnaWVzID0gW1xuICAgICAgJ3hwYXRoJyxcbiAgICAgICdpZCcsXG4gICAgICAnY2xhc3MgbmFtZScsXG4gICAgICAnYWNjZXNzaWJpbGl0eSBpZCcsXG4gICAgICAnLWFuZHJvaWQgdWlhdXRvbWF0b3InXG4gICAgXTtcbiAgICB0aGlzLmRlc2lyZWRDYXBDb25zdHJhaW50cyA9IGRlc2lyZWRDb25zdHJhaW50cztcbiAgICB0aGlzLnNlc3Npb25DaHJvbWVkcml2ZXJzID0ge307XG4gICAgdGhpcy5qd3BQcm94eUFjdGl2ZSA9IGZhbHNlO1xuICAgIHRoaXMuandwUHJveHlBdm9pZCA9IF8uY2xvbmUoTk9fUFJPWFkpO1xuICAgIHRoaXMuc2V0dGluZ3MgPSBuZXcgRGV2aWNlU2V0dGluZ3Moe2lnbm9yZVVuaW1wb3J0YW50Vmlld3M6IGZhbHNlfSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRoaXMub25TZXR0aW5nc1VwZGF0ZS5iaW5kKHRoaXMpKTtcbiAgICB0aGlzLmNocm9tZWRyaXZlciA9IG51bGw7XG4gICAgdGhpcy5hcGtTdHJpbmdzID0ge307XG4gICAgdGhpcy5ib290c3RyYXBQb3J0ID0gb3B0cy5ib290c3RyYXBQb3J0IHx8IERFVklDRV9QT1JUO1xuICAgIHRoaXMudW5sb2NrZXIgPSBoZWxwZXJzLnVubG9ja2VyO1xuXG4gICAgZm9yIChsZXQgW2NtZCwgZm5dIG9mIF8udG9QYWlycyhjb21tYW5kcykpIHtcbiAgICAgIEFuZHJvaWREcml2ZXIucHJvdG90eXBlW2NtZF0gPSBmbjtcbiAgICB9XG4gIH1cblxuICBhc3luYyBjcmVhdGVTZXNzaW9uICguLi5hcmdzKSB7XG4gICAgLy8gdGhlIHdob2xlIGNyZWF0ZVNlc3Npb24gZmxvdyBpcyBzdXJyb3VuZGVkIGluIGEgdHJ5LWNhdGNoIHN0YXRlbWVudFxuICAgIC8vIGlmIGNyZWF0aW5nIGEgc2Vzc2lvbiBmYWlscyBhdCBhbnkgcG9pbnQsIHdlIHRlYXJkb3duIGV2ZXJ5dGhpbmcgd2VcbiAgICAvLyBzZXQgdXAgYmVmb3JlIHRocm93aW5nIHRoZSBlcnJvci5cbiAgICB0cnkge1xuICAgICAgbGV0IFtzZXNzaW9uSWQsIGNhcHNdID0gYXdhaXQgc3VwZXIuY3JlYXRlU2Vzc2lvbiguLi5hcmdzKTtcblxuICAgICAgbGV0IHNlcnZlckRldGFpbHMgPSB7cGxhdGZvcm06ICdMSU5VWCcsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICB3ZWJTdG9yYWdlRW5hYmxlZDogZmFsc2UsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICB0YWtlc1NjcmVlbnNob3Q6IHRydWUsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICBqYXZhc2NyaXB0RW5hYmxlZDogdHJ1ZSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGFiYXNlRW5hYmxlZDogZmFsc2UsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICBuZXR3b3JrQ29ubmVjdGlvbkVuYWJsZWQ6IHRydWUsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICBsb2NhdGlvbkNvbnRleHRFbmFibGVkOiBmYWxzZSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgIHdhcm5pbmdzOiB7fSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2lyZWQ6IHRoaXMuY2Fwc307XG5cbiAgICAgIHRoaXMuY2FwcyA9IE9iamVjdC5hc3NpZ24oc2VydmVyRGV0YWlscywgdGhpcy5jYXBzKTtcblxuICAgICAgLy8gYXNzaWduaW5nIGRlZmF1bHRzXG4gICAgICBsZXQgZGVmYXVsdE9wdHMgPSB7XG4gICAgICAgIGFjdGlvbjogXCJhbmRyb2lkLmludGVudC5hY3Rpb24uTUFJTlwiLFxuICAgICAgICBjYXRlZ29yeTogXCJhbmRyb2lkLmludGVudC5jYXRlZ29yeS5MQVVOQ0hFUlwiLFxuICAgICAgICBmbGFnczogXCIweDEwMjAwMDAwXCIsXG4gICAgICAgIGRpc2FibGVBbmRyb2lkV2F0Y2hlcnM6IGZhbHNlLFxuICAgICAgICB0bXBEaXI6IGF3YWl0IHRlbXBEaXIuc3RhdGljRGlyKCksXG4gICAgICAgIGZ1bGxSZXNldDogZmFsc2UsXG4gICAgICAgIGF1dG9MYXVuY2g6IHRydWUsXG4gICAgICAgIGFkYlBvcnQ6IERFRkFVTFRfQURCX1BPUlQsXG4gICAgICAgIGFuZHJvaWRJbnN0YWxsVGltZW91dDogOTAwMDBcbiAgICAgIH07XG4gICAgICBfLmRlZmF1bHRzKHRoaXMub3B0cywgZGVmYXVsdE9wdHMpO1xuICAgICAgaWYgKCF0aGlzLm9wdHMuamF2YVZlcnNpb24pIHtcbiAgICAgICAgdGhpcy5vcHRzLmphdmFWZXJzaW9uID0gYXdhaXQgaGVscGVycy5nZXRKYXZhVmVyc2lvbigpO1xuICAgICAgfVxuICAgICAgdGhpcy51c2VVbmxvY2tIZWxwZXJBcHAgPSBfLmlzVW5kZWZpbmVkKHRoaXMuY2Fwcy51bmxvY2tUeXBlKTtcblxuICAgICAgLy8gbm90IHVzZXIgdmlzaWJsZSB2aWEgY2Fwc1xuICAgICAgaWYgKHRoaXMub3B0cy5ub1Jlc2V0ID09PSB0cnVlKSB7XG4gICAgICAgIHRoaXMub3B0cy5mdWxsUmVzZXQgPSBmYWxzZTtcbiAgICAgIH1cbiAgICAgIGlmICh0aGlzLm9wdHMuZnVsbFJlc2V0ID09PSB0cnVlKSB7XG4gICAgICAgIHRoaXMub3B0cy5ub1Jlc2V0ID0gZmFsc2U7XG4gICAgICB9XG4gICAgICB0aGlzLm9wdHMuZmFzdFJlc2V0ID0gIXRoaXMub3B0cy5mdWxsUmVzZXQgJiYgIXRoaXMub3B0cy5ub1Jlc2V0O1xuICAgICAgdGhpcy5vcHRzLnNraXBVbmluc3RhbGwgPSB0aGlzLm9wdHMuZmFzdFJlc2V0IHx8IHRoaXMub3B0cy5ub1Jlc2V0O1xuXG4gICAgICB0aGlzLmN1ckNvbnRleHQgPSB0aGlzLmRlZmF1bHRDb250ZXh0TmFtZSgpO1xuXG4gICAgICBpZiAodGhpcy5pc0Nocm9tZVNlc3Npb24pIHtcbiAgICAgICAgbG9nLmluZm8oXCJXZSdyZSBnb2luZyB0byBydW4gYSBDaHJvbWUtYmFzZWQgc2Vzc2lvblwiKTtcbiAgICAgICAgbGV0IHtwa2csIGFjdGl2aXR5fSA9IGhlbHBlcnMuZ2V0Q2hyb21lUGtnKHRoaXMub3B0cy5icm93c2VyTmFtZSk7XG4gICAgICAgIHRoaXMub3B0cy5hcHBQYWNrYWdlID0gcGtnO1xuICAgICAgICB0aGlzLm9wdHMuYXBwQWN0aXZpdHkgPSBhY3Rpdml0eTtcbiAgICAgICAgbG9nLmluZm8oYENocm9tZS10eXBlIHBhY2thZ2UgYW5kIGFjdGl2aXR5IGFyZSAke3BrZ30gYW5kICR7YWN0aXZpdHl9YCk7XG4gICAgICB9XG5cbiAgICAgIGlmICh0aGlzLm9wdHMubmF0aXZlV2ViU2NyZWVuc2hvdCkge1xuICAgICAgICB0aGlzLmp3cFByb3h5QXZvaWQucHVzaChbJ0dFVCcsIG5ldyBSZWdFeHAoJ14vc2Vzc2lvbi9bXi9dKy9zY3JlZW5zaG90JyldKTtcbiAgICAgIH1cblxuICAgICAgaWYgKHRoaXMub3B0cy5yZWJvb3QpIHtcbiAgICAgICAgdGhpcy5zZXRBdmRGcm9tQ2FwYWJpbGl0aWVzKGNhcHMpO1xuICAgICAgfVxuXG4gICAgICAvLyBnZXQgZGV2aWNlIHVkaWQgZm9yIHRoaXMgc2Vzc2lvblxuICAgICAgbGV0IHt1ZGlkLCBlbVBvcnR9ID0gYXdhaXQgaGVscGVycy5nZXREZXZpY2VJbmZvRnJvbUNhcHModGhpcy5vcHRzKTtcbiAgICAgIHRoaXMub3B0cy51ZGlkID0gdWRpZDtcbiAgICAgIHRoaXMub3B0cy5lbVBvcnQgPSBlbVBvcnQ7XG5cbiAgICAgIC8vIHNldCB1cCBhbiBpbnN0YW5jZSBvZiBBREJcbiAgICAgIHRoaXMuYWRiID0gYXdhaXQgaGVscGVycy5jcmVhdGVBREIodGhpcy5vcHRzLmphdmFWZXJzaW9uLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzLm9wdHMudWRpZCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcy5vcHRzLmVtUG9ydCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcy5vcHRzLmFkYlBvcnQsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRoaXMub3B0cy5zdXBwcmVzc0tpbGxTZXJ2ZXIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRoaXMub3B0cy5yZW1vdGVBZGJIb3N0LFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzLm9wdHMuY2xlYXJEZXZpY2VMb2dzT25TdGFydCk7XG5cbiAgICAgIGlmICh0aGlzLmhlbHBlcnMuaXNQYWNrYWdlT3JCdW5kbGUodGhpcy5vcHRzLmFwcCkpIHtcbiAgICAgICAgLy8gdXNlciBwcm92aWRlZCBwYWNrYWdlIGluc3RlYWQgb2YgYXBwIGZvciAnYXBwJyBjYXBhYmlsaXR5LCBtYXNzYWdlIG9wdGlvbnNcbiAgICAgICAgdGhpcy5vcHRzLmFwcFBhY2thZ2UgPSB0aGlzLm9wdHMuYXBwO1xuICAgICAgICB0aGlzLm9wdHMuYXBwID0gbnVsbDtcbiAgICAgIH1cblxuICAgICAgaWYgKHRoaXMub3B0cy5hcHApIHtcbiAgICAgICAgLy8gZmluZCBhbmQgY29weSwgb3IgZG93bmxvYWQgYW5kIHVuemlwIGFuIGFwcCB1cmwgb3IgcGF0aFxuICAgICAgICB0aGlzLm9wdHMuYXBwID0gYXdhaXQgdGhpcy5oZWxwZXJzLmNvbmZpZ3VyZUFwcCh0aGlzLm9wdHMuYXBwLCBBUFBfRVhURU5TSU9OKTtcbiAgICAgICAgdGhpcy5vcHRzLmFwcElzVGVtcCA9IGNhcHMuYXBwICE9PSB0aGlzLm9wdHMuYXBwOyAvLyBkaWQgd2UgbWFrZSBhIHRlbXBvcmFyeSBjb3B5P1xuICAgICAgICBhd2FpdCB0aGlzLmNoZWNrQXBwUHJlc2VudCgpO1xuICAgICAgfSBlbHNlIGlmICh0aGlzLmFwcE9uRGV2aWNlKSB7XG4gICAgICAgIC8vIHRoZSBhcHAgaXNuJ3QgYW4gYWN0dWFsIGFwcCBmaWxlIGJ1dCByYXRoZXIgc29tZXRoaW5nIHdlIHdhbnQgdG9cbiAgICAgICAgLy8gYXNzdW1lIGlzIG9uIHRoZSBkZXZpY2UgYW5kIGp1c3QgbGF1bmNoIHZpYSB0aGUgYXBwUGFja2FnZVxuICAgICAgICBsb2cuaW5mbyhgQXBwIGZpbGUgd2FzIG5vdCBsaXN0ZWQsIGluc3RlYWQgd2UncmUgZ29pbmcgdG8gcnVuIGAgK1xuICAgICAgICAgICAgICAgICBgJHt0aGlzLm9wdHMuYXBwUGFja2FnZX0gZGlyZWN0bHkgb24gdGhlIGRldmljZWApO1xuICAgICAgICBhd2FpdCB0aGlzLmNoZWNrUGFja2FnZVByZXNlbnQoKTtcbiAgICAgIH1cblxuICAgICAgLy8gU29tZSBjbG91ZCBzZXJ2aWNlcyB1c2luZyBhcHBpdW0gbGF1bmNoIHRoZSBhdmQgdGhlbXNlbHZlcywgc28gd2UgZW5zdXJlIG5ldHNwZWVkXG4gICAgICAvLyBpcyBzZXQgZm9yIGVtdWxhdG9ycyBieSBjYWxsaW5nIGFkYi5uZXR3b3JrU3BlZWQgYmVmb3JlIHJ1bm5pbmcgdGhlIGFwcFxuICAgICAgaWYgKHV0aWwuaGFzVmFsdWUodGhpcy5vcHRzLm5ldHdvcmtTcGVlZCkpIHtcbiAgICAgICAgaWYgKCF0aGlzLmlzRW11bGF0b3IoKSkge1xuICAgICAgICAgIGxvZy53YXJuKFwiU29ycnksIG5ldHdvcmtTcGVlZCBjYXBhYmlsaXR5IGlzIG9ubHkgYXZhaWxhYmxlIGZvciBlbXVsYXRvcnNcIik7XG4gICAgICAgIH0gZWxzZSB7XG4gICAgICAgICAgbGV0IG5ldHdvcmtTcGVlZCA9IGhlbHBlcnMuZW5zdXJlTmV0d29ya1NwZWVkKHRoaXMuYWRiLCB0aGlzLm9wdHMubmV0d29ya1NwZWVkKTtcbiAgICAgICAgICBhd2FpdCB0aGlzLmFkYi5uZXR3b3JrU3BlZWQobmV0d29ya1NwZWVkKTtcbiAgICAgICAgfVxuICAgICAgfVxuICAgICAgLy8gY2hlY2sgaWYgd2UgaGF2ZSB0byBlbmFibGUvZGlzYWJsZSBncHMgYmVmb3JlIHJ1bm5pbmcgdGhlIGFwcGxpY2F0aW9uXG4gICAgICBpZiAodXRpbC5oYXNWYWx1ZSh0aGlzLm9wdHMuZ3BzRW5hYmxlZCkpIHtcbiAgICAgICAgaWYgKHRoaXMuaXNFbXVsYXRvcigpKSB7XG4gICAgICAgICAgbG9nLmluZm8oYFRyeWluZyB0byAke3RoaXMub3B0cy5ncHNFbmFibGVkID8gXCJlbmFibGVcIiA6IFwiZGlzYWJsZVwifSBncHMgbG9jYXRpb24gcHJvdmlkZXJgKTtcbiAgICAgICAgICBhd2FpdCB0aGlzLmFkYi50b2dnbGVHUFNMb2NhdGlvblByb3ZpZGVyKHRoaXMub3B0cy5ncHNFbmFibGVkKTtcbiAgICAgICAgfSBlbHNlIHtcbiAgICAgICAgICBsb2cud2FybignU29ycnkhIGdwc0VuYWJsZWQgY2FwYWJpbGl0eSBpcyBvbmx5IGF2YWlsYWJsZSBmb3IgZW11bGF0b3JzJyk7XG4gICAgICAgIH1cbiAgICAgIH1cblxuICAgICAgYXdhaXQgdGhpcy5zdGFydEFuZHJvaWRTZXNzaW9uKHRoaXMub3B0cyk7XG4gICAgICByZXR1cm4gW3Nlc3Npb25JZCwgdGhpcy5jYXBzXTtcbiAgICB9IGNhdGNoIChlKSB7XG4gICAgICAvLyBpZ25vcmluZyBkZWxldGUgc2Vzc2lvbiBleGNlcHRpb24gaWYgYW55IGFuZCB0aHJvdyB0aGUgcmVhbCBlcnJvclxuICAgICAgLy8gdGhhdCBoYXBwZW5lZCB3aGlsZSBjcmVhdGluZyB0aGUgc2Vzc2lvbi5cbiAgICAgIHRyeSB7XG4gICAgICAgIGF3YWl0IHRoaXMuZGVsZXRlU2Vzc2lvbigpO1xuICAgICAgfSBjYXRjaCAoaWduKSB7fVxuICAgICAgdGhyb3cgZTtcbiAgICB9XG4gIH1cblxuICBpc0VtdWxhdG9yICgpIHtcbiAgICByZXR1cm4gISEodGhpcy5vcHRzLmF2ZCB8fCAvZW11bGF0b3IvLnRlc3QodGhpcy5vcHRzLnVkaWQpKTtcbiAgfVxuXG4gIHNldEF2ZEZyb21DYXBhYmlsaXRpZXMgKGNhcHMpIHtcbiAgICBpZiAodGhpcy5vcHRzLmF2ZCkge1xuICAgICAgbG9nLmluZm8oJ2F2ZCBuYW1lIGRlZmluZWQsIGlnbm9yaW5nIGRldmljZSBuYW1lIGFuZCBwbGF0Zm9ybSB2ZXJzaW9uJyk7XG4gICAgfSBlbHNlIHtcbiAgICAgIGlmICghY2Fwcy5kZXZpY2VOYW1lKSB7XG4gICAgICAgIGxvZy5lcnJvckFuZFRocm93KCdhdmQgb3IgZGV2aWNlTmFtZSBzaG91bGQgYmUgc3BlY2lmaWVkIHdoZW4gcmVib290IG9wdGlvbiBpcyBlbmFibGVzJyk7XG4gICAgICB9XG4gICAgICBpZiAoIWNhcHMucGxhdGZvcm1WZXJzaW9uKSB7XG4gICAgICAgIGxvZy5lcnJvckFuZFRocm93KCdhdmQgb3IgcGxhdGZvcm1WZXJzaW9uIHNob3VsZCBiZSBzcGVjaWZpZWQgd2hlbiByZWJvb3Qgb3B0aW9uIGlzIGVuYWJsZWQnKTtcbiAgICAgIH1cbiAgICAgIGxldCBhdmREZXZpY2UgPSBjYXBzLmRldmljZU5hbWUucmVwbGFjZSgvW15hLXpBLVowLTlfLl0vZywgXCItXCIpO1xuICAgICAgdGhpcy5vcHRzLmF2ZCA9IGAke2F2ZERldmljZX1fXyR7Y2Fwcy5wbGF0Zm9ybVZlcnNpb259YDtcbiAgICB9XG4gIH1cblxuICBnZXQgYXBwT25EZXZpY2UgKCkge1xuICAgIHJldHVybiB0aGlzLmhlbHBlcnMuaXNQYWNrYWdlT3JCdW5kbGUodGhpcy5vcHRzLmFwcCkgfHwgKCF0aGlzLm9wdHMuYXBwICYmXG4gICAgICAgICAgIHRoaXMuaGVscGVycy5pc1BhY2thZ2VPckJ1bmRsZSh0aGlzLm9wdHMuYXBwUGFja2FnZSkpO1xuICB9XG5cbiAgZ2V0IGlzQ2hyb21lU2Vzc2lvbiAoKSB7XG4gICAgcmV0dXJuIGhlbHBlcnMuaXNDaHJvbWVCcm93c2VyKHRoaXMub3B0cy5icm93c2VyTmFtZSk7XG4gIH1cblxuICBhc3luYyBvblNldHRpbmdzVXBkYXRlIChrZXksIHZhbHVlKSB7XG4gICAgaWYgKGtleSA9PT0gXCJpZ25vcmVVbmltcG9ydGFudFZpZXdzXCIpIHtcbiAgICAgIGF3YWl0IHRoaXMuc2V0Q29tcHJlc3NlZExheW91dEhpZXJhcmNoeSh2YWx1ZSk7XG4gICAgfVxuICB9XG5cbiAgYXN5bmMgc3RhcnRBbmRyb2lkU2Vzc2lvbiAoKSB7XG4gICAgbG9nLmluZm8oYFN0YXJ0aW5nIEFuZHJvaWQgc2Vzc2lvbmApO1xuICAgIC8vIHNldCB1cCB0aGUgZGV2aWNlIHRvIHJ1biBvbiAocmVhbCBvciBlbXVsYXRvciwgZXRjKVxuICAgIHRoaXMuZGVmYXVsdElNRSA9IGF3YWl0IGhlbHBlcnMuaW5pdERldmljZSh0aGlzLmFkYiwgdGhpcy5vcHRzKTtcblxuICAgIC8vIHNldCBhY3R1YWwgZGV2aWNlIG5hbWUsIHVkaWQsIHBsYXRmb3JtIHZlcnNpb24sIHNjcmVlbiBzaXplLCBtb2RlbCBhbmQgbWFudWZhY3R1cmVyIGRldGFpbHNcbiAgICB0aGlzLmNhcHMuZGV2aWNlTmFtZSA9IHRoaXMuYWRiLmN1ckRldmljZUlkO1xuICAgIHRoaXMuY2Fwcy5kZXZpY2VVRElEID0gdGhpcy5vcHRzLnVkaWQ7XG4gICAgdGhpcy5jYXBzLnBsYXRmb3JtVmVyc2lvbiA9IGF3YWl0IHRoaXMuYWRiLmdldFBsYXRmb3JtVmVyc2lvbigpO1xuICAgIHRoaXMuY2Fwcy5kZXZpY2VTY3JlZW5TaXplID0gYXdhaXQgdGhpcy5hZGIuZ2V0U2NyZWVuU2l6ZSgpO1xuICAgIHRoaXMuY2Fwcy5kZXZpY2VNb2RlbCA9IGF3YWl0IHRoaXMuYWRiLmdldE1vZGVsKCk7XG4gICAgdGhpcy5jYXBzLmRldmljZU1hbnVmYWN0dXJlciA9IGF3YWl0IHRoaXMuYWRiLmdldE1hbnVmYWN0dXJlcigpO1xuXG4gICAgLy8gSWYgdGhlIHVzZXIgc2V0cyBhdXRvTGF1bmNoIHRvIGZhbHNlLCB0aGV5IGFyZSByZXNwb25zaWJsZSBmb3IgaW5pdEFVVCgpIGFuZCBzdGFydEFVVCgpXG4gICAgaWYgKHRoaXMub3B0cy5hdXRvTGF1bmNoKSB7XG4gICAgICAvLyBzZXQgdXAgYXBwIHVuZGVyIHRlc3RcbiAgICAgIGF3YWl0IHRoaXMuaW5pdEFVVCgpO1xuICAgIH1cbiAgICAvLyBzdGFydCBVaUF1dG9tYXRvclxuICAgIHRoaXMuYm9vdHN0cmFwID0gbmV3IGhlbHBlcnMuYm9vdHN0cmFwKHRoaXMuYWRiLCB0aGlzLmJvb3RzdHJhcFBvcnQsIHRoaXMub3B0cy53ZWJzb2NrZXQpO1xuICAgIGF3YWl0IHRoaXMuYm9vdHN0cmFwLnN0YXJ0KHRoaXMub3B0cy5hcHBQYWNrYWdlLCB0aGlzLm9wdHMuZGlzYWJsZUFuZHJvaWRXYXRjaGVycywgdGhpcy5vcHRzLmFjY2VwdFNzbENlcnRzKTtcbiAgICAvLyBoYW5kbGluZyB1bmV4cGVjdGVkIHNodXRkb3duXG4gICAgdGhpcy5ib290c3RyYXAub25VbmV4cGVjdGVkU2h1dGRvd24uY2F0Y2goYXN5bmMgKGVycikgPT4geyAvLyBlc2xpbnQtZGlzYWJsZS1saW5lIHByb21pc2UvcHJlZmVyLWF3YWl0LXRvLWNhbGxiYWNrc1xuICAgICAgaWYgKCF0aGlzLmJvb3RzdHJhcC5pZ25vcmVVbmV4cGVjdGVkU2h1dGRvd24pIHtcbiAgICAgICAgYXdhaXQgdGhpcy5zdGFydFVuZXhwZWN0ZWRTaHV0ZG93bihlcnIpO1xuICAgICAgfVxuICAgIH0pO1xuXG4gICAgaWYgKCF0aGlzLm9wdHMuc2tpcFVubG9jaykge1xuICAgICAgLy8gTGV0J3MgdHJ5IHRvIHVubG9jayB0aGUgZGV2aWNlXG4gICAgICBhd2FpdCBoZWxwZXJzLnVubG9jayh0aGlzLCB0aGlzLmFkYiwgdGhpcy5jYXBzKTtcbiAgICB9XG5cbiAgICAvLyBTZXQgQ29tcHJlc3NlZExheW91dEhpZXJhcmNoeSBvbiB0aGUgZGV2aWNlIGJhc2VkIG9uIGN1cnJlbnQgc2V0dGluZ3Mgb2JqZWN0XG4gICAgLy8gdGhpcyBoYXMgdG8gaGFwcGVuIF9hZnRlcl8gYm9vdHN0cmFwIGlzIGluaXRpYWxpemVkXG4gICAgaWYgKHRoaXMub3B0cy5pZ25vcmVVbmltcG9ydGFudFZpZXdzKSB7XG4gICAgICBhd2FpdCB0aGlzLnNldHRpbmdzLnVwZGF0ZSh7aWdub3JlVW5pbXBvcnRhbnRWaWV3czogdGhpcy5vcHRzLmlnbm9yZVVuaW1wb3J0YW50Vmlld3N9KTtcbiAgICB9XG5cbiAgICBpZiAodGhpcy5pc0Nocm9tZVNlc3Npb24pIHtcbiAgICAgIC8vIHN0YXJ0IGEgY2hyb21lZHJpdmVyIHNlc3Npb24gYW5kIHByb3h5IHRvIGl0XG4gICAgICBhd2FpdCB0aGlzLnN0YXJ0Q2hyb21lU2Vzc2lvbigpO1xuICAgIH0gZWxzZSB7XG4gICAgICBpZiAodGhpcy5vcHRzLmF1dG9MYXVuY2gpIHtcbiAgICAgICAgLy8gc3RhcnQgYXBwXG4gICAgICAgIGF3YWl0IHRoaXMuc3RhcnRBVVQoKTtcbiAgICAgIH1cbiAgICB9XG5cbiAgICBpZiAodXRpbC5oYXNWYWx1ZSh0aGlzLm9wdHMub3JpZW50YXRpb24pKSB7XG4gICAgICBsb2cuZGVidWcoYFNldHRpbmcgaW5pdGlhbCBvcmllbnRhdGlvbiB0byAnJHt0aGlzLm9wdHMub3JpZW50YXRpb259J2ApO1xuICAgICAgYXdhaXQgdGhpcy5zZXRPcmllbnRhdGlvbih0aGlzLm9wdHMub3JpZW50YXRpb24pO1xuICAgIH1cblxuICAgIGF3YWl0IHRoaXMuaW5pdEF1dG9XZWJ2aWV3KCk7XG4gIH1cblxuICBhc3luYyBpbml0QXV0b1dlYnZpZXcgKCkge1xuICAgIGlmICh0aGlzLm9wdHMuYXV0b1dlYnZpZXcpIHtcbiAgICAgIGxldCB2aWV3TmFtZSA9IHRoaXMuZGVmYXVsdFdlYnZpZXdOYW1lKCk7XG4gICAgICBsZXQgdGltZW91dCA9ICh0aGlzLm9wdHMuYXV0b1dlYnZpZXdUaW1lb3V0KSB8fCAyMDAwO1xuXG4gICAgICBsb2cuaW5mbyhgU2V0dGluZyBhdXRvIHdlYnZpZXcgdG8gY29udGV4dCAnJHt2aWV3TmFtZX0nIHdpdGggdGltZW91dCAke3RpbWVvdXR9bXNgKTtcblxuICAgICAgLy8gdHJ5IGV2ZXJ5IDUwMG1zIHVudGlsIHRpbWVvdXQgaXMgb3ZlclxuICAgICAgYXdhaXQgcmV0cnlJbnRlcnZhbCh0aW1lb3V0IC8gNTAwLCA1MDAsIGFzeW5jICgpID0+IHtcbiAgICAgICAgYXdhaXQgdGhpcy5zZXRDb250ZXh0KHZpZXdOYW1lKTtcbiAgICAgIH0pO1xuICAgIH1cbiAgfVxuXG4gIGFzeW5jIGluaXRBVVQgKCkge1xuICAgIC8vIHBvcHVsYXRlIGFwcFBhY2thZ2UsIGFwcEFjdGl2aXR5LCBhcHBXYWl0UGFja2FnZSwgYXBwV2FpdEFjdGl2aXR5LFxuICAgIC8vIGFuZCB0aGUgZGV2aWNlIGJlaW5nIHVzZWRcbiAgICAvLyBpbiB0aGUgb3B0cyBhbmQgY2FwcyAoc28gaXQgZ2V0cyBiYWNrIHRvIHRoZSB1c2VyIG9uIHNlc3Npb24gY3JlYXRpb24pXG4gICAgbGV0IGxhdW5jaEluZm8gPSBhd2FpdCBoZWxwZXJzLmdldExhdW5jaEluZm8odGhpcy5hZGIsIHRoaXMub3B0cyk7XG4gICAgT2JqZWN0LmFzc2lnbih0aGlzLm9wdHMsIGxhdW5jaEluZm8pO1xuICAgIE9iamVjdC5hc3NpZ24odGhpcy5jYXBzLCBsYXVuY2hJbmZvKTtcbiAgICAvLyBpbnN0YWxsIGFwcFxuICAgIGlmICghdGhpcy5vcHRzLmFwcCkge1xuICAgICAgaWYgKHRoaXMub3B0cy5mdWxsUmVzZXQpIHtcbiAgICAgICAgbG9nLmVycm9yQW5kVGhyb3coJ0Z1bGwgcmVzZXQgcmVxdWlyZXMgYW4gYXBwIGNhcGFiaWxpdHksIHVzZSBmYXN0UmVzZXQgaWYgYXBwIGlzIG5vdCBwcm92aWRlZCcpO1xuICAgICAgfVxuICAgICAgbG9nLmRlYnVnKCdObyBhcHAgY2FwYWJpbGl0eS4gQXNzdW1pbmcgaXQgaXMgYWxyZWFkeSBvbiB0aGUgZGV2aWNlJyk7XG4gICAgICBpZiAodGhpcy5vcHRzLmZhc3RSZXNldCkge1xuICAgICAgICBhd2FpdCBoZWxwZXJzLnJlc2V0QXBwKHRoaXMuYWRiLCB0aGlzLm9wdHMpO1xuICAgICAgfVxuICAgICAgcmV0dXJuO1xuICAgIH1cbiAgICBpZiAoIXRoaXMub3B0cy5za2lwVW5pbnN0YWxsKSB7XG4gICAgICBhd2FpdCB0aGlzLmFkYi51bmluc3RhbGxBcGsodGhpcy5vcHRzLmFwcFBhY2thZ2UpO1xuICAgIH1cbiAgICBhd2FpdCBoZWxwZXJzLmluc3RhbGxBcGsodGhpcy5hZGIsIHRoaXMub3B0cyk7XG4gICAgdGhpcy5hcGtTdHJpbmdzW3RoaXMub3B0cy5sYW5ndWFnZV0gPSBhd2FpdCBoZWxwZXJzLnB1c2hTdHJpbmdzKFxuICAgICAgICB0aGlzLm9wdHMubGFuZ3VhZ2UsIHRoaXMuYWRiLCB0aGlzLm9wdHMpO1xuXG4gICAgLy8gVGhpcyBtdXN0IHJ1biBhZnRlciBpbnN0YWxsaW5nIHRoZSBhcGssIG90aGVyd2lzZSBpdCB3b3VsZCBjYXVzZSB0aGVcbiAgICAvLyBpbnN0YWxsIHRvIGZhaWwuIEFuZCBiZWZvcmUgcnVubmluZyB0aGUgYXBwLlxuICAgIGlmICghXy5pc1VuZGVmaW5lZCh0aGlzLm9wdHMuc2hhcmVkUHJlZmVyZW5jZXMpKSB7XG4gICAgICBhd2FpdCB0aGlzLnNldFNoYXJlZFByZWZlcmVuY2VzKHRoaXMub3B0cyk7XG4gICAgfVxuICB9XG5cbiAgYXN5bmMgY2hlY2tBcHBQcmVzZW50ICgpIHtcbiAgICBsb2cuZGVidWcoXCJDaGVja2luZyB3aGV0aGVyIGFwcCBpcyBhY3R1YWxseSBwcmVzZW50XCIpO1xuICAgIGlmICghKGF3YWl0IGZzLmV4aXN0cyh0aGlzLm9wdHMuYXBwKSkpIHtcbiAgICAgIGxvZy5lcnJvckFuZFRocm93KGBDb3VsZCBub3QgZmluZCBhcHAgYXBrIGF0ICR7dGhpcy5vcHRzLmFwcH1gKTtcbiAgICB9XG4gIH1cblxuICBhc3luYyBjaGVja1BhY2thZ2VQcmVzZW50ICgpIHtcbiAgICBsb2cuZGVidWcoXCJDaGVja2luZyB3aGV0aGVyIHBhY2thZ2UgaXMgcHJlc2VudCBvbiB0aGUgZGV2aWNlXCIpO1xuICAgIGlmICghKGF3YWl0IHRoaXMuYWRiLnNoZWxsKFsncG0nLCAnbGlzdCcsICdwYWNrYWdlcycsIHRoaXMub3B0cy5hcHBQYWNrYWdlXSkpKSB7XG4gICAgICBsb2cuZXJyb3JBbmRUaHJvdyhgQ291bGQgbm90IGZpbmQgcGFja2FnZSAke3RoaXMub3B0cy5hcHBQYWNrYWdlfSBvbiB0aGUgZGV2aWNlYCk7XG4gICAgfVxuICB9XG5cbiAgLy8gU2V0IENvbXByZXNzZWRMYXlvdXRIaWVyYXJjaHkgb24gdGhlIGRldmljZVxuICBhc3luYyBzZXRDb21wcmVzc2VkTGF5b3V0SGllcmFyY2h5IChjb21wcmVzcykge1xuICAgIGF3YWl0IHRoaXMuYm9vdHN0cmFwLnNlbmRBY3Rpb24oXCJjb21wcmVzc2VkTGF5b3V0SGllcmFyY2h5XCIsIHtjb21wcmVzc0xheW91dDogY29tcHJlc3N9KTtcbiAgfVxuXG4gIGFzeW5jIGRlbGV0ZVNlc3Npb24gKCkge1xuICAgIGxvZy5kZWJ1ZyhcIlNodXR0aW5nIGRvd24gQW5kcm9pZCBkcml2ZXJcIik7XG4gICAgYXdhaXQgc3VwZXIuZGVsZXRlU2Vzc2lvbigpO1xuICAgIGlmICh0aGlzLmJvb3RzdHJhcCkge1xuICAgICAgLy8gY2VydGFpbiBjbGVhbnVwIHdlIG9ubHkgY2FyZSB0byBkbyBpZiB0aGUgYm9vdHN0cmFwIHdhcyBldmVyIHJ1blxuICAgICAgYXdhaXQgdGhpcy5zdG9wQ2hyb21lZHJpdmVyUHJveGllcygpO1xuICAgICAgaWYgKHRoaXMub3B0cy51bmljb2RlS2V5Ym9hcmQgJiYgdGhpcy5vcHRzLnJlc2V0S2V5Ym9hcmQgJiYgdGhpcy5kZWZhdWx0SU1FKSB7XG4gICAgICAgIGxvZy5kZWJ1ZyhgUmVzZXR0aW5nIElNRSB0byAke3RoaXMuZGVmYXVsdElNRX1gKTtcbiAgICAgICAgYXdhaXQgdGhpcy5hZGIuc2V0SU1FKHRoaXMuZGVmYXVsdElNRSk7XG4gICAgICB9XG4gICAgICBpZiAoIXRoaXMuaXNDaHJvbWVTZXNzaW9uKSB7XG4gICAgICAgIGF3YWl0IHRoaXMuYWRiLmZvcmNlU3RvcCh0aGlzLm9wdHMuYXBwUGFja2FnZSk7XG4gICAgICB9XG4gICAgICBhd2FpdCB0aGlzLmFkYi5nb1RvSG9tZSgpO1xuICAgICAgaWYgKHRoaXMub3B0cy5mdWxsUmVzZXQgJiYgIXRoaXMub3B0cy5za2lwVW5pbnN0YWxsICYmICF0aGlzLmFwcE9uRGV2aWNlKSB7XG4gICAgICAgIGF3YWl0IHRoaXMuYWRiLnVuaW5zdGFsbEFwayh0aGlzLm9wdHMuYXBwUGFja2FnZSk7XG4gICAgICB9XG4gICAgICBhd2FpdCB0aGlzLmJvb3RzdHJhcC5zaHV0ZG93bigpO1xuICAgICAgdGhpcy5ib290c3RyYXAgPSBudWxsO1xuICAgIH0gZWxzZSB7XG4gICAgICBsb2cuZGVidWcoXCJDYWxsZWQgZGVsZXRlU2Vzc2lvbiBidXQgYm9vdHN0cmFwIHdhc24ndCBhY3RpdmVcIik7XG4gICAgfVxuICAgIC8vIHNvbWUgY2xlYW51cCB3ZSB3YW50IHRvIGRvIHJlZ2FyZGxlc3MsIGluIGNhc2Ugd2UgYXJlIHNodXR0aW5nIGRvd25cbiAgICAvLyBtaWQtc3RhcnR1cFxuICAgIGF3YWl0IHRoaXMuYWRiLnN0b3BMb2djYXQoKTtcbiAgICBpZiAodGhpcy51c2VVbmxvY2tIZWxwZXJBcHApIHtcbiAgICAgIGF3YWl0IHRoaXMuYWRiLmZvcmNlU3RvcCgnaW8uYXBwaXVtLnVubG9jaycpO1xuICAgIH1cbiAgICBpZiAodGhpcy5vcHRzLnJlYm9vdCkge1xuICAgICAgbGV0IGF2ZE5hbWUgPSB0aGlzLm9wdHMuYXZkLnJlcGxhY2UoJ0AnLCAnJyk7XG4gICAgICBsb2cuZGVidWcoYGNsb3NpbmcgZW11bGF0b3IgJyR7YXZkTmFtZX0nYCk7XG4gICAgICBhd2FpdCB0aGlzLmFkYi5raWxsRW11bGF0b3IoYXZkTmFtZSk7XG4gICAgfVxuICAgIGlmICh0aGlzLm9wdHMuY2xlYXJTeXN0ZW1GaWxlcykge1xuICAgICAgaWYgKHRoaXMub3B0cy5hcHBJc1RlbXApIHtcbiAgICAgICAgbG9nLmRlYnVnKGBUZW1wb3JhcnkgY29weSBvZiBhcHAgd2FzIG1hZGU6IGRlbGV0aW5nICcke3RoaXMub3B0cy5hcHB9J2ApO1xuICAgICAgICB0cnkge1xuICAgICAgICAgIGF3YWl0IGZzLnJpbXJhZih0aGlzLm9wdHMuYXBwKTtcbiAgICAgICAgfSBjYXRjaCAoZXJyKSB7XG4gICAgICAgICAgbG9nLndhcm4oYFVuYWJsZSB0byBkZWxldGUgdGVtcG9yYXJ5IGFwcDogJHtlcnIubWVzc2FnZX1gKTtcbiAgICAgICAgfVxuICAgICAgfSBlbHNlIHtcbiAgICAgICAgbG9nLmRlYnVnKCdBcHAgd2FzIG5vdCBjb3BpZWQsIHNvIG5vdCBkZWxldGluZycpO1xuICAgICAgfVxuICAgIH0gZWxzZSB7XG4gICAgICBsb2cuZGVidWcoJ05vdCBjbGVhbmluZyBnZW5lcmF0ZWQgZmlsZXMuIEFkZCBgY2xlYXJTeXN0ZW1GaWxlc2AgY2FwYWJpbGl0eSBpZiB3YW50ZWQuJyk7XG4gICAgfVxuICB9XG5cbiAgYXN5bmMgc2V0U2hhcmVkUHJlZmVyZW5jZXMgKCkge1xuICAgIGxldCBzaGFyZWRQcmVmcyA9IHRoaXMub3B0cy5zaGFyZWRQcmVmZXJlbmNlcztcbiAgICBsb2cuaW5mbyhcIlRyeWluZyB0byBzZXQgc2hhcmVkIHByZWZlcmVuY2VzXCIpO1xuICAgIGxldCBuYW1lID0gc2hhcmVkUHJlZnMubmFtZTtcbiAgICBpZiAoXy5pc1VuZGVmaW5lZChuYW1lKSkge1xuICAgICAgbG9nLndhcm4oYFNraXBwaW5nIHNldHRpbmcgU2hhcmVkIHByZWZlcmVuY2VzLCBuYW1lIGlzIHVuZGVmaW5lZDogJHtKU09OLnN0cmluZ2lmeShzaGFyZWRQcmVmcyl9YCk7XG4gICAgICByZXR1cm4gZmFsc2U7XG4gICAgfVxuICAgIGxldCByZW1vdGVQYXRoID0gYC9kYXRhL2RhdGEvJHt0aGlzLm9wdHMuYXBwUGFja2FnZX0vc2hhcmVkX3ByZWZzYDtcbiAgICBsZXQgcmVtb3RlRmlsZSA9IGAke3JlbW90ZVBhdGh9LyR7bmFtZX0ueG1sYDtcbiAgICBsZXQgbG9jYWxQYXRoID0gYC90bXAvJHtuYW1lfS54bWxgO1xuICAgIGxldCBidWlsZGVyID0gdGhpcy5nZXRQcmVmc0J1aWxkZXIoKTtcbiAgICBidWlsZGVyLmJ1aWxkKHNoYXJlZFByZWZzLnByZWZzKTtcbiAgICBsb2cuaW5mbyhgQ3JlYXRpbmcgdGVtcG9yYXJ5IHNoYXJlZCBwcmVmZXJlbmNlczogJHtsb2NhbFBhdGh9YCk7XG4gICAgYnVpbGRlci50b0ZpbGUobG9jYWxQYXRoKTtcbiAgICBsb2cuaW5mbyhgQ3JlYXRpbmcgc2hhcmVkX3ByZWZzIHJlbW90ZSBmb2xkZXI6ICR7cmVtb3RlUGF0aH1gKTtcbiAgICBhd2FpdCB0aGlzLmFkYi5zaGVsbChbJ21rZGlyJywgJy1wJywgcmVtb3RlUGF0aF0pO1xuICAgIGxvZy5pbmZvKGBQdXNoaW5nIHNoYXJlZF9wcmVmcyB0byAke3JlbW90ZUZpbGV9YCk7XG4gICAgYXdhaXQgdGhpcy5hZGIucHVzaChsb2NhbFBhdGgsIHJlbW90ZUZpbGUpO1xuICAgIHRyeSB7XG4gICAgICBsb2cuaW5mbyhgVHJ5aW5nIHRvIHJlbW92ZSBzaGFyZWQgcHJlZmVyZW5jZXMgdGVtcG9yYXJ5IGZpbGVgKTtcbiAgICAgIGlmIChhd2FpdCBmcy5leGlzdHMobG9jYWxQYXRoKSkge1xuICAgICAgICBhd2FpdCBmcy51bmxpbmsobG9jYWxQYXRoKTtcbiAgICAgIH1cbiAgICB9IGNhdGNoIChlKSB7XG4gICAgICBsb2cud2FybihgRXJyb3IgdHJ5aW5nIHRvIHJlbW92ZSB0ZW1wb3JhcnkgZmlsZSAke2xvY2FsUGF0aH1gKTtcbiAgICB9XG4gICAgcmV0dXJuIHRydWU7XG4gIH1cblxuICBnZXRQcmVmc0J1aWxkZXIgKCkge1xuICAgIC8qIEFkZCB0aGlzIG1ldGhvZCB0byBjcmVhdGUgYSBuZXcgU2hhcmVkUHJlZnNCdWlsZGVyIGluc3RlYWQgb2ZcbiAgICAgKiBkaXJlY3RseSBjcmVhdGluZyB0aGUgb2JqZWN0IG9uIHNldFNoYXJlZFByZWZlcmVuY2VzIGZvciB0ZXN0aW5nIHB1cnBvc2VzXG4gICAgKi9cbiAgICByZXR1cm4gbmV3IFNoYXJlZFByZWZzQnVpbGRlcigpO1xuICB9XG5cbiAgdmFsaWRhdGVEZXNpcmVkQ2FwcyAoY2Fwcykge1xuICAgIC8vIGNoZWNrIHdpdGggdGhlIGJhc2UgY2xhc3MsIGFuZCByZXR1cm4gaWYgaXQgZmFpbHNcbiAgICBsZXQgcmVzID0gc3VwZXIudmFsaWRhdGVEZXNpcmVkQ2FwcyhjYXBzKTtcbiAgICBpZiAoIXJlcykgcmV0dXJuIHJlczsgLy8gZXNsaW50LWRpc2FibGUtbGluZSBjdXJseVxuXG4gICAgLy8gbWFrZSBzdXJlIHRoYXQgdGhlIGNhcGFiaWxpdGllcyBoYXZlIG9uZSBvZiBgYXBwYCwgYGFwcFBhY2thZ2VgIG9yIGBicm93c2VyYFxuICAgIGlmICgoIWNhcHMuYnJvd3Nlck5hbWUgfHwgIWhlbHBlcnMuaXNDaHJvbWVCcm93c2VyKGNhcHMuYnJvd3Nlck5hbWUpKSAmJlxuICAgICAgIWNhcHMuYXBwICYmICFjYXBzLmFwcFBhY2thZ2UpIHtcbiAgICAgIGxldCBtc2cgPSAnVGhlIGRlc2lyZWQgY2FwYWJpbGl0aWVzIG11c3QgaW5jbHVkZSBlaXRoZXIgYW4gYXBwLCBhcHBQYWNrYWdlIG9yIGJyb3dzZXJOYW1lJztcbiAgICAgIGxvZy5lcnJvckFuZFRocm93KG1zZyk7XG4gICAgfVxuICAgIC8vIHdhcm4gaWYgdGhlIGNhcGFiaWxpdGllcyBoYXZlIGJvdGggYGFwcGAgYW5kIGBicm93c2VyLCBhbHRob3VnaCB0aGlzXG4gICAgLy8gaXMgY29tbW9uIHdpdGggc2VsZW5pdW0gZ3JpZFxuICAgIGlmIChjYXBzLmJyb3dzZXJOYW1lICYmIGNhcHMuYXBwKSB7XG4gICAgICBsZXQgbXNnID0gJ1RoZSBkZXNpcmVkIGNhcGFiaWxpdGllcyBzaG91bGQgZ2VuZXJhbGx5IG5vdCBpbmNsdWRlIGJvdGggYW4gYXBwIGFuZCBhIGJyb3dzZXJOYW1lJztcbiAgICAgIGxvZy53YXJuKG1zZyk7XG4gICAgfVxuICB9XG5cbiAgcHJveHlBY3RpdmUgKHNlc3Npb25JZCkge1xuICAgIHN1cGVyLnByb3h5QWN0aXZlKHNlc3Npb25JZCk7XG5cbiAgICByZXR1cm4gdGhpcy5qd3BQcm94eUFjdGl2ZTtcbiAgfVxuXG4gIGdldFByb3h5QXZvaWRMaXN0IChzZXNzaW9uSWQpIHtcbiAgICBzdXBlci5nZXRQcm94eUF2b2lkTGlzdChzZXNzaW9uSWQpO1xuXG4gICAgcmV0dXJuIHRoaXMuandwUHJveHlBdm9pZDtcbiAgfVxuXG4gIGNhblByb3h5IChzZXNzaW9uSWQpIHtcbiAgICBzdXBlci5jYW5Qcm94eShzZXNzaW9uSWQpO1xuXG4gICAgLy8gdGhpcyB3aWxsIGNoYW5nZSBkZXBlbmRpbmcgb24gQ2hyb21lRHJpdmVyIHN0YXR1c1xuICAgIHJldHVybiBfLmlzRnVuY3Rpb24odGhpcy5wcm94eVJlcVJlcyk7XG4gIH1cbn1cblxuZXhwb3J0IGRlZmF1bHQgQW5kcm9pZERyaXZlcjtcbiJdLCJzb3VyY2VSb290IjoiLi4vLi4ifQ==

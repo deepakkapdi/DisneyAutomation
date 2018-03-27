@@ -1,0 +1,21 @@
+[ {
+  "uid" : "4292cba64647b63",
+  "name" : "Login test case",
+  "time" : {
+    "start" : 1520339781242,
+    "stop" : 1520339871303,
+    "duration" : 90061
+  },
+  "status" : "broken",
+  "severity" : "normal"
+}, {
+  "uid" : "547aaac4c67cc159",
+  "name" : "PhotoPass_Link_Photos",
+  "time" : {
+    "start" : 1520339575440,
+    "stop" : 1520339781241,
+    "duration" : 205801
+  },
+  "status" : "broken",
+  "severity" : "normal"
+} ]

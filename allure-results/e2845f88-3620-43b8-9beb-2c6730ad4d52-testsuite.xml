@@ -1,0 +1,39 @@
+<?xml version='1.0'?>
+<ns2:test-suite xmlns:ns2='urn:model.allure.qatools.yandex.ru' start='1520338933376' stop='1520339355558'>
+    <name>Testing_Photopass_Link_Photos_Functionality</name>
+    <title>Testing_Photopass_Link_Photos_Functionality</title>
+    <test-cases>
+        <test-case start='1520338933376' status='broken' stop='1520339355557'>
+            <name>PhotoPass_Link_Photos</name>
+            <title>PhotoPass_Link_Photos</title>
+            <labels/>
+            <parameters/>
+            <steps>
+                <step start='1520338934386' status='broken' stop='1520339314505'>
+                    <name>Launching Application</name>
+                    <title>Launching Application</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339315543' status='broken' stop='1520339355550'>
+                    <name>Tap on PullDown Image</name>
+                    <title>Tap on PullDown Image</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339355555' status='broken' stop='1520339355557'>
+                    <name>Attached Screenshot</name>
+                    <title>Attached Screenshot</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+            </steps>
+            <attachments/>
+            <failure>
+                <message>A session id is required for this command but wasn't found in the response payload</message>
+                <stack-trace>Error: A session id is required for this command but wasn't found in the response payload
+                    at screenshot() -     at E:\DisneyMobileAutomation\DisneyAutomation\Lib\Helpers\HelperFunctions.js:5:</stack-trace>
+            </failure>
+        </test-case>
+    </test-cases>
+</ns2:test-suite>

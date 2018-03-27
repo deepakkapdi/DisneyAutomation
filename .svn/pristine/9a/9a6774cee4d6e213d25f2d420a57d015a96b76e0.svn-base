@@ -1,0 +1,573 @@
+'use strict';
+
+var _regeneratorRuntime = require('babel-runtime/regenerator')['default'];
+
+var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _2 = require('../..');
+
+var _requestPromise = require('request-promise');
+
+var _requestPromise2 = _interopRequireDefault(_requestPromise);
+
+var _chai = require('chai');
+
+var _chai2 = _interopRequireDefault(_chai);
+
+var _chaiAsPromised = require('chai-as-promised');
+
+var _chaiAsPromised2 = _interopRequireDefault(_chaiAsPromised);
+
+var _bluebird = require('bluebird');
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
+var should = _chai2['default'].should();
+_chai2['default'].use(_chaiAsPromised2['default']);
+
+function baseDriverE2ETests(DriverClass) {
+  var defaultCaps = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+  describe('BaseDriver (e2e)', function () {
+    var _this = this;
+
+    var baseServer = undefined,
+        d = new DriverClass();
+    before(function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap((0, _2.server)((0, _2.routeConfiguringFunction)(d), 8181));
+
+          case 2:
+            baseServer = context$3$0.sent;
+
+          case 3:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    after(function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(baseServer.close());
+
+          case 2:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+
+    function startSession(caps) {
+      return (0, _requestPromise2['default'])({
+        url: 'http://localhost:8181/wd/hub/session',
+        method: 'POST',
+        json: { desiredCapabilities: caps, requiredCapabilities: {} }
+      });
+    }
+
+    function endSession(id) {
+      return (0, _requestPromise2['default'])({
+        url: 'http://localhost:8181/wd/hub/session/' + id,
+        method: 'DELETE',
+        json: true,
+        simple: false
+      });
+    }
+
+    function getSession(id) {
+      return (0, _requestPromise2['default'])({
+        url: 'http://localhost:8181/wd/hub/session/' + id,
+        method: 'GET',
+        json: true,
+        simple: false
+      });
+    }
+
+    describe('session handling', function () {
+      it('should create session and retrieve a session id, then delete it', function callee$3$0() {
+        var res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session',
+                method: 'POST',
+                json: { desiredCapabilities: defaultCaps, requiredCapabilities: {} },
+                simple: false,
+                resolveWithFullResponse: true
+              }));
+
+            case 2:
+              res = context$4$0.sent;
+
+              res.statusCode.should.equal(200);
+              res.body.status.should.equal(0);
+              should.exist(res.body.sessionId);
+              res.body.value.should.eql(defaultCaps);
+
+              context$4$0.next = 9;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId,
+                method: 'DELETE',
+                json: true,
+                simple: false,
+                resolveWithFullResponse: true
+              }));
+
+            case 9:
+              res = context$4$0.sent;
+
+              res.statusCode.should.equal(200);
+              res.body.status.should.equal(0);
+              should.equal(d.sessionId, null);
+
+            case 13:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+    });
+
+    it.skip('should throw NYI for commands not implemented', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, _this);
+    });
+
+    describe('command timeouts', function () {
+      function startTimeoutSession(timeout) {
+        var caps = _lodash2['default'].clone(defaultCaps);
+        caps.newCommandTimeout = timeout;
+        return startSession(caps);
+      }
+
+      d.findElement = (function () {
+        return 'foo';
+      }).bind(d);
+
+      d.findElements = (function callee$3$0() {
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(_bluebird2['default'].delay(200));
+
+            case 2:
+              return context$4$0.abrupt('return', ['foo']);
+
+            case 3:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      }).bind(d);
+
+      it('should set a default commandTimeout', function callee$3$0() {
+        var newSession;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(startTimeoutSession());
+
+            case 2:
+              newSession = context$4$0.sent;
+
+              d.newCommandTimeoutMs.should.be.above(0);
+              context$4$0.next = 6;
+              return _regeneratorRuntime.awrap(endSession(newSession.sessionId));
+
+            case 6:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+
+      it('should timeout on commands using commandTimeout cap', function callee$3$0() {
+        var newSession, res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(startTimeoutSession(0.25));
+
+            case 2:
+              newSession = context$4$0.sent;
+              context$4$0.next = 5;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId + '/element',
+                method: 'POST',
+                json: { using: 'name', value: 'foo' }
+              }));
+
+            case 5:
+              context$4$0.next = 7;
+              return _regeneratorRuntime.awrap(_bluebird2['default'].delay(400));
+
+            case 7:
+              context$4$0.next = 9;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId,
+                method: 'GET',
+                json: true,
+                simple: false
+              }));
+
+            case 9:
+              res = context$4$0.sent;
+
+              res.status.should.equal(6);
+              should.equal(d.sessionId, null);
+              context$4$0.next = 14;
+              return _regeneratorRuntime.awrap(endSession(newSession.sessionId));
+
+            case 14:
+              res = context$4$0.sent;
+
+              res.status.should.equal(6);
+
+            case 16:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+
+      it('should not timeout with commandTimeout of false', function callee$3$0() {
+        var newSession, start, res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(startTimeoutSession(0.1));
+
+            case 2:
+              newSession = context$4$0.sent;
+              start = Date.now();
+              context$4$0.next = 6;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId + '/elements',
+                method: 'POST',
+                json: { using: 'name', value: 'foo' }
+              }));
+
+            case 6:
+              res = context$4$0.sent;
+
+              (Date.now() - start).should.be.above(150);
+              res.value.should.eql(['foo']);
+              context$4$0.next = 11;
+              return _regeneratorRuntime.awrap(endSession(newSession.sessionId));
+
+            case 11:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+
+      it('should not timeout with commandTimeout of 0', function callee$3$0() {
+        var newSession, res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              d.newCommandTimeoutMs = 2;
+              context$4$0.next = 3;
+              return _regeneratorRuntime.awrap(startTimeoutSession(0));
+
+            case 3:
+              newSession = context$4$0.sent;
+              context$4$0.next = 6;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId + '/element',
+                method: 'POST',
+                json: { using: 'name', value: 'foo' }
+              }));
+
+            case 6:
+              context$4$0.next = 8;
+              return _regeneratorRuntime.awrap(_bluebird2['default'].delay(400));
+
+            case 8:
+              context$4$0.next = 10;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId,
+                method: 'GET',
+                json: true,
+                simple: false
+              }));
+
+            case 10:
+              res = context$4$0.sent;
+
+              res.status.should.equal(0);
+              context$4$0.next = 14;
+              return _regeneratorRuntime.awrap(endSession(newSession.sessionId));
+
+            case 14:
+              res = context$4$0.sent;
+
+              res.status.should.equal(0);
+
+              d.newCommandTimeoutMs = 60 * 1000;
+
+            case 17:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+
+      it('should not timeout if its just the command taking awhile', function callee$3$0() {
+        var newSession, res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(startTimeoutSession(0.25));
+
+            case 2:
+              newSession = context$4$0.sent;
+              context$4$0.next = 5;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId + '/element',
+                method: 'POST',
+                json: { using: 'name', value: 'foo' }
+              }));
+
+            case 5:
+              context$4$0.next = 7;
+              return _regeneratorRuntime.awrap(_bluebird2['default'].delay(400));
+
+            case 7:
+              context$4$0.next = 9;
+              return _regeneratorRuntime.awrap((0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/session/' + d.sessionId,
+                method: 'GET',
+                json: true,
+                simple: false
+              }));
+
+            case 9:
+              res = context$4$0.sent;
+
+              res.status.should.equal(6);
+              should.equal(d.sessionId, null);
+              context$4$0.next = 14;
+              return _regeneratorRuntime.awrap(endSession(newSession.sessionId));
+
+            case 14:
+              res = context$4$0.sent;
+
+              res.status.should.equal(6);
+
+            case 16:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+
+      it('should not have a timer running before or after a session', function callee$3$0() {
+        var newSession;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              should.not.exist(d.noCommandTimer);
+              context$4$0.next = 3;
+              return _regeneratorRuntime.awrap(startTimeoutSession(0.25));
+
+            case 3:
+              newSession = context$4$0.sent;
+
+              newSession.sessionId.should.equal(d.sessionId);
+              should.exist(d.noCommandTimer);
+              context$4$0.next = 8;
+              return _regeneratorRuntime.awrap(endSession(newSession.sessionId));
+
+            case 8:
+              should.not.exist(d.noCommandTimer);
+
+            case 9:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+    });
+
+    describe('settings api', function () {
+      before(function () {
+        d.settings = new _2.DeviceSettings({ ignoreUnimportantViews: false });
+      });
+      it('should be able to get settings object', function () {
+        d.settings.getSettings().ignoreUnimportantViews.should.be['false'];
+      });
+      it('should throw error when updateSettings method is not defined', function callee$3$0() {
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(d.settings.update({ ignoreUnimportantViews: true }).should.eventually.be.rejectedWith('onSettingsUpdate'));
+
+            case 2:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+      it('should throw error for invalid update object', function callee$3$0() {
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(d.settings.update('invalid json').should.eventually.be.rejectedWith('JSON'));
+
+            case 2:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+    });
+
+    describe('unexpected exits', function () {
+      it('should reject a current command when the driver crashes', function callee$3$0() {
+        var p, res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              d._oldGetStatus = d.getStatus;
+              d.getStatus = (function callee$4$0() {
+                return _regeneratorRuntime.async(function callee$4$0$(context$5$0) {
+                  while (1) switch (context$5$0.prev = context$5$0.next) {
+                    case 0:
+                      context$5$0.next = 2;
+                      return _regeneratorRuntime.awrap(_bluebird2['default'].delay(5000));
+
+                    case 2:
+                    case 'end':
+                      return context$5$0.stop();
+                  }
+                }, null, this);
+              }).bind(d);
+              p = (0, _requestPromise2['default'])({
+                url: 'http://localhost:8181/wd/hub/status',
+                method: 'GET',
+                json: true,
+                simple: false
+              });
+              context$4$0.next = 5;
+              return _regeneratorRuntime.awrap(_bluebird2['default'].delay(20));
+
+            case 5:
+              d.startUnexpectedShutdown(new Error('Crashytimes'));
+              context$4$0.next = 8;
+              return _regeneratorRuntime.awrap(p);
+
+            case 8:
+              res = context$4$0.sent;
+
+              res.status.should.equal(13);
+              res.value.message.should.contain('Crashytimes');
+              context$4$0.next = 13;
+              return _regeneratorRuntime.awrap(d.onUnexpectedShutdown.should.be.rejectedWith('Crashytimes'));
+
+            case 13:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+    });
+
+    describe('event timings', function () {
+      it('should not add timings if not using opt-in cap', function callee$3$0() {
+        var session, res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              context$4$0.next = 2;
+              return _regeneratorRuntime.awrap(startSession(defaultCaps));
+
+            case 2:
+              session = context$4$0.sent;
+              context$4$0.next = 5;
+              return _regeneratorRuntime.awrap(getSession(session.sessionId));
+
+            case 5:
+              res = context$4$0.sent;
+
+              should.not.exist(res.events);
+              context$4$0.next = 9;
+              return _regeneratorRuntime.awrap(endSession(session.sessionId));
+
+            case 9:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+      it('should add start session timings', function callee$3$0() {
+        var caps, session, res;
+        return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+          while (1) switch (context$4$0.prev = context$4$0.next) {
+            case 0:
+              caps = _Object$assign({}, defaultCaps, { eventTimings: true });
+              context$4$0.next = 3;
+              return _regeneratorRuntime.awrap(startSession(caps));
+
+            case 3:
+              session = context$4$0.sent;
+              context$4$0.next = 6;
+              return _regeneratorRuntime.awrap(getSession(session.sessionId));
+
+            case 6:
+              res = context$4$0.sent.value;
+
+              should.exist(res.events);
+              should.exist(res.events.newSessionRequested);
+              should.exist(res.events.newSessionStarted);
+              res.events.newSessionRequested[0].should.be.a('number');
+              res.events.newSessionStarted[0].should.be.a('number');
+              context$4$0.next = 14;
+              return _regeneratorRuntime.awrap(endSession(session.sessionId));
+
+            case 14:
+            case 'end':
+              return context$4$0.stop();
+          }
+        }, null, this);
+      });
+    });
+  });
+}
+
+exports['default'] = baseDriverE2ETests;
+module.exports = exports['default'];
+
+// make sure that the request gets to the server before our shutdown
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInRlc3QvYmFzZWRyaXZlci9kcml2ZXItZTJlLXRlc3RzLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7OztzQkFBYyxRQUFROzs7O2lCQUMyQyxPQUFPOzs4QkFDcEQsaUJBQWlCOzs7O29CQUNwQixNQUFNOzs7OzhCQUNJLGtCQUFrQjs7Ozt3QkFDL0IsVUFBVTs7OztBQUV4QixJQUFNLE1BQU0sR0FBRyxrQkFBSyxNQUFNLEVBQUUsQ0FBQztBQUM3QixrQkFBSyxHQUFHLDZCQUFnQixDQUFDOztBQUV6QixTQUFTLGtCQUFrQixDQUFFLFdBQVcsRUFBb0I7TUFBbEIsV0FBVyx5REFBRyxFQUFFOztBQUN4RCxVQUFRLENBQUMsa0JBQWtCLEVBQUUsWUFBWTs7O0FBQ3ZDLFFBQUksVUFBVSxZQUFBO1FBQUUsQ0FBQyxHQUFHLElBQUksV0FBVyxFQUFFLENBQUM7QUFDdEMsVUFBTSxDQUFDOzs7Ozs2Q0FDYyxlQUFPLGlDQUF5QixDQUFDLENBQUMsRUFBRSxJQUFJLENBQUM7OztBQUE1RCxzQkFBVTs7Ozs7OztLQUNYLENBQUMsQ0FBQztBQUNILFNBQUssQ0FBQzs7Ozs7NkNBQ0UsVUFBVSxDQUFDLEtBQUssRUFBRTs7Ozs7OztLQUN6QixDQUFDLENBQUM7O0FBRUgsYUFBUyxZQUFZLENBQUUsSUFBSSxFQUFFO0FBQzNCLGFBQU8saUNBQVE7QUFDYixXQUFHLEVBQUUsc0NBQXNDO0FBQzNDLGNBQU0sRUFBRSxNQUFNO0FBQ2QsWUFBSSxFQUFFLEVBQUMsbUJBQW1CLEVBQUUsSUFBSSxFQUFFLG9CQUFvQixFQUFFLEVBQUUsRUFBQztPQUM1RCxDQUFDLENBQUM7S0FDSjs7QUFFRCxhQUFTLFVBQVUsQ0FBRSxFQUFFLEVBQUU7QUFDdkIsYUFBTyxpQ0FBUTtBQUNiLFdBQUcsNENBQTBDLEVBQUUsQUFBRTtBQUNqRCxjQUFNLEVBQUUsUUFBUTtBQUNoQixZQUFJLEVBQUUsSUFBSTtBQUNWLGNBQU0sRUFBRSxLQUFLO09BQ2QsQ0FBQyxDQUFD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bnQiOlsiaW1wb3J0IF8gZnJvbSAnbG9kYXNoJztcbmltcG9ydCB7IHNlcnZlciwgcm91dGVDb25maWd1cmluZ0Z1bmN0aW9uLCBEZXZpY2VTZXR0aW5ncyB9IGZyb20gJy4uLy4uJztcbmltcG9ydCByZXF1ZXN0IGZyb20gJ3JlcXVlc3QtcHJvbWlzZSc7XG5pbXBvcnQgY2hhaSBmcm9tICdjaGFpJztcbmltcG9ydCBjaGFpQXNQcm9taXNlZCBmcm9tICdjaGFpLWFzLXByb21pc2VkJztcbmltcG9ydCBCIGZyb20gJ2JsdWViaXJkJztcblxuY29uc3Qgc2hvdWxkID0gY2hhaS5zaG91bGQoKTtcbmNoYWkudXNlKGNoYWlBc1Byb21pc2VkKTtcblxuZnVuY3Rpb24gYmFzZURyaXZlckUyRVRlc3RzIChEcml2ZXJDbGFzcywgZGVmYXVsdENhcHMgPSB7fSkge1xuICBkZXNjcmliZSgnQmFzZURyaXZlciAoZTJlKScsIGZ1bmN0aW9uICgpIHtcbiAgICBsZXQgYmFzZVNlcnZlciwgZCA9IG5ldyBEcml2ZXJDbGFzcygpO1xuICAgIGJlZm9yZShhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBiYXNlU2VydmVyID0gYXdhaXQgc2VydmVyKHJvdXRlQ29uZmlndXJpbmdGdW5jdGlvbihkKSwgODE4MSk7XG4gICAgfSk7XG4gICAgYWZ0ZXIoYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgYXdhaXQgYmFzZVNlcnZlci5jbG9zZSgpO1xuICAgIH0pO1xuXG4gICAgZnVuY3Rpb24gc3RhcnRTZXNzaW9uIChjYXBzKSB7XG4gICAgICByZXR1cm4gcmVxdWVzdCh7XG4gICAgICAgIHVybDogJ2h0dHA6Ly9sb2NhbGhvc3Q6ODE4MS93ZC9odWIvc2Vzc2lvbicsXG4gICAgICAgIG1ldGhvZDogJ1BPU1QnLFxuICAgICAgICBqc29uOiB7ZGVzaXJlZENhcGFiaWxpdGllczogY2FwcywgcmVxdWlyZWRDYXBhYmlsaXRpZXM6IHt9fSxcbiAgICAgIH0pO1xuICAgIH1cblxuICAgIGZ1bmN0aW9uIGVuZFNlc3Npb24gKGlkKSB7XG4gICAgICByZXR1cm4gcmVxdWVzdCh7XG4gICAgICAgIHVybDogYGh0dHA6Ly9sb2NhbGhvc3Q6ODE4MS93ZC9odWIvc2Vzc2lvbi8ke2lkfWAsXG4gICAgICAgIG1ldGhvZDogJ0RFTEVURScsXG4gICAgICAgIGpzb246IHRydWUsXG4gICAgICAgIHNpbXBsZTogZmFsc2VcbiAgICAgIH0pO1xuICAgIH1cblxuICAgIGZ1bmN0aW9uIGdldFNlc3Npb24gKGlkKSB7XG4gICAgICByZXR1cm4gcmVxdWVzdCh7XG4gICAgICAgIHVybDogYGh0dHA6Ly9sb2NhbGhvc3Q6ODE4MS93ZC9odWIvc2Vzc2lvbi8ke2lkfWAsXG4gICAgICAgIG1ldGhvZDogJ0dFVCcsXG4gICAgICAgIGpzb246IHRydWUsXG4gICAgICAgIHNpbXBsZTogZmFsc2VcbiAgICAgIH0pO1xuICAgIH1cblxuICAgIGRlc2NyaWJlKCdzZXNzaW9uIGhhbmRsaW5nJywgZnVuY3Rpb24gKCkge1xuICAgICAgaXQoJ3Nob3VsZCBjcmVhdGUgc2Vzc2lvbiBhbmQgcmV0cmlldmUgYSBzZXNzaW9uIGlkLCB0aGVuIGRlbGV0ZSBpdCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IHJlcyA9IGF3YWl0IHJlcXVlc3Qoe1xuICAgICAgICAgIHVybDogJ2h0dHA6Ly9sb2NhbGhvc3Q6ODE4MS93ZC9odWIvc2Vzc2lvbicsXG4gICAgICAgICAgbWV0aG9kOiAnUE9TVCcsXG4gICAgICAgICAganNvbjoge2Rlc2lyZWRDYXBhYmlsaXRpZXM6IGRlZmF1bHRDYXBzLCByZXF1aXJlZENhcGFiaWxpdGllczoge319LFxuICAgICAgICAgIHNpbXBsZTogZmFsc2UsXG4gICAgICAgICAgcmVzb2x2ZVdpdGhGdWxsUmVzcG9uc2U6IHRydWVcbiAgICAgICAgfSk7XG5cbiAgICAgICAgcmVzLnN0YXR1c0NvZGUuc2hvdWxkLmVxdWFsKDIwMCk7XG4gICAgICAgIHJlcy5ib2R5LnN0YXR1cy5zaG91bGQuZXF1YWwoMCk7XG4gICAgICAgIHNob3VsZC5leGlzdChyZXMuYm9keS5zZXNzaW9uSWQpO1xuICAgICAgICByZXMuYm9keS52YWx1ZS5zaG91bGQuZXFsKGRlZmF1bHRDYXBzKTtcblxuICAgICAgICByZXMgPSBhd2FpdCByZXF1ZXN0KHtcbiAgICAgICAgICB1cmw6IGBodHRwOi8vbG9jYWxob3N0OjgxODEvd2QvaHViL3Nlc3Npb24vJHtkLnNlc3Npb25JZH1gLFxuICAgICAgICAgIG1ldGhvZDogJ0RFTEVURScsXG4gICAgICAgICAganNvbjogdHJ1ZSxcbiAgICAgICAgICBzaW1wbGU6IGZhbHNlLFxuICAgICAgICAgIHJlc29sdmVXaXRoRnVsbFJlc3BvbnNlOiB0cnVlXG4gICAgICAgIH0pO1xuXG4gICAgICAgIHJlcy5zdGF0dXNDb2RlLnNob3VsZC5lcXVhbCgyMDApO1xuICAgICAgICByZXMuYm9keS5zdGF0dXMuc2hvdWxkLmVxdWFsKDApO1xuICAgICAgICBzaG91bGQuZXF1YWwoZC5zZXNzaW9uSWQsIG51bGwpO1xuICAgICAgfSk7XG4gICAgfSk7XG5cbiAgICBpdC5za2lwKCdzaG91bGQgdGhyb3cgTllJIGZvciBjb21tYW5kcyBub3QgaW1wbGVtZW50ZWQnLCBhc3luYyAoKSA9PiB7XG4gICAgfSk7XG5cbiAgICBkZXNjcmliZSgnY29tbWFuZCB0aW1lb3V0cycsIGZ1bmN0aW9uICgpIHtcbiAgICAgIGZ1bmN0aW9uIHN0YXJ0VGltZW91dFNlc3Npb24gKHRpbWVvdXQpIHtcbiAgICAgICAgbGV0IGNhcHMgPSBfLmNsb25lKGRlZmF1bHRDYXBzKTtcbiAgICAgICAgY2Fwcy5uZXdDb21tYW5kVGltZW91dCA9IHRpbWVvdXQ7XG4gICAgICAgIHJldHVybiBzdGFydFNlc3Npb24oY2Fwcyk7XG4gICAgICB9XG5cbiAgICAgIGQuZmluZEVsZW1lbnQgPSBmdW5jdGlvbiAoKSB7XG4gICAgICAgIHJldHVybiAnZm9vJztcbiAgICAgIH0uYmluZChkKTtcblxuICAgICAgZC5maW5kRWxlbWVudHMgPSBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICAgIGF3YWl0IEIuZGVsYXkoMjAwKTtcbiAgICAgICAgcmV0dXJuIFsnZm9vJ107XG4gICAgICB9LmJpbmQoZCk7XG5cbiAgICAgIGl0KCdzaG91bGQgc2V0IGEgZGVmYXVsdCBjb21tYW5kVGltZW91dCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IG5ld1Nlc3Npb24gPSBhd2FpdCBzdGFydFRpbWVvdXRTZXNzaW9uKCk7XG4gICAgICAgIGQubmV3Q29tbWFuZFRpbWVvdXRNcy5zaG91bGQuYmUuYWJvdmUoMCk7XG4gICAgICAgIGF3YWl0IGVuZFNlc3Npb24obmV3U2Vzc2lvbi5zZXNzaW9uSWQpO1xuICAgICAgfSk7XG5cbiAgICAgIGl0KCdzaG91bGQgdGltZW91dCBvbiBjb21tYW5kcyB1c2luZyBjb21tYW5kVGltZW91dCBjYXAnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICAgIGxldCBuZXdTZXNzaW9uID0gYXdhaXQgc3RhcnRUaW1lb3V0U2Vzc2lvbigwLjI1KTtcblxuICAgICAgICBhd2FpdCByZXF1ZXN0KHtcbiAgICAgICAgICB1cmw6IGBodHRwOi8vbG9jYWxob3N0OjgxODEvd2QvaHViL3Nlc3Npb24vJHtkLnNlc3Npb25JZH0vZWxlbWVudGAsXG4gICAgICAgICAgbWV0aG9kOiAnUE9TVCcsXG4gICAgICAgICAganNvbjoge3VzaW5nOiAnbmFtZScsIHZhbHVlOiAnZm9vJ30sXG4gICAgICAgIH0pO1xuICAgICAgICBhd2FpdCBCLmRlbGF5KDQwMCk7XG4gICAgICAgIGxldCByZXMgPSBhd2FpdCByZXF1ZXN0KHtcbiAgICAgICAgICB1cmw6IGBodHRwOi8vbG9jYWxob3N0OjgxODEvd2QvaHViL3Nlc3Npb24vJHtkLnNlc3Npb25JZH1gLFxuICAgICAgICAgIG1ldGhvZDogJ0dFVCcsXG4gICAgICAgICAganNvbjogdHJ1ZSxcbiAgICAgICAgICBzaW1wbGU6IGZhbHNlXG4gICAgICAgIH0pO1xuICAgICAgICByZXMuc3RhdHVzLnNob3VsZC5lcXVhbCg2KTtcbiAgICAgICAgc2hvdWxkLmVxdWFsKGQuc2Vzc2lvbklkLCBudWxsKTtcbiAgICAgICAgcmVzID0gYXdhaXQgZW5kU2Vzc2lvbihuZXdTZXNzaW9uLnNlc3Npb25JZCk7XG4gICAgICAgIHJlcy5zdGF0dXMuc2hvdWxkLmVxdWFsKDYpO1xuICAgICAgfSk7XG5cbiAgICAgIGl0KCdzaG91bGQgbm90IHRpbWVvdXQgd2l0aCBjb21tYW5kVGltZW91dCBvZiBmYWxzZScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IG5ld1Nlc3Npb24gPSBhd2FpdCBzdGFydFRpbWVvdXRTZXNzaW9uKDAuMSk7XG4gICAgICAgIGxldCBzdGFydCA9IERhdGUubm93KCk7XG4gICAgICAgIGxldCByZXMgPSBhd2FpdCByZXF1ZXN0KHtcbiAgICAgICAgICB1cmw6IGBodHRwOi8vbG9jYWxob3N0OjgxODEvd2QvaHViL3Nlc3Npb24vJHtkLnNlc3Npb25JZH0vZWxlbWVudHNgLFxuICAgICAgICAgIG1ldGhvZDogJ1BPU1QnLFxuICAgICAgICAgIGpzb246IHt1c2luZzogJ25hbWUnLCB2YWx1ZTogJ2Zvbyd9LFxuICAgICAgICB9KTtcbiAgICAgICAgKERhdGUubm93KCkgLSBzdGFydCkuc2hvdWxkLmJlLmFib3ZlKDE1MCk7XG4gICAgICAgIHJlcy52YWx1ZS5zaG91bGQuZXFsKFsnZm9vJ10pO1xuICAgICAgICBhd2FpdCBlbmRTZXNzaW9uKG5ld1Nlc3Npb24uc2Vzc2lvbklkKTtcbiAgICAgIH0pO1xuXG4gICAgICBpdCgnc2hvdWxkIG5vdCB0aW1lb3V0IHdpdGggY29tbWFuZFRpbWVvdXQgb2YgMCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgZC5uZXdDb21tYW5kVGltZW91dE1zID0gMjtcbiAgICAgICAgbGV0IG5ld1Nlc3Npb24gPSBhd2FpdCBzdGFydFRpbWVvdXRTZXNzaW9uKDApO1xuXG4gICAgICAgIGF3YWl0IHJlcXVlc3Qoe1xuICAgICAgICAgIHVybDogYGh0dHA6Ly9sb2NhbGhvc3Q6ODE4MS93ZC9odWIvc2Vzc2lvbi8ke2Quc2Vzc2lvbklkfS9lbGVtZW50YCxcbiAgICAgICAgICBtZXRob2Q6ICdQT1NUJyxcbiAgICAgICAgICBqc29uOiB7dXNpbmc6ICduYW1lJywgdmFsdWU6ICdmb28nfSxcbiAgICAgICAgfSk7XG4gICAgICAgIGF3YWl0IEIuZGVsYXkoNDAwKTtcbiAgICAgICAgbGV0IHJlcyA9IGF3YWl0IHJlcXVlc3Qoe1xuICAgICAgICAgIHVybDogYGh0dHA6Ly9sb2NhbGhvc3Q6ODE4MS93ZC9odWIvc2Vzc2lvbi8ke2Quc2Vzc2lvbklkfWAsXG4gICAgICAgICAgbWV0aG9kOiAnR0VUJyxcbiAgICAgICAgICBqc29uOiB0cnVlLFxuICAgICAgICAgIHNpbXBsZTogZmFsc2VcbiAgICAgICAgfSk7XG4gICAgICAgIHJlcy5zdGF0dXMuc2hvdWxkLmVxdWFsKDApO1xuICAgICAgICByZXMgPSBhd2FpdCBlbmRTZXNzaW9uKG5ld1Nlc3Npb24uc2Vzc2lvbklkKTtcbiAgICAgICAgcmVzLnN0YXR1cy5zaG91bGQuZXF1YWwoMCk7XG5cbiAgICAgICAgZC5uZXdDb21tYW5kVGltZW91dE1zID0gNjAgKiAxMDAwO1xuICAgICAgfSk7XG5cbiAgICAgIGl0KCdzaG91bGQgbm90IHRpbWVvdXQgaWYgaXRzIGp1c3QgdGhlIGNvbW1hbmQgdGFraW5nIGF3aGlsZScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IG5ld1Nlc3Npb24gPSBhd2FpdCBzdGFydFRpbWVvdXRTZXNzaW9uKDAuMjUpO1xuICAgICAgICBhd2FpdCByZXF1ZXN0KHtcbiAgICAgICAgICB1cmw6IGBodHRwOi8vbG9jYWxob3N0OjgxODEvd2QvaHViL3Nlc3Npb24vJHtkLnNlc3Npb25JZH0vZWxlbWVudGAsXG4gICAgICAgICAgbWV0aG9kOiAnUE9TVCcsXG4gICAgICAgICAganNvbjoge3VzaW5nOiAnbmFtZScsIHZhbHVlOiAnZm9vJ30sXG4gICAgICAgIH0pO1xuICAgICAgICBhd2FpdCBCLmRlbGF5KDQwMCk7XG4gICAgICAgIGxldCByZXMgPSBhd2FpdCByZXF1ZXN0KHtcbiAgICAgICAgICB1cmw6IGBodHRwOi8vbG9jYWxob3N0OjgxODEvd2QvaHViL3Nlc3Npb24vJHtkLnNlc3Npb25JZH1gLFxuICAgICAgICAgIG1ldGhvZDogJ0dFVCcsXG4gICAgICAgICAganNvbjogdHJ1ZSxcbiAgICAgICAgICBzaW1wbGU6IGZhbHNlXG4gICAgICAgIH0pO1xuICAgICAgICByZXMuc3RhdHVzLnNob3VsZC5lcXVhbCg2KTtcbiAgICAgICAgc2hvdWxkLmVxdWFsKGQuc2Vzc2lvbklkLCBudWxsKTtcbiAgICAgICAgcmVzID0gYXdhaXQgZW5kU2Vzc2lvbihuZXdTZXNzaW9uLnNlc3Npb25JZCk7XG4gICAgICAgIHJlcy5zdGF0dXMuc2hvdWxkLmVxdWFsKDYpO1xuICAgICAgfSk7XG5cbiAgICAgIGl0KCdzaG91bGQgbm90IGhhdmUgYSB0aW1lciBydW5uaW5nIGJlZm9yZSBvciBhZnRlciBhIHNlc3Npb24nLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICAgIHNob3VsZC5ub3QuZXhpc3QoZC5ub0NvbW1hbmRUaW1lcik7XG4gICAgICAgIGxldCBuZXdTZXNzaW9uID0gYXdhaXQgc3RhcnRUaW1lb3V0U2Vzc2lvbigwLjI1KTtcbiAgICAgICAgbmV3U2Vzc2lvbi5zZXNzaW9uSWQuc2hvdWxkLmVxdWFsKGQuc2Vzc2lvbklkKTtcbiAgICAgICAgc2hvdWxkLmV4aXN0KGQubm9Db21tYW5kVGltZXIpO1xuICAgICAgICBhd2FpdCBlbmRTZXNzaW9uKG5ld1Nlc3Npb24uc2Vzc2lvbklkKTtcbiAgICAgICAgc2hvdWxkLm5vdC5leGlzdChkLm5vQ29tbWFuZFRpbWVyKTtcbiAgICAgIH0pO1xuXG4gICAgfSk7XG5cbiAgICBkZXNjcmliZSgnc2V0dGluZ3MgYXBpJywgZnVuY3Rpb24gKCkge1xuICAgICAgYmVmb3JlKGZ1bmN0aW9uICgpIHtcbiAgICAgICAgZC5zZXR0aW5ncyA9IG5ldyBEZXZpY2VTZXR0aW5ncyh7aWdub3JlVW5pbXBvcnRhbnRWaWV3czogZmFsc2V9KTtcbiAgICAgIH0pO1xuICAgICAgaXQoJ3Nob3VsZCBiZSBhYmxlIHRvIGdldCBzZXR0aW5ncyBvYmplY3QnLCBmdW5jdGlvbiAoKSB7XG4gICAgICAgIGQuc2V0dGluZ3MuZ2V0U2V0dGluZ3MoKS5pZ25vcmVVbmltcG9ydGFudFZpZXdzLnNob3VsZC5iZS5mYWxzZTtcbiAgICAgIH0pO1xuICAgICAgaXQoJ3Nob3VsZCB0aHJvdyBlcnJvciB3aGVuIHVwZGF0ZVNldHRpbmdzIG1ldGhvZCBpcyBub3QgZGVmaW5lZCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgYXdhaXQgZC5zZXR0aW5ncy51cGRhdGUoe2lnbm9yZVVuaW1wb3J0YW50Vmlld3M6IHRydWV9KS5zaG91bGQuZXZlbnR1YWxseVxuICAgICAgICAgICAgICAgIC5iZS5yZWplY3RlZFdpdGgoJ29uU2V0dGluZ3NVcGRhdGUnKTtcbiAgICAgIH0pO1xuICAgICAgaXQoJ3Nob3VsZCB0aHJvdyBlcnJvciBmb3IgaW52YWxpZCB1cGRhdGUgb2JqZWN0JywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgICBhd2FpdCBkLnNldHRpbmdzLnVwZGF0ZSgnaW52YWxpZCBqc29uJykuc2hvdWxkLmV2ZW50dWFsbHlcbiAgICAgICAgICAgICAgICAuYmUucmVqZWN0ZWRXaXRoKCdKU09OJyk7XG4gICAgICB9KTtcbiAgICB9KTtcblxuICAgIGRlc2NyaWJlKCd1bmV4cGVjdGVkIGV4aXRzJywgZnVuY3Rpb24gKCkge1xuICAgICAgaXQoJ3Nob3VsZCByZWplY3QgYSBjdXJyZW50IGNvbW1hbmQgd2hlbiB0aGUgZHJpdmVyIGNyYXNoZXMnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICAgIGQuX29sZEdldFN0YXR1cyA9IGQuZ2V0U3RhdHVzO1xuICAgICAgICBkLmdldFN0YXR1cyA9IGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgICBhd2FpdCBCLmRlbGF5KDUwMDApO1xuICAgICAgICB9LmJpbmQoZCk7XG4gICAgICAgIGxldCBwID0gcmVxdWVzdCh7XG4gICAgICAgICAgdXJsOiAnaHR0cDovL2xvY2FsaG9zdDo4MTgxL3dkL2h1Yi9zdGF0dXMnLFxuICAgICAgICAgIG1ldGhvZDogJ0dFVCcsXG4gICAgICAgICAganNvbjogdHJ1ZSxcbiAgICAgICAgICBzaW1wbGU6IGZhbHNlXG4gICAgICAgIH0pO1xuICAgICAgICAvLyBtYWtlIHN1cmUgdGhhdCB0aGUgcmVxdWVzdCBnZXRzIHRvIHRoZSBzZXJ2ZXIgYmVmb3JlIG91ciBzaHV0ZG93blxuICAgICAgICBhd2FpdCBCLmRlbGF5KDIwKTtcbiAgICAgICAgZC5zdGFydFVuZXhwZWN0ZWRTaHV0ZG93bihuZXcgRXJyb3IoJ0NyYXNoeXRpbWVzJykpO1xuICAgICAgICBsZXQgcmVzID0gYXdhaXQgcDtcbiAgICAgICAgcmVzLnN0YXR1cy5zaG91bGQuZXF1YWwoMTMpO1xuICAgICAgICByZXMudmFsdWUubWVzc2FnZS5zaG91bGQuY29udGFpbignQ3Jhc2h5dGltZXMnKTtcbiAgICAgICAgYXdhaXQgZC5vblVuZXhwZWN0ZWRTaHV0ZG93bi5zaG91bGQuYmUucmVqZWN0ZWRXaXRoKCdDcmFzaHl0aW1lcycpO1xuICAgICAgfSk7XG4gICAgfSk7XG5cbiAgICBkZXNjcmliZSgnZXZlbnQgdGltaW5ncycsIGZ1bmN0aW9uICgpIHtcbiAgICAgIGl0KCdzaG91bGQgbm90IGFkZCB0aW1pbmdzIGlmIG5vdCB1c2luZyBvcHQtaW4gY2FwJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgICBsZXQgc2Vzc2lvbiA9IGF3YWl0IHN0YXJ0U2Vzc2lvbihkZWZhdWx0Q2Fwcyk7XG4gICAgICAgIGxldCByZXMgPSBhd2FpdCBnZXRTZXNzaW9uKHNlc3Npb24uc2Vzc2lvbklkKTtcbiAgICAgICAgc2hvdWxkLm5vdC5leGlzdChyZXMuZXZlbnRzKTtcbiAgICAgICAgYXdhaXQgZW5kU2Vzc2lvbihzZXNzaW9uLnNlc3Npb25JZCk7XG4gICAgICB9KTtcbiAgICAgIGl0KCdzaG91bGQgYWRkIHN0YXJ0IHNlc3Npb24gdGltaW5ncycsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IGNhcHMgPSBPYmplY3QuYXNzaWduKHt9LCBkZWZhdWx0Q2Fwcywge2V2ZW50VGltaW5nczogdHJ1ZX0pO1xuICAgICAgICBsZXQgc2Vzc2lvbiA9IGF3YWl0IHN0YXJ0U2Vzc2lvbihjYXBzKTtcbiAgICAgICAgbGV0IHJlcyA9IChhd2FpdCBnZXRTZXNzaW9uKHNlc3Npb24uc2Vzc2lvbklkKSkudmFsdWU7XG4gICAgICAgIHNob3VsZC5leGlzdChyZXMuZXZlbnRzKTtcbiAgICAgICAgc2hvdWxkLmV4aXN0KHJlcy5ldmVudHMubmV3U2Vzc2lvblJlcXVlc3RlZCk7XG4gICAgICAgIHNob3VsZC5leGlzdChyZXMuZXZlbnRzLm5ld1Nlc3Npb25TdGFydGVkKTtcbiAgICAgICAgcmVzLmV2ZW50cy5uZXdTZXNzaW9uUmVxdWVzdGVkWzBdLnNob3VsZC5iZS5hKCdudW1iZXInKTtcbiAgICAgICAgcmVzLmV2ZW50cy5uZXdTZXNzaW9uU3RhcnRlZFswXS5zaG91bGQuYmUuYSgnbnVtYmVyJyk7XG4gICAgICAgIGF3YWl0IGVuZFNlc3Npb24oc2Vzc2lvbi5zZXNzaW9uSWQpO1xuICAgICAgfSk7XG4gICAgfSk7XG5cbiAgfSk7XG59XG5cbmV4cG9ydCBkZWZhdWx0IGJhc2VEcml2ZXJFMkVUZXN0cztcbiJdLCJzb3VyY2VSb290IjoiLi4vLi4vLi4ifQ==

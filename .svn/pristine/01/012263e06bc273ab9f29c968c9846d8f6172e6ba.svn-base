@@ -1,0 +1,25 @@
+{
+  "uid" : "4b4757e66a1912dae1a509f688f20b0f",
+  "name" : "categories",
+  "children" : [ {
+    "name" : "Product defects",
+    "children" : [ {
+      "name" : "element (\"android=new UiSelector().className(\"android.widget\")\") still not existing after 30000ms",
+      "children" : [ {
+        "name" : "Login test case",
+        "uid" : "95b94c26b418a821",
+        "parentUid" : "822f0945840a9110874f0b95b1b517a9",
+        "status" : "failed",
+        "time" : {
+          "start" : 1519725685687,
+          "stop" : 1519725827859,
+          "duration" : 142172
+        },
+        "flaky" : false,
+        "parameters" : [ ]
+      } ],
+      "uid" : "822f0945840a9110874f0b95b1b517a9"
+    } ],
+    "uid" : "8fb3a91ba5aaf9de24cc8a92edc82b5d"
+  } ]
+}

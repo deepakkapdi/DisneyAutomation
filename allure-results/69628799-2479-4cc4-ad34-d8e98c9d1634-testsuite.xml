@@ -1,0 +1,89 @@
+<?xml version='1.0'?>
+<ns2:test-suite xmlns:ns2='urn:model.allure.qatools.yandex.ru' start='1520339575440' stop='1520339871303'>
+    <name>Testing_Photopass_Link_Photos_Functionality</name>
+    <title>Testing_Photopass_Link_Photos_Functionality</title>
+    <test-cases>
+        <test-case start='1520339575440' status='broken' stop='1520339781241'>
+            <name>PhotoPass_Link_Photos</name>
+            <title>PhotoPass_Link_Photos</title>
+            <labels/>
+            <parameters/>
+            <steps>
+                <step start='1520339576449' status='passed' stop='1520339712636'>
+                    <name>Launching Application</name>
+                    <title>Launching Application</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339712637' status='broken' stop='1520339732644'>
+                    <name>Wating for element</name>
+                    <title>Wating for element</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339733648' status='passed' stop='1520339734058'>
+                    <name>Tap on PullDown Image</name>
+                    <title>Tap on PullDown Image</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339734058' status='broken' stop='1520339774063'>
+                    <name>Tap on Dismiss button</name>
+                    <title>Tap on Dismiss button</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339774066' status='passed' stop='1520339781241'>
+                    <name>Attached Screenshot</name>
+                    <title>Attached Screenshot</title>
+                    <attachments>
+                        <attachment title='Screenshot' source='eff1ec90-32d2-48b8-829e-3b13858bb10f-attachment.jpeg' type='image/jpeg' size='149976'/>
+                    </attachments>
+                    <steps/>
+                </step>
+            </steps>
+            <attachments/>
+            <failure>
+                <message>element ("android=new UiSelector().resourceId("android:id/button2")") still not existing after 40000ms</message>
+                <stack-trace>Error: element ("android=new UiSelector().resourceId("android:id/button2")") still not existing after 40000ms
+                    at elements("android=new UiSelector().resourceId("android:id/button2")") - node_modules\webdriverio\build\lib\commands\isExisting.js:46:17
+                    at isExisting("android=new UiSelector().resourceId("android:id/button2")") - node_modules\webdriverio\build\lib\commands\waitForExist.js:67:22</stack-trace>
+            </failure>
+        </test-case>
+        <test-case start='1520339781242' status='broken' stop='1520339871303'>
+            <name>Login test case</name>
+            <title>Login test case</title>
+            <labels/>
+            <parameters/>
+            <steps>
+                <step start='1520339782243' status='broken' stop='1520339822246'>
+                    <name>Launching Application</name>
+                    <title>Launching Application</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339823248' status='broken' stop='1520339863251'>
+                    <name>Tap on PullDown Image</name>
+                    <title>Tap on PullDown Image</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+                <step start='1520339863254' status='passed' stop='1520339871302'>
+                    <name>Attached Screenshot</name>
+                    <title>Attached Screenshot</title>
+                    <attachments>
+                        <attachment title='Screenshot' source='709001ad-0905-45c6-aeff-57d8376c8fe8-attachment.jpeg' type='image/jpeg' size='164472'/>
+                    </attachments>
+                    <steps/>
+                </step>
+            </steps>
+            <attachments/>
+            <failure>
+                <message>element ("android=new UiSelector().resourceId("com.disney.wdw.android:id/pulldown_image")") still not existing after 40000ms</message>
+                <stack-trace>Error: element ("android=new UiSelector().resourceId("com.disney.wdw.android:id/pulldown_image")") still not existing after 40000ms
+                    at elements("android=new UiSelector().resourceId("com.disney.wdw.android:id/pulldown_image")") - node_modules\webdriverio\build\lib\commands\isExisting.js:46:17
+                    at isExisting("android=new UiSelector().resourceId("com.disney.wdw.android:id/pulldown_image")") - node_modules\webdriverio\build\lib\commands\waitForExist.js:67:22</stack-trace>
+            </failure>
+        </test-case>
+    </test-cases>
+</ns2:test-suite>

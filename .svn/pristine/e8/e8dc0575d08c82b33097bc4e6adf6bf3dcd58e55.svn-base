@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DisneyReport</title>
+    
+    <link rel="stylesheet" href="css/mochawesome.css">
+  </head>
+  <body>
+
+    <!-- NAVBAR -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="report-info-cnt">
+          <h1 class="report-title">DisneyReport</h1>
+          <h3 class="report-date">Thursday, February 8 2018, 05:33pm</h3>
+        </div>
+        <div class="nav-right">
+          <div class="quick-summary-cnt">
+              <ul class="list-unstyled quick-summary">
+                <li class="qs-item summary-duration" title="Duration">54.468<span>S</span></li>
+                <li class="qs-item summary-suites" title="Suites">1</li>
+                <li class="qs-item summary-tests" title="Tests">3</li>
+                <li class="qs-item summary-passes" title="Passed" data-filter="passed">1</li>
+                <li class="qs-item summary-failures" title="Failed" data-filter="failed">2</li>
+                <li class="qs-item summary-pending" title="Pending" data-filter="pending">0</li>
+              </ul>          </div>
+          <button class="nav-menu-btn open-menu"><i class="icon-menu"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Summary -->
+    <div class="summary">
+      <div class="container">
+          <div class="row">
+            <div class="summary-col summary-duration">
+              <h1 class="summary-count">54.468<span>S</span></h1>
+              <h4 class="summary-label">S</h4>
+            </div>
+            <div class="summary-col summary-suites" title="Suites">
+              <h1 class="summary-count">1</h1>
+              <h4 class="summary-label">Suite</h4>
+            </div>
+            <div class="summary-col summary-tests" title="Tests">
+              <h1 class="summary-count">3</h1>
+              <h4 class="summary-label">Tests</h4>
+            </div>
+            <div class="summary-col summary-passes" data-filter="passed" title="Passed">
+              <h1 class="summary-count">1</h1>
+              <h4 class="summary-label">Passed</h4>
+            </div>
+            <div class="summary-col summary-failures" data-filter="failed" title="Failed">
+              <h1 class="summary-count">2</h1>
+              <h4 class="summary-label">Failed</h4>
+            </div>
+            <div class="summary-col summary-pending" data-filter="pending" title="Pending">
+              <h1 class="summary-count">0</h1>
+              <h4 class="summary-label">Pending</h4>
+            </div>
+          </div>      </div>
+    </div>
+    <div class="statusbar">
+      <div class="container">
+          <div class="row">
+            <div class="status-item status-item-pending-pct">0% Pending</div>
+            <div class="status-item status-item-passing-pct danger">33.3% Passing</div>
+          </div>      </div>
+    </div>
+
+    <!-- Suites -->
+    <div class="details container">
+            <section class="suite-wrap">
+          <div id="ec6a3c42-24c1-4dd4-b70a-db0fd8369b64" class="suite has-tests has-passed has-failed">
+            <h3 class="suite-title">Launching Application</h3>
+            <h5 class="suite-filename">\LaunchDisney.js</h5>
+            <!-- Suite Chart -->
+            <div class="suite-chart-wrap">
+              <canvas id="ec6a3c42-24c1-4dd4-b70a-db0fd8369b64" class="suite-chart" width="50" height="50" data-total-passes="1" data-total-failures="2" data-total-pending="0" data-total-skipped="0"></canvas>
+            </div>
+            <div class="suite-data-wrap">
+              <!-- Suite Summary -->
+              <ul class="suite-summary list-unstyled">
+                <li class="suite-summary-item duration">31.668 s</li>
+                <li class="suite-summary-item tests">3</li>
+                <li class="suite-summary-item passed">1</li>
+                <li class="suite-summary-item failed">2</li>
+                <li class="suite-summary-item pending">0</li>
+              </ul>
+              <!-- Test Info -->
+              <div class="suite-test-wrap">
+                <div class="suite-test-header" data-toggle="collapse" data-target="#ec6a3c42-24c1-4dd4-b70a-db0fd8369b64-test-list">
+                  <h4 class="suite-test-header-title">Tests</h4>
+                </div>
+                <div id="ec6a3c42-24c1-4dd4-b70a-db0fd8369b64-test-list" class="list-group test-list collapse in">
+                    <div id="db54ac82-957c-4df6-b45d-71200ecd6e85" class="list-group-item test passed">
+          <!-- Test Heading -->
+          <div class="test-heading">
+            <h4 class="test-title">
+              <span class="text-muted hidden"> it </span>
+              Passed case_1518091359278
+            </h4>
+            <div class="pull-right">
+              <button class="btn btn-link btn-sm toggle-btn toggle-code collapsed" data-toggle="collapse" data-target="#db54ac82-957c-4df6-b45d-71200ecd6e85 > .test-logr.collapse">Log </button>
+              <button class="btn btn-link btn-sm toggle-btn toggle-code collapsed" data-toggle="collapse" data-target="#db54ac82-957c-4df6-b45d-71200ecd6e85 > .test-code.collapse">Code </button>
+              <span class="test-duration fast">0 ms</span>
+            </div>
+          </div>
+          <!-- Test Errors -->
+          <!-- Test Code -->
+          <div class="test-code collapse">
+            <pre><code class="hljs javascript small"><span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Passed"</span>);</code></pre>
+          </div>
+        </div>            <div id="3ee6b9d7-a807-4625-a47f-6bc50beec454" class="list-group-item test failed">
+          <!-- Test Heading -->
+          <div class="test-heading">
+            <h4 class="test-title">
+              <span class="text-muted hidden"> it </span>
+              Clicking on Pulldown menu_1518091359278
+            </h4>
+            <div class="pull-right">
+              <button class="btn btn-link btn-sm toggle-btn toggle-code collapsed" data-toggle="collapse" data-target="#3ee6b9d7-a807-4625-a47f-6bc50beec454 > .test-logr.collapse">Log </button>
+              <button class="btn btn-link btn-sm toggle-btn toggle-code collapsed" data-toggle="collapse" data-target="#3ee6b9d7-a807-4625-a47f-6bc50beec454 > .test-code.collapse">Code </button>
+              <span class="test-duration ">10.125 s</span>
+            </div>
+          </div>
+          <!-- Test Errors -->
+            <p class="test-error-message">TypeError: Cannot read property &#x27;ELEMENT&#x27; of null
+              <button class="btn btn-link btn-sm toggle-btn toggle-stack collapsed" data-toggle="collapse" data-target="#3ee6b9d7-a807-4625-a47f-6bc50beec454 > .test-error-stack.collapse">Stack </button><button class="btn btn-link btn-sm toggle-btn toggle-stack collapsed" data-toggle="collapse" data-target="#3ee6b9d7-a807-4625-a47f-6bc50beec454 > .test-error-scr.collapse">Screenshot </button>
+            </p>
+        <br>  <!-- Test Code -->
+          <div class="test-code collapse">
+            <pre><code class="hljs javascript small"><span class="hljs-keyword">this</span>.timeout(<span class="hljs-number">50000</span>);<br>  	<span class="hljs-keyword">return</span> client<br>  	.pause(<span class="hljs-number">10000</span>)<br>  	.touchAction(<span class="hljs-string">'android=new UiSelector().resourceId("com.disney.wdw.android:id/pulldown_image")'</span>,<span class="hljs-string">'tap'</span>);</code></pre>
+          </div>
+          <div class="test-error-stack collapse">
+            <pre><code class="hljs small">Difference between Expected(+) and Actual(-):
+        Cannot read property 'ELEMENT' of null
+        
+        Expected:
+        undefined
+        
+        Actual:
+        undefined
+        
+        Stack:
+        <span class="hljs-built_in">TypeError</span>: Cannot read property <span class="hljs-string">'ELEMENT'</span> <span class="hljs-keyword">of</span> <span class="hljs-literal">null</span><br>    at node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">289</span>:<span class="hljs-number">56</span><br>    at <span class="hljs-built_in">Array</span>.forEach (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">anonymous</span>&gt;</span>)</span><br>    at node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">287</span>:<span class="hljs-number">18</span><br>    at <span class="hljs-built_in">Array</span>.map (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">anonymous</span>&gt;</span>)</span><br>    at replaceSelectorsById (node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">278</span>:<span class="hljs-number">20</span>)<br>    at node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">127</span>:<span class="hljs-number">19</span><br>    at &lt;anonymous&gt;<br>    at process._tickCallback (internal/process/next_tick.js:<span class="hljs-number">160</span>:<span class="hljs-number">7</span>)</code></pre>
+          </div>
+          <div class="test-error-scr collapse">
+            <pre><code class="hljs small"><img src="./screenshots/Clicking on Pulldown menu_1518091359278.jpeg"></code></pre>
+          </div>
+        </div>            <div id="c0451dc7-4cfb-45f9-9e59-dc874c7308e8" class="list-group-item test failed">
+          <!-- Test Heading -->
+          <div class="test-heading">
+            <h4 class="test-title">
+              <span class="text-muted hidden"> it </span>
+              Clicking on Ok Alert_1518091359278
+            </h4>
+            <div class="pull-right">
+              <button class="btn btn-link btn-sm toggle-btn toggle-code collapsed" data-toggle="collapse" data-target="#c0451dc7-4cfb-45f9-9e59-dc874c7308e8 > .test-logr.collapse">Log </button>
+              <button class="btn btn-link btn-sm toggle-btn toggle-code collapsed" data-toggle="collapse" data-target="#c0451dc7-4cfb-45f9-9e59-dc874c7308e8 > .test-code.collapse">Code </button>
+              <span class="test-duration ">21.543 s</span>
+            </div>
+          </div>
+          <!-- Test Errors -->
+            <p class="test-error-message">TypeError: Cannot read property &#x27;ELEMENT&#x27; of null
+              <button class="btn btn-link btn-sm toggle-btn toggle-stack collapsed" data-toggle="collapse" data-target="#c0451dc7-4cfb-45f9-9e59-dc874c7308e8 > .test-error-stack.collapse">Stack </button><button class="btn btn-link btn-sm toggle-btn toggle-stack collapsed" data-toggle="collapse" data-target="#c0451dc7-4cfb-45f9-9e59-dc874c7308e8 > .test-error-scr.collapse">Screenshot </button>
+            </p>
+        <br>  <!-- Test Code -->
+          <div class="test-code collapse">
+            <pre><code class="hljs javascript small"><span class="hljs-keyword">this</span>.timeout(<span class="hljs-number">50000</span>);<br>	   	<span class="hljs-keyword">return</span> client<br>	   	.pause(<span class="hljs-number">10000</span>)<br>	   	.touchAction(<span class="hljs-string">'android=new UiSelector().resourceId("com.disney.wdw.android:id/button1")'</span>,<span class="hljs-string">'tap'</span>);</code></pre>
+          </div>
+          <div class="test-error-stack collapse">
+            <pre><code class="hljs small">Difference between Expected(+) and Actual(-):
+        Cannot read property 'ELEMENT' of null
+        
+        Expected:
+        undefined
+        
+        Actual:
+        undefined
+        
+        Stack:
+        <span class="hljs-built_in">TypeError</span>: Cannot read property <span class="hljs-string">'ELEMENT'</span> <span class="hljs-keyword">of</span> <span class="hljs-literal">null</span><br>    at node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">289</span>:<span class="hljs-number">56</span><br>    at <span class="hljs-built_in">Array</span>.forEach (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">anonymous</span>&gt;</span>)</span><br>    at node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">287</span>:<span class="hljs-number">18</span><br>    at <span class="hljs-built_in">Array</span>.map (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">anonymous</span>&gt;</span>)</span><br>    at replaceSelectorsById (node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">278</span>:<span class="hljs-number">20</span>)<br>    at node_modules\webdriverio\build\lib\commands\touchAction.js:<span class="hljs-number">127</span>:<span class="hljs-number">19</span><br>    at &lt;anonymous&gt;<br>    at process._tickCallback (internal/process/next_tick.js:<span class="hljs-number">160</span>:<span class="hljs-number">7</span>)</code></pre>
+          </div>
+          <div class="test-error-scr collapse">
+            <pre><code class="hljs small"><img src="./screenshots/Clicking on Ok Alert_1518091359278.jpeg"></code></pre>
+          </div>
+        </div>        </div>
+              </div>
+            </div>
+        
+        
+          </div>
+        </section>
+    </div>
+
+    <footer>
+      <div class="container">
+        <p>Report generated by <a href="http://adamgruber.github.io/mochawesome/" target="_blank">mochawesome</a>.<br>Designed and built by <a href="https://github.com/adamgruber" target="_blank">adamgruber</a>. &copy;2018.</p>
+      </div>
+    </footer>
+
+    <!-- Nav Menu -->
+    <div class="nav-menu-wrap">
+      <div class="menu-overlay close-menu"></div>
+      <nav class="menu">
+        <button class="nav-menu-btn close-menu"><i class="icon-failed"></i></button>
+        <ul class="list-unstyled main-menu">
+                <li class="nav-menu-item">
+                <a href="#ec6a3c42-24c1-4dd4-b70a-db0fd8369b64" class="nav-menu-item-link has-failures">Launching Application</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/vendor.js"></script>
+    <script src="js/mochawesome.js"></script>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+/* Naming convention should be pagename_elementwithtype.Please follow the same
+   acrros your scripts
+*/
+exports.DisneyAppOR = {
+    //Push Notification Button
+
+    launchPage_pushOKBtn: 'android=new UiSelector().resourceId("android:id/button1")',
+    launchPage_pushDismiss: 'android=new UiSelector().resourceId("android:id/button2")',
+    launchPage_pullDownImage: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/pulldown_image")',
+
+    //LoginPage
+    loginPage_signInLink: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/txt_signin")',
+    loginPage_emailTb: 'android=new UiSelector().className("android.widget.EditText")',
+	loginPage_emailTb1: 'android=new UiSelector().className("android.widget")',
+    loginPage_emailclearBtn: 'android=new UiSelector().xpath("//android.widget.ImageView[@content-desc="clear text"][1]")',
+    loginPage_passwordTb: 'android=new UiSelector().className("DisneyEditText")',
+    loginPage_signInBtn: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/btn_login")',
+
+    //LandingPage
+    pg_Landing_myAccountLink: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/profile_my_account")',
+    pg_Landing_myAvatar: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/img_avatar")',
+    pg_Landing_refreshLink:	'android=new UiSelector().resourceId("com.disney.wdw.android:id/refresh_text")',
+    pg_Landing_linkandview:'android=new UiSelector().resourceId("com.disney.wdw.android:id/image_card_subtitle")',
+
+    //DisneyPhotoPassPage
+    pg_PhotoPass_linkPhotos:'android=new UiSelector().resourceId("com.disney.wdw.android:id/link_photos_text")',
+    pg_linkYourPhotos_enterId: 'android=new UiSelector().textContains("enter a PhotoPass ID")',
+    //pg_linkYourPhotos_enterId: 'android=new UiSelector().xpath("//DisneyEditText[@content-desc="editbox, Enter the ID number"]")',
+
+    pg_linkYourPhotos_idtb:'android=new UiSelector().className("DisneyEditText")',
+    pg_linkYourPhotos_submitbtn: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/photo_pass_code_submit_button")',
+    pg_PhotoPass_messageContainer: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/photo_card_linked_message_container")',
+	
+	//Deepak
+
+
+    //SignOutpage
+    pg_signOutLink: 'android=new UiSelector().resourceId("com.disney.wdw.android:id/tv_profile_sign_out")',
+
+  }

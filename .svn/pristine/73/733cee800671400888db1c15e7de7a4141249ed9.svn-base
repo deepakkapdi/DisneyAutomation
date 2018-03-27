@@ -1,0 +1,29 @@
+{
+  "uid" : "ab17fc5a4eb3bca4b216b548c7f9fcbc",
+  "name" : "timeline",
+  "children" : [ {
+    "name" : "Login test case",
+    "uid" : "95b94c26b418a821",
+    "parentUid" : "ab17fc5a4eb3bca4b216b548c7f9fcbc",
+    "status" : "failed",
+    "time" : {
+      "start" : 1519725685687,
+      "stop" : 1519725827859,
+      "duration" : 142172
+    },
+    "flaky" : false,
+    "parameters" : [ ]
+  }, {
+    "name" : "PhotoPass_Link_Photos",
+    "uid" : "cad3bf9c6e737043",
+    "parentUid" : "ab17fc5a4eb3bca4b216b548c7f9fcbc",
+    "status" : "passed",
+    "time" : {
+      "start" : 1519725369215,
+      "stop" : 1519725685687,
+      "duration" : 316472
+    },
+    "flaky" : false,
+    "parameters" : [ ]
+  } ]
+}

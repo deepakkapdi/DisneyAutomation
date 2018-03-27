@@ -1,0 +1,105 @@
+{
+  "uid" : "7774395760402fcd",
+  "name" : "PhotoPass_Link_Photos",
+  "fullName" : "Testing_Photopass_Link_Photos_Functionality.PhotoPass_Link_Photos",
+  "historyId" : "1cb8e90dfae1a8dbba3e5625dddd052",
+  "time" : {
+    "start" : 1520338757553,
+    "stop" : 1520338850710,
+    "duration" : 93157
+  },
+  "description" : "",
+  "descriptionHtml" : "",
+  "status" : "broken",
+  "statusMessage" : "A session id is required for this command but wasn't found in the response payload",
+  "statusTrace" : "Error: A session id is required for this command but wasn't found in the response payload\n                    at screenshot() -     at E:\\DisneyMobileAutomation\\DisneyAutomation\\Lib\\Helpers\\HelperFunctions.js:5:",
+  "flaky" : false,
+  "beforeStages" : [ ],
+  "testStage" : {
+    "status" : "broken",
+    "statusMessage" : "A session id is required for this command but wasn't found in the response payload",
+    "statusTrace" : "Error: A session id is required for this command but wasn't found in the response payload\n                    at screenshot() -     at E:\\DisneyMobileAutomation\\DisneyAutomation\\Lib\\Helpers\\HelperFunctions.js:5:",
+    "steps" : [ {
+      "name" : "Launching Application",
+      "time" : {
+        "start" : 1520338758563,
+        "stop" : 1520338809682,
+        "duration" : 51119
+      },
+      "status" : "broken",
+      "statusMessage" : "Error: A session id is required for this command but wasn't found in the response payload\n                    at screenshot() -     at E:\\DisneyMobileAutomation\\DisneyAutomation\\Lib\\Helpers\\HelperFunctions.js:5:",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : true,
+      "stepsCount" : 0,
+      "hasContent" : true
+    }, {
+      "name" : "Tap on PullDown Image",
+      "time" : {
+        "start" : 1520338810686,
+        "stop" : 1520338850700,
+        "duration" : 40014
+      },
+      "status" : "broken",
+      "statusMessage" : "Error: A session id is required for this command but wasn't found in the response payload\n                    at screenshot() -     at E:\\DisneyMobileAutomation\\DisneyAutomation\\Lib\\Helpers\\HelperFunctions.js:5:",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : true,
+      "stepsCount" : 0,
+      "hasContent" : true
+    }, {
+      "name" : "Attached Screenshot",
+      "time" : {
+        "start" : 1520338850703,
+        "stop" : 1520338850706,
+        "duration" : 3
+      },
+      "status" : "broken",
+      "statusMessage" : "Error: A session id is required for this command but wasn't found in the response payload\n                    at screenshot() -     at E:\\DisneyMobileAutomation\\DisneyAutomation\\Lib\\Helpers\\HelperFunctions.js:5:",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : true,
+      "stepsCount" : 0,
+      "hasContent" : true
+    } ],
+    "attachments" : [ ],
+    "parameters" : [ ],
+    "attachmentsCount" : 0,
+    "shouldDisplayMessage" : true,
+    "stepsCount" : 3,
+    "hasContent" : true
+  },
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "suite",
+    "value" : "Testing_Photopass_Link_Photos_Functionality"
+  }, {
+    "name" : "testClass",
+    "value" : "Testing_Photopass_Link_Photos_Functionality"
+  }, {
+    "name" : "testMethod",
+    "value" : "PhotoPass_Link_Photos"
+  }, {
+    "name" : "package",
+    "value" : "Testing_Photopass_Link_Photos_Functionality"
+  }, {
+    "name" : "resultFormat",
+    "value" : "allure1"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : true,
+  "retry" : true,
+  "extra" : {
+    "categories" : [ ],
+    "tags" : [ ]
+  },
+  "source" : "7774395760402fcd.json",
+  "parameterValues" : [ ]
+}

@@ -1,0 +1,33 @@
+{
+  "uid" : "98d3104e051c652961429bf95fa0b5d6",
+  "name" : "suites",
+  "children" : [ {
+    "name" : "Testing_Photopass_Link_Photos_Functionality",
+    "children" : [ {
+      "name" : "PhotoPass_Link_Photos",
+      "uid" : "cad3bf9c6e737043",
+      "parentUid" : "64779ed57e4e2f77ea35542abdf81aee",
+      "status" : "passed",
+      "time" : {
+        "start" : 1519725369215,
+        "stop" : 1519725685687,
+        "duration" : 316472
+      },
+      "flaky" : false,
+      "parameters" : [ ]
+    }, {
+      "name" : "Login test case",
+      "uid" : "95b94c26b418a821",
+      "parentUid" : "64779ed57e4e2f77ea35542abdf81aee",
+      "status" : "failed",
+      "time" : {
+        "start" : 1519725685687,
+        "stop" : 1519725827859,
+        "duration" : 142172
+      },
+      "flaky" : false,
+      "parameters" : [ ]
+    } ],
+    "uid" : "64779ed57e4e2f77ea35542abdf81aee"
+  } ]
+}

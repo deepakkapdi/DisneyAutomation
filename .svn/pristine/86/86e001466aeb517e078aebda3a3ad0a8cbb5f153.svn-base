@@ -1,0 +1,710 @@
+'use strict';
+
+var _regeneratorRuntime = require('babel-runtime/regenerator')['default'];
+
+var _getIterator = require('babel-runtime/core-js/get-iterator')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _teen_process = require('teen_process');
+
+var _loggerJs = require('../logger.js');
+
+var _loggerJs2 = _interopRequireDefault(_loggerJs);
+
+var _helpersJs = require('../helpers.js');
+
+var _appiumSupport = require('appium-support');
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _xmldom = require('xmldom');
+
+var _xmldom2 = _interopRequireDefault(_xmldom);
+
+var _xpath = require('xpath');
+
+var _xpath2 = _interopRequireDefault(_xpath);
+
+var helperJarPath = _path2['default'].resolve(__dirname, '..', '..', '..', 'jars');
+var manifestMethods = {};
+
+// android:process= may be defined in AndroidManifest.xml
+// http://developer.android.com/reference/android/R.attr.html#process
+// note that the process name when used with ps must be truncated to the last 15 chars
+// ps -c com.example.android.apis becomes ps -c le.android.apis
+manifestMethods.processFromManifest = function callee$0$0(localApk) {
+  var args, _ref, stdout, result, lines, applicationRegex, applicationFound, attributeRegex, processRegex, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, line, notAttribute, _process;
+
+  return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        context$1$0.prev = 0;
+        context$1$0.next = 3;
+        return _regeneratorRuntime.awrap(this.initAapt());
+
+      case 3:
+        _loggerJs2['default'].info("Retrieving process from manifest");
+        args = ['dump', 'xmltree', localApk, 'AndroidManifest.xml'];
+        context$1$0.next = 7;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)(this.binaries.aapt, args));
+
+      case 7:
+        _ref = context$1$0.sent;
+        stdout = _ref.stdout;
+        result = null;
+        lines = stdout.split("\n");
+        applicationRegex = new RegExp(/\s+E: application \(line=\d+\).*/);
+        applicationFound = false;
+        attributeRegex = new RegExp(/\s+A: .+/);
+        processRegex = new RegExp(/\s+A: android:process\(0x01010011\)="([^"]+).*"/);
+        _iteratorNormalCompletion = true;
+        _didIteratorError = false;
+        _iteratorError = undefined;
+        context$1$0.prev = 18;
+        _iterator = _getIterator(lines);
+
+      case 20:
+        if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+          context$1$0.next = 37;
+          break;
+        }
+
+        line = _step.value;
+
+        if (applicationFound) {
+          context$1$0.next = 26;
+          break;
+        }
+
+        if (applicationRegex.test(line)) {
+          applicationFound = true;
+        }
+        context$1$0.next = 34;
+        break;
+
+      case 26:
+        notAttribute = !attributeRegex.test(line);
+
+        if (!notAttribute) {
+          context$1$0.next = 29;
+          break;
+        }
+
+        return context$1$0.abrupt('break', 37);
+
+      case 29:
+        _process = processRegex.exec(line);
+
+        if (!(_process && _process.length > 1)) {
+          context$1$0.next = 34;
+          break;
+        }
+
+        result = _process[1];
+        // must trim to last 15 for android's ps binary
+        if (result.length > 15) {
+          result = result.substr(result.length - 15);
+        }
+        return context$1$0.abrupt('break', 37);
+
+      case 34:
+        _iteratorNormalCompletion = true;
+        context$1$0.next = 20;
+        break;
+
+      case 37:
+        context$1$0.next = 43;
+        break;
+
+      case 39:
+        context$1$0.prev = 39;
+        context$1$0.t0 = context$1$0['catch'](18);
+        _didIteratorError = true;
+        _iteratorError = context$1$0.t0;
+
+      case 43:
+        context$1$0.prev = 43;
+        context$1$0.prev = 44;
+
+        if (!_iteratorNormalCompletion && _iterator['return']) {
+          _iterator['return']();
+        }
+
+      case 46:
+        context$1$0.prev = 46;
+
+        if (!_didIteratorError) {
+          context$1$0.next = 49;
+          break;
+        }
+
+        throw _iteratorError;
+
+      case 49:
+        return context$1$0.finish(46);
+
+      case 50:
+        return context$1$0.finish(43);
+
+      case 51:
+        return context$1$0.abrupt('return', result);
+
+      case 54:
+        context$1$0.prev = 54;
+        context$1$0.t1 = context$1$0['catch'](0);
+
+        _loggerJs2['default'].errorAndThrow('processFromManifest failed. Original error: ' + context$1$0.t1.message);
+
+      case 57:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this, [[0, 54], [18, 39, 43, 51], [44,, 46, 50]]);
+};
+
+/**
+ * @typedef {Object} APKInfo
+ * @property {string} apkPackage - The name of application package, for example 'com.acme.app'.
+ * @property {string} apkActivity - The name of main application activity.
+ */
+
+/**
+* Extract package and main activity name from application manifest using
+* the custom apk tools.
+*
+* @param {string} localApk - The full path to application package.
+* @param {string} aaptPath - The full path to appt binary.
+* @param {string} jarPath - The full path to appium_apk_tools.jar utility
+* @param {string} tmpRoot - The full path to the class-wide temporary folder.
+* @return {APKInfo} The parsed application info.
+* @throws {Error} If there was an error while getting the data from the given
+*                 application package.
+*/
+function extractApkInfoWithApkTools(localApk, aaptPath, jarPath, tmpRoot) {
+  var args, stdout, apkPackage, apkActivity, outputPath, getLaunchActivity, output, act;
+  return _regeneratorRuntime.async(function extractApkInfoWithApkTools$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        _loggerJs2['default'].info("Extracting package and launch activity from manifest");
+        args = ['dump', 'badging', localApk];
+        context$1$0.next = 4;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)(aaptPath, args));
+
+      case 4:
+        stdout = context$1$0.sent.stdout;
+        apkPackage = new RegExp(/package: name='([^']+)'/g).exec(stdout);
+
+        if (!(!apkPackage || apkPackage.length < 2)) {
+          context$1$0.next = 8;
+          break;
+        }
+
+        throw new Error('Cannot parse package name from ' + ('\'' + _lodash2['default'].join([aaptPath, 'dump', 'badging', '"' + localApk + '"'], ' ') + '\' command  output'));
+
+      case 8:
+        apkPackage = apkPackage[1];
+        apkActivity = new RegExp(/launchable-activity: name='([^']+)'/g).exec(stdout);
+
+        if (!(apkActivity && apkActivity.length >= 2)) {
+          context$1$0.next = 13;
+          break;
+        }
+
+        apkActivity = apkActivity[1];
+        return context$1$0.abrupt('return', { apkPackage: apkPackage, apkActivity: apkActivity });
+
+      case 13:
+        outputPath = _path2['default'].resolve(tmpRoot, apkPackage);
+        getLaunchActivity = ['-jar', jarPath, 'printLaunchActivity', localApk, outputPath];
+        context$1$0.next = 17;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)('java', getLaunchActivity));
+
+      case 17:
+        output = context$1$0.sent;
+
+        if (!output.stderr) {
+          context$1$0.next = 20;
+          break;
+        }
+
+        throw new Error('Cannot parse launchActivity from manifest: ' + output.stderr);
+
+      case 20:
+        stdout = output.stdout;
+        act = new RegExp(/Launch activity parsed:([^']+)/g).exec(stdout);
+
+        if (!(act && act.length >= 2)) {
+          context$1$0.next = 25;
+          break;
+        }
+
+        apkActivity = act[1];
+        return context$1$0.abrupt('return', { apkPackage: apkPackage, apkActivity: apkActivity });
+
+      case 25:
+        throw new Error('Cannot parse main activity name from \'' + stdout + '\' command  output');
+
+      case 26:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this);
+}
+
+/**
+ * Extract package and main activity name from application manifest using
+ * apkanalyzer tool.
+ *
+ * @param {string} localApk - The full path to application package.
+ * @param {string} apkanalyzerPath - The full path to apkanalyzer tool.
+ * @return {APKInfo} The parsed application info.
+ * @throws {Error} If there was an error while getting the data from the given
+ *                 application package or if the tool itself
+ *                 is not present on the local file system.
+ */
+function extractApkInfoWithApkanalyzer(localApk, apkanalyzerPath) {
+  var args, manifestXml, doc, apkPackageAttribute, apkPackage, apkActivityAttribute, apkActivity;
+  return _regeneratorRuntime.async(function extractApkInfoWithApkanalyzer$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        args = ['-h', 'manifest', 'print', localApk];
+
+        _loggerJs2['default'].debug('Starting \'' + apkanalyzerPath + '\' with args ' + JSON.stringify(args));
+        context$1$0.next = 4;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)(apkanalyzerPath, args, {
+          shell: true,
+          cwd: _path2['default'].dirname(apkanalyzerPath)
+        }));
+
+      case 4:
+        manifestXml = context$1$0.sent.stdout;
+        doc = new _xmldom2['default'].DOMParser().parseFromString(manifestXml);
+        apkPackageAttribute = _xpath2['default'].select1('//manifest/@package', doc);
+
+        if (apkPackageAttribute) {
+          context$1$0.next = 9;
+          break;
+        }
+
+        throw new Error('Cannot parse package name from ' + manifestXml);
+
+      case 9:
+        apkPackage = apkPackageAttribute.value;
+        apkActivityAttribute = _xpath2['default'].select1("//application/*[starts-with(name(), 'activity') " + "and .//action[@*[local-name()='name' and .='android.intent.action.MAIN']] " + "and .//category[@*[local-name()='name' and .='android.intent.category.LAUNCHER']]]" + "/@*[local-name()='name']", doc);
+
+        if (apkActivityAttribute) {
+          context$1$0.next = 13;
+          break;
+        }
+
+        throw new Error('Cannot parse main activity name from ' + manifestXml);
+
+      case 13:
+        apkActivity = apkActivityAttribute.value;
+        return context$1$0.abrupt('return', { apkPackage: apkPackage, apkActivity: apkActivity });
+
+      case 15:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this);
+}
+
+/**
+ * Extract package and main activity name from application manifest.
+ *
+ * @param {string} localApk - The full path to application package.
+ * @return {APKInfo} The parsed application info.
+ * @throws {error} If there was an error while getting the data from the given
+ *                 application package.
+ */
+manifestMethods.packageAndLaunchActivityFromManifest = function callee$0$0(localApk) {
+  var apkInfoGetters, savedError, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, infoGetter, _ref2, apkPackage, apkActivity;
+
+  return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+    var _this = this;
+
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        apkInfoGetters = [function callee$1$0() {
+          var apkanalyzerPath;
+          return _regeneratorRuntime.async(function callee$1$0$(context$2$0) {
+            while (1) switch (context$2$0.prev = context$2$0.next) {
+              case 0:
+                context$2$0.next = 2;
+                return _regeneratorRuntime.awrap((0, _helpersJs.getApkanalyzerForOs)(this));
+
+              case 2:
+                apkanalyzerPath = context$2$0.sent;
+                context$2$0.next = 5;
+                return _regeneratorRuntime.awrap(extractApkInfoWithApkanalyzer(localApk, apkanalyzerPath));
+
+              case 5:
+                return context$2$0.abrupt('return', context$2$0.sent);
+
+              case 6:
+              case 'end':
+                return context$2$0.stop();
+            }
+          }, null, _this);
+        }, function callee$1$0() {
+          return _regeneratorRuntime.async(function callee$1$0$(context$2$0) {
+            while (1) switch (context$2$0.prev = context$2$0.next) {
+              case 0:
+                context$2$0.next = 2;
+                return _regeneratorRuntime.awrap(this.initAapt());
+
+              case 2:
+                context$2$0.next = 4;
+                return _regeneratorRuntime.awrap(extractApkInfoWithApkTools(localApk, this.binaries.aapt, this.jars['appium_apk_tools.jar'], this.tmpDir));
+
+              case 4:
+                return context$2$0.abrupt('return', context$2$0.sent);
+
+              case 5:
+              case 'end':
+                return context$2$0.stop();
+            }
+          }, null, _this);
+        }];
+        savedError = undefined;
+        _iteratorNormalCompletion2 = true;
+        _didIteratorError2 = false;
+        _iteratorError2 = undefined;
+        context$1$0.prev = 5;
+        _iterator2 = _getIterator(apkInfoGetters);
+
+      case 7:
+        if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
+          context$1$0.next = 27;
+          break;
+        }
+
+        infoGetter = _step2.value;
+        context$1$0.prev = 9;
+        context$1$0.next = 12;
+        return _regeneratorRuntime.awrap(infoGetter());
+
+      case 12:
+        _ref2 = context$1$0.sent;
+        apkPackage = _ref2.apkPackage;
+        apkActivity = _ref2.apkActivity;
+
+        _loggerJs2['default'].info('Package name: \'' + apkPackage + '\'');
+        _loggerJs2['default'].info('Main activity name: \'' + apkActivity + '\'');
+        return context$1$0.abrupt('return', { apkPackage: apkPackage, apkActivity: apkActivity });
+
+      case 20:
+        context$1$0.prev = 20;
+        context$1$0.t0 = context$1$0['catch'](9);
+
+        if (infoGetter !== _lodash2['default'].last(apkInfoGetters)) {
+          _loggerJs2['default'].info('Using the alternative activity name detection method ' + ('because of: ' + context$1$0.t0.message));
+        }
+        savedError = context$1$0.t0;
+
+      case 24:
+        _iteratorNormalCompletion2 = true;
+        context$1$0.next = 7;
+        break;
+
+      case 27:
+        context$1$0.next = 33;
+        break;
+
+      case 29:
+        context$1$0.prev = 29;
+        context$1$0.t1 = context$1$0['catch'](5);
+        _didIteratorError2 = true;
+        _iteratorError2 = context$1$0.t1;
+
+      case 33:
+        context$1$0.prev = 33;
+        context$1$0.prev = 34;
+
+        if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+          _iterator2['return']();
+        }
+
+      case 36:
+        context$1$0.prev = 36;
+
+        if (!_didIteratorError2) {
+          context$1$0.next = 39;
+          break;
+        }
+
+        throw _iteratorError2;
+
+      case 39:
+        return context$1$0.finish(36);
+
+      case 40:
+        return context$1$0.finish(33);
+
+      case 41:
+        _loggerJs2['default'].errorAndThrow('packageAndLaunchActivityFromManifest failed. ' + ('Original error: ' + savedError.message) + (savedError.stderr ? '; StdErr: ' + savedError.stderr : ''));
+
+      case 42:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this, [[5, 29, 33, 41], [9, 20], [34,, 36, 40]]);
+};
+
+/**
+ * Extract target SDK version from application manifest.
+ *
+ * @param {string} localApk - The full path to application package.
+ * @return {number} The version of the target SDK.
+ * @throws {error} If there was an error while getting the data from the given
+ *                 application package.
+ */
+manifestMethods.targetSdkVersionFromManifest = function callee$0$0(localApk) {
+  var args, _ref3, stdout, targetSdkVersion;
+
+  return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        context$1$0.prev = 0;
+        context$1$0.next = 3;
+        return _regeneratorRuntime.awrap(this.initAapt());
+
+      case 3:
+        _loggerJs2['default'].info("Extracting package and launch activity from manifest");
+        args = ['dump', 'badging', localApk];
+        context$1$0.next = 7;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)(this.binaries.aapt, args));
+
+      case 7:
+        _ref3 = context$1$0.sent;
+        stdout = _ref3.stdout;
+        targetSdkVersion = new RegExp(/targetSdkVersion:'([^']+)'/g).exec(stdout);
+
+        if (targetSdkVersion) {
+          context$1$0.next = 12;
+          break;
+        }
+
+        throw new Error('targetSdkVersion is not specified in the application.');
+
+      case 12:
+        return context$1$0.abrupt('return', parseInt(targetSdkVersion[1], 10));
+
+      case 15:
+        context$1$0.prev = 15;
+        context$1$0.t0 = context$1$0['catch'](0);
+
+        _loggerJs2['default'].errorAndThrow('fetching targetSdkVersion from local APK failed. Original error: ' + context$1$0.t0.message);
+
+      case 18:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this, [[0, 15]]);
+};
+
+/**
+ * Extract target SDK version from package information.
+ *
+ * @param {string} pkg - The class name of the package installed on the device under test.
+ * @return {number} The version of the target SDK.
+ */
+manifestMethods.targetSdkVersionUsingPKG = function callee$0$0(pkg) {
+  var stdout, targetSdkVersion;
+  return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        context$1$0.next = 2;
+        return _regeneratorRuntime.awrap(this.shell(['dumpsys', 'package', pkg]));
+
+      case 2:
+        stdout = context$1$0.sent;
+        targetSdkVersion = new RegExp(/targetSdk=([^\s\s]+)/g).exec(stdout);
+
+        if (targetSdkVersion && targetSdkVersion.length >= 2) {
+          targetSdkVersion = targetSdkVersion[1];
+        } else {
+          // targetSdk not found in the dump, assigning 0 to targetSdkVersion
+          targetSdkVersion = 0;
+        }
+        return context$1$0.abrupt('return', parseInt(targetSdkVersion, 10));
+
+      case 6:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this);
+};
+
+manifestMethods.compileManifest = function callee$0$0(manifest, manifestPackage, targetPackage) {
+  var _ref4, platform, platformPath, args;
+
+  return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        _loggerJs2['default'].debug('Compiling manifest ' + manifest);
+        context$1$0.next = 3;
+        return _regeneratorRuntime.awrap((0, _helpersJs.getAndroidPlatformAndPath)());
+
+      case 3:
+        _ref4 = context$1$0.sent;
+        platform = _ref4.platform;
+        platformPath = _ref4.platformPath;
+
+        if (platform) {
+          context$1$0.next = 8;
+          break;
+        }
+
+        throw new Error("Required platform doesn't exist (API level >= 17)");
+
+      case 8:
+        _loggerJs2['default'].debug('Compiling manifest.');
+        context$1$0.prev = 9;
+        args = ['package', '-M', manifest, '--rename-manifest-package', manifestPackage, '--rename-instrumentation-target-package', targetPackage, '-I', _path2['default'].resolve(platformPath, 'android.jar'), '-F', manifest + '.apk', '-f'];
+        context$1$0.next = 13;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)(this.binaries.aapt, args));
+
+      case 13:
+        _loggerJs2['default'].debug("Compiled manifest");
+        context$1$0.next = 19;
+        break;
+
+      case 16:
+        context$1$0.prev = 16;
+        context$1$0.t0 = context$1$0['catch'](9);
+
+        _loggerJs2['default'].errorAndThrow('Error compiling manifest. Original error: ' + context$1$0.t0.message);
+
+      case 19:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this, [[9, 16]]);
+};
+
+manifestMethods.insertManifest = function callee$0$0(manifest, srcApk, dstApk) {
+  var java, args;
+  return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        _loggerJs2['default'].debug('Inserting manifest, src: ' + srcApk + ' dst: ' + dstApk);
+        context$1$0.prev = 1;
+        context$1$0.next = 4;
+        return _regeneratorRuntime.awrap((0, _helpersJs.unzipFile)(manifest + '.apk'));
+
+      case 4:
+        context$1$0.next = 6;
+        return _regeneratorRuntime.awrap(_appiumSupport.fs.copyFile(srcApk, dstApk));
+
+      case 6:
+        _loggerJs2['default'].debug("Testing new tmp apk");
+        context$1$0.next = 9;
+        return _regeneratorRuntime.awrap((0, _helpersJs.assertZipArchive)(dstApk));
+
+      case 9:
+        _loggerJs2['default'].debug("Moving manifest");
+
+        if (!_appiumSupport.system.isWindows()) {
+          context$1$0.next = 17;
+          break;
+        }
+
+        java = _path2['default'].resolve(process.env.JAVA_HOME, 'bin', 'java');
+        args = ['-jar', _path2['default'].resolve(helperJarPath, 'move_manifest.jar'), dstApk, manifest];
+        context$1$0.next = 15;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)(java, args));
+
+      case 15:
+        context$1$0.next = 19;
+        break;
+
+      case 17:
+        context$1$0.next = 19;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)('zip', ['-j', '-m', dstApk, manifest]));
+
+      case 19:
+        _loggerJs2['default'].debug("Inserted manifest.");
+        context$1$0.next = 25;
+        break;
+
+      case 22:
+        context$1$0.prev = 22;
+        context$1$0.t0 = context$1$0['catch'](1);
+
+        _loggerJs2['default'].errorAndThrow('Error inserting manifest. Original error: ' + context$1$0.t0.message);
+
+      case 25:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this, [[1, 22]]);
+};
+
+/**
+ * Check whether package manifest contains Internet permissions.
+ *
+ * @param {string} localApk - The full path to application package.
+ * @return {boolean} True if the manifest requires Internet access permission.
+ */
+manifestMethods.hasInternetPermissionFromManifest = function callee$0$0(localApk) {
+  var _ref5, stdout;
+
+  return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+    while (1) switch (context$1$0.prev = context$1$0.next) {
+      case 0:
+        context$1$0.prev = 0;
+        context$1$0.next = 3;
+        return _regeneratorRuntime.awrap(this.initAapt());
+
+      case 3:
+        _loggerJs2['default'].debug("Checking if has internet permission from manifest");
+        context$1$0.next = 6;
+        return _regeneratorRuntime.awrap((0, _teen_process.exec)(this.binaries.aapt, ['dump', 'badging', localApk]));
+
+      case 6:
+        _ref5 = context$1$0.sent;
+        stdout = _ref5.stdout;
+        return context$1$0.abrupt('return', new RegExp(/uses-permission:.*'android.permission.INTERNET'/).test(stdout));
+
+      case 11:
+        context$1$0.prev = 11;
+        context$1$0.t0 = context$1$0['catch'](0);
+
+        _loggerJs2['default'].errorAndThrow('Error checking internet permission for manifest. Original error: ' + context$1$0.t0.message);
+
+      case 14:
+      case 'end':
+        return context$1$0.stop();
+    }
+  }, null, this, [[0, 11]]);
+};
+
+exports['default'] = manifestMethods;
+module.exports = exports['default'];
+
+// process must be an attribute after application.
+
+// this is an application attribute process.
+
+// Look for activity or activity-alias with
+// action == android.intent.action.MAIN and
+// category == android.intent.category.LAUNCHER
+// descendants
+
+// Insert compiled manifest into /tmp/appPackage.clean.apk
+// -j = keep only the file, not the dirs
+// -m = move manifest into target apk.
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImxpYi90b29scy9hbmRyb2lkLW1hbmlmZXN0LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs0QkFBcUIsY0FBYzs7d0JBQ25CLGNBQWM7Ozs7eUJBRU0sZUFBZTs7NkJBQ3hCLGdCQUFnQjs7c0JBQzdCLFFBQVE7Ozs7b0JBQ0wsTUFBTTs7OztzQkFDSixRQUFROzs7O3FCQUNULE9BQU87Ozs7QUFFekIsSUFBTSxhQUFhLEdBQUcsa0JBQUssT0FBTyxDQUFDLFNBQVMsRUFBRSxJQUFJLEVBQUUsSUFBSSxFQUFFLElBQUksRUFBRSxNQUFNLENBQUMsQ0FBQztBQUN4RSxJQUFJLGVBQWUsR0FBRyxFQUFFLENBQUM7Ozs7OztBQU16QixlQUFlLENBQUMsbUJBQW1CLEdBQUcsb0JBQWdCLFFBQVE7TUFJdEQsSUFBSSxRQUNILE1BQU0sRUFDUCxNQUFNLEVBQ04sS0FBSyxFQUNMLGdCQUFnQixFQUNoQixnQkFBZ0IsRUFDaEIsY0FBYyxFQUNkLFlBQVksa0ZBQ1AsSUFBSSxFQU1MLFlBQVksRUFLWixRQUFPOzs7Ozs7O3lDQXJCVCxJQUFJLENBQUMsUUFBUSxFQUFFOzs7QUFDckIsOEJBQUksSUFBSSxDQUFDLGtDQUFrQyxDQUFDLENBQUM7QUFDekMsWUFBSSxHQUFHLENBQUMsTUFBTSxFQUFFLFNBQVMsRUFBRSxRQUFRLEVBQUUscUJBQXFCLENBQUM7O3lDQUMxQyx3QkFBSyxJQUFJLENBQUMsUUFBUSxDQUFDLElBQUksRUFBRSxJQUFJLENBQUM7Ozs7QUFBOUMsY0FBTSxRQUFOLE1BQU07QUFDUCxjQUFNLEdBQUcsSUFBSTtBQUNiLGFBQUssR0FBRyxNQUFNLENBQUMsS0FBSyxDQUFDLElBQUksQ0FBQztBQUMxQix3QkFBZ0IsR0FBRyxJQUFJLE1BQU0sQ0FBQyxrQ0FBa0MsQ0FBQztBQUNqRSx3QkFBZ0IsR0FBRyxLQUFLO0FBQ3hCLHNCQUFjLEdBQUcsSUFBSSxNQUFNLENBQUMsVUFBVSxDQUFDO0FBQ3ZDLG9CQUFZLEdBQUcsSUFB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RSxRQUFRLENBQUMsQ0FBQzs7OztBQUF2RSxjQUFNLFNBQU4sTUFBTTs0Q0FDSixJQUFJLE1BQU0sQ0FBQyxpREFBaUQsQ0FBQyxDQUFDLElBQUksQ0FBQyxNQUFNLENBQUM7Ozs7OztBQUVqRiw4QkFBSSxhQUFhLHVFQUFxRSxlQUFFLE9BQU8sQ0FBRyxDQUFDOzs7Ozs7O0NBRXRHLENBQUM7O3FCQUdhLGVBQWUiLCJmaWxlIjoibGliL3Rvb2xzL2FuZHJvaWQtbWFuaWZlc3QuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBleGVjIH0gZnJvbSAndGVlbl9wcm9jZXNzJztcbmltcG9ydCBsb2cgZnJvbSAnLi4vbG9nZ2VyLmpzJztcbmltcG9ydCB7IGdldEFuZHJvaWRQbGF0Zm9ybUFuZFBhdGgsIHVuemlwRmlsZSwgYXNzZXJ0WmlwQXJjaGl2ZSxcbiAgICAgICAgIGdldEFwa2FuYWx5emVyRm9yT3MgfSBmcm9tICcuLi9oZWxwZXJzLmpzJztcbmltcG9ydCB7IHN5c3RlbSwgZnMgfSBmcm9tICdhcHBpdW0tc3VwcG9ydCc7XG5pbXBvcnQgXyBmcm9tICdsb2Rhc2gnO1xuaW1wb3J0IHBhdGggZnJvbSAncGF0aCc7XG5pbXBvcnQgeG1sZG9tIGZyb20gJ3htbGRvbSc7XG5pbXBvcnQgeHBhdGggZnJvbSAneHBhdGgnO1xuXG5jb25zdCBoZWxwZXJKYXJQYXRoID0gcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgJy4uJywgJy4uJywgJy4uJywgJ2phcnMnKTtcbmxldCBtYW5pZmVzdE1ldGhvZHMgPSB7fTtcblxuLy8gYW5kcm9pZDpwcm9jZXNzPSBtYXkgYmUgZGVmaW5lZCBpbiBBbmRyb2lkTWFuaWZlc3QueG1sXG4vLyBodHRwOi8vZGV2ZWxvcGVyLmFuZHJvaWQuY29tL3JlZmVyZW5jZS9hbmRyb2lkL1IuYXR0ci5odG1sI3Byb2Nlc3Ncbi8vIG5vdGUgdGhhdCB0aGUgcHJvY2VzcyBuYW1lIHdoZW4gdXNlZCB3aXRoIHBzIG11c3QgYmUgdHJ1bmNhdGVkIHRvIHRoZSBsYXN0IDE1IGNoYXJzXG4vLyBwcyAtYyBjb20uZXhhbXBsZS5hbmRyb2lkLmFwaXMgYmVjb21lcyBwcyAtYyBsZS5hbmRyb2lkLmFwaXNcbm1hbmlmZXN0TWV0aG9kcy5wcm9jZXNzRnJvbU1hbmlmZXN0ID0gYXN5bmMgZnVuY3Rpb24gKGxvY2FsQXBrKSB7XG4gIHRyeSB7XG4gICAgYXdhaXQgdGhpcy5pbml0QWFwdCgpO1xuICAgIGxvZy5pbmZvKFwiUmV0cmlldmluZyBwcm9jZXNzIGZyb20gbWFuaWZlc3RcIik7XG4gICAgbGV0IGFyZ3MgPSBbJ2R1bXAnLCAneG1sdHJlZScsIGxvY2FsQXBrLCAnQW5kcm9pZE1hbmlmZXN0LnhtbCddO1xuICAgIGxldCB7c3Rkb3V0fSA9IGF3YWl0IGV4ZWModGhpcy5iaW5hcmllcy5hYXB0LCBhcmdzKTtcbiAgICBsZXQgcmVzdWx0ID0gbnVsbDtcbiAgICBsZXQgbGluZXMgPSBzdGRvdXQuc3BsaXQoXCJcXG5cIik7XG4gICAgbGV0IGFwcGxpY2F0aW9uUmVnZXggPSBuZXcgUmVnRXhwKC9cXHMrRTogYXBwbGljYXRpb24gXFwobGluZT1cXGQrXFwpLiovKTtcbiAgICBsZXQgYXBwbGljYXRpb25Gb3VuZCA9IGZhbHNlO1xuICAgIGxldCBhdHRyaWJ1dGVSZWdleCA9IG5ldyBSZWdFeHAoL1xccytBOiAuKy8pO1xuICAgIGxldCBwcm9jZXNzUmVnZXggPSBuZXcgUmVnRXhwKC9cXHMrQTogYW5kcm9pZDpwcm9jZXNzXFwoMHgwMTAxMDAxMVxcKT1cIihbXlwiXSspLipcIi8pO1xuICAgIGZvciAobGV0IGxpbmUgb2YgbGluZXMpIHtcbiAgICAgIGlmICghYXBwbGljYXRpb25Gb3VuZCkge1xuICAgICAgICBpZiAoYXBwbGljYXRpb25SZWdleC50ZXN0KGxpbmUpKSB7XG4gICAgICAgICAgYXBwbGljYXRpb25Gb3VuZCA9IHRydWU7XG4gICAgICAgIH1cbiAgICAgIH0gZWxzZSB7XG4gICAgICAgIGxldCBub3RBdHRyaWJ1dGUgPSAhYXR0cmlidXRlUmVnZXgudGVzdChsaW5lKTtcbiAgICAgICAgLy8gcHJvY2VzcyBtdXN0IGJlIGFuIGF0dHJpYnV0ZSBhZnRlciBhcHBsaWNhdGlvbi5cbiAgICAgICAgaWYgKG5vdEF0dHJpYnV0ZSkge1xuICAgICAgICAgIGJyZWFrO1xuICAgICAgICB9XG4gICAgICAgIGxldCBwcm9jZXNzID0gcHJvY2Vzc1JlZ2V4LmV4ZWMobGluZSk7XG4gICAgICAgIC8vIHRoaXMgaXMgYW4gYXBwbGljYXRpb24gYXR0cmlidXRlIHByb2Nlc3MuXG4gICAgICAgIGlmIChwcm9jZXNzICYmIHByb2Nlc3MubGVuZ3RoID4gMSkge1xuICAgICAgICAgIHJlc3VsdCA9IHByb2Nlc3NbMV07XG4gICAgICAgICAgLy8gbXVzdCB0cmltIHRvIGxhc3QgMTUgZm9yIGFuZHJvaWQncyBwcyBiaW5hcnlcbiAgICAgICAgICBpZiAocmVzdWx0Lmxlbmd0aCA+IDE1KSB7XG4gICAgICAgICAgICByZXN1bHQgPSByZXN1bHQuc3Vic3RyKHJlc3VsdC5sZW5ndGggLSAxNSk7XG4gICAgICAgICAgfVxuICAgICAgICAgIGJyZWFrO1xuICAgICAgICB9XG4gICAgICB9XG4gICAgfVxuICAgIHJldHVybiByZXN1bHQ7XG4gIH0gY2F0Y2ggKGUpIHtcbiAgICBsb2cuZXJyb3JBbmRUaHJvdyhgcHJvY2Vzc0Zyb21NYW5pZmVzdCBmYWlsZWQuIE9yaWdpbmFsIGVycm9yOiAke2UubWVzc2FnZX1gKTtcbiAgfVxufTtcblxuLyoqXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBBUEtJbmZvXG4gKiBAcHJvcGVydHkge3N0cmluZ30gYXBrUGFja2FnZSAtIFRoZSBuYW1lIG9mIGFwcGxpY2F0aW9uIHBhY2thZ2UsIGZvciBleGFtcGxlICdjb20uYWNtZS5hcHAnLlxuICogQHByb3BlcnR5IHtzdHJpbmd9IGFwa0FjdGl2aXR5IC0gVGhlIG5hbWUgb2YgbWFpbiBhcHBsaWNhdGlvbiBhY3Rpdml0eS5cbiAqL1xuXG4gLyoqXG4gKiBFeHRyYWN0IHBhY2thZ2UgYW5kIG1haW4gYWN0aXZpdHkgbmFtZSBmcm9tIGFwcGxpY2F0aW9uIG1hbmlmZXN0IHVzaW5nXG4gKiB0aGUgY3VzdG9tIGFwayB0b29scy5cbiAqXG4gKiBAcGFyYW0ge3N0cmluZ30gbG9jYWxBcGsgLSBUaGUgZnVsbCBwYXRoIHRvIGFwcGxpY2F0aW9uIHBhY2thZ2UuXG4gKiBAcGFyYW0ge3N0cmluZ30gYWFwdFBhdGggLSBUaGUgZnVsbCBwYXRoIHRvIGFwcHQgYmluYXJ5LlxuICogQHBhcmFtIHtzdHJpbmd9IGphclBhdGggLSBUaGUgZnVsbCBwYXRoIHRvIGFwcGl1bV9hcGtfdG9vbHMuamFyIHV0aWxpdHlcbiAqIEBwYXJhbSB7c3RyaW5nfSB0bXBSb290IC0gVGhlIGZ1bGwgcGF0aCB0byB0aGUgY2xhc3Mtd2lkZSB0ZW1wb3JhcnkgZm9sZGVyLlxuICogQHJldHVybiB7QVBLSW5mb30gVGhlIHBhcnNlZCBhcHBsaWNhdGlvbiBpbmZvLlxuICogQHRocm93cyB7RXJyb3J9IElmIHRoZXJlIHdhcyBhbiBlcnJvciB3aGlsZSBnZXR0aW5nIHRoZSBkYXRhIGZyb20gdGhlIGdpdmVuXG4gKiAgICAgICAgICAgICAgICAgYXBwbGljYXRpb24gcGFja2FnZS5cbiAqL1xuYXN5bmMgZnVuY3Rpb24gZXh0cmFjdEFwa0luZm9XaXRoQXBrVG9vbHMgKGxvY2FsQXBrLCBhYXB0UGF0aCwgamFyUGF0aCwgdG1wUm9vdCkge1xuICBsb2cuaW5mbyhcIkV4dHJhY3RpbmcgcGFja2FnZSBhbmQgbGF1bmNoIGFjdGl2aXR5IGZyb20gbWFuaWZlc3RcIik7XG4gIGxldCBhcmdzID0gWydkdW1wJywgJ2JhZGdpbmcnLCBsb2NhbEFwa107XG4gIGxldCBzdGRvdXQgPSAoYXdhaXQgZXhlYyhhYXB0UGF0aCwgYXJncykpLnN0ZG91dDtcbiAgbGV0IGFwa1BhY2thZ2UgPSBuZXcgUmVnRXhwKC9wYWNrYWdlOiBuYW1lPScoW14nXSspJy9nKS5leGVjKHN0ZG91dCk7XG4gIGlmICghYXBrUGFja2FnZSB8fCBhcGtQYWNrYWdlLmxlbmd0aCA8IDIpIHtcbiAgICB0aHJvdyBuZXcgRXJyb3IoYENhbm5vdCBwYXJzZSBwYWNrYWdlIG5hbWUgZnJvbSBgICtcbiAgICAgIGAnJHtfLmpvaW4oW2FhcHRQYXRoLCAnZHVtcCcsICdiYWRnaW5nJywgJ1wiJyArIGxvY2FsQXBrICsgJ1wiJ10sICcgJyl9JyBjb21tYW5kICBvdXRwdXRgKTtcbiAgfVxuICBhcGtQYWNrYWdlID0gYXBrUGFja2FnZVsxXTtcbiAgbGV0IGFwa0FjdGl2aXR5ID0gbmV3IFJlZ0V4cCgvbGF1bmNoYWJsZS1hY3Rpdml0eTogbmFtZT0nKFteJ10rKScvZykuZXhlYyhzdGRvdXQpO1xuICBpZiAoYXBrQWN0aXZpdHkgJiYgYXBrQWN0aXZpdHkubGVuZ3RoID49IDIpIHtcbiAgICBhcGtBY3Rpdml0eSA9IGFwa0FjdGl2aXR5WzFdO1xuICAgIHJldHVybiB7YXBrUGFja2FnZSwgYXBrQWN0aXZpdHl9O1xuICB9XG5cbiAgbGV0IG91dHB1dFBhdGggPSBwYXRoLnJlc29sdmUodG1wUm9vdCwgYXBrUGFja2FnZSk7XG4gIGxldCBnZXRMYXVuY2hBY3Rpdml0eSA9IFtcbiAgICAnLWphcicsIGphclBhdGgsXG4gICAgJ3ByaW50TGF1bmNoQWN0aXZpdHknLCBsb2NhbEFwayxcbiAgICBvdXRwdXRQYXRoXG4gIF07XG4gIGNvbnN0IG91dHB1dCA9IGF3YWl0IGV4ZWMoJ2phdmEnLCBnZXRMYXVuY2hBY3Rpdml0eSk7XG4gIGlmIChvdXRwdXQuc3RkZXJyKSB7XG4gICAgdGhyb3cgbmV3IEVycm9yKGBDYW5ub3QgcGFyc2UgbGF1bmNoQWN0aXZpdHkgZnJvbSBtYW5pZmVzdDogJHtvdXRwdXQuc3RkZXJyfWApO1xuICB9XG4gIHN0ZG91dCA9IG91dHB1dC5zdGRvdXQ7XG4gIGxldCBhY3QgPSBuZXcgUmVnRXhwKC9MYXVuY2ggYWN0aXZpdHkgcGFyc2VkOihbXiddKykvZykuZXhlYyhzdGRvdXQpO1xuICBpZiAoYWN0ICYmIGFjdC5sZW5ndGggPj0gMikge1xuICAgIGFwa0FjdGl2aXR5ID0gYWN0WzFdO1xuICAgIHJldHVybiB7YXBrUGFja2FnZSwgYXBrQWN0aXZpdHl9O1xuICB9XG4gIHRocm93IG5ldyBFcnJvcihgQ2Fubm90IHBhcnNlIG1haW4gYWN0aXZpdHkgbmFtZSBmcm9tICcke3N0ZG91dH0nIGNvbW1hbmQgIG91dHB1dGApO1xufVxuXG4vKipcbiAqIEV4dHJhY3QgcGFja2FnZSBhbmQgbWFpbiBhY3Rpdml0eSBuYW1lIGZyb20gYXBwbGljYXRpb24gbWFuaWZlc3QgdXNpbmdcbiAqIGFwa2FuYWx5emVyIHRvb2wuXG4gKlxuICogQHBhcmFtIHtzdHJpbmd9IGxvY2FsQXBrIC0gVGhlIGZ1bGwgcGF0aCB0byBhcHBsaWNhdGlvbiBwYWNrYWdlLlxuICogQHBhcmFtIHtzdHJpbmd9IGFwa2FuYWx5emVyUGF0aCAtIFRoZSBmdWxsIHBhdGggdG8gYXBrYW5hbHl6ZXIgdG9vbC5cbiAqIEByZXR1cm4ge0FQS0luZm99IFRoZSBwYXJzZWQgYXBwbGljYXRpb24gaW5mby5cbiAqIEB0aHJvd3Mge0Vycm9yfSBJZiB0aGVyZSB3YXMgYW4gZXJyb3Igd2hpbGUgZ2V0dGluZyB0aGUgZGF0YSBmcm9tIHRoZSBnaXZlblxuICogICAgICAgICAgICAgICAgIGFwcGxpY2F0aW9uIHBhY2thZ2Ugb3IgaWYgdGhlIHRvb2wgaXRzZWxmXG4gKiAgICAgICAgICAgICAgICAgaXMgbm90IHByZXNlbnQgb24gdGhlIGxvY2FsIGZpbGUgc3lzdGVtLlxuICovXG5hc3luYyBmdW5jdGlvbiBleHRyYWN0QXBrSW5mb1dpdGhBcGthbmFseXplciAobG9jYWxBcGssIGFwa2FuYWx5emVyUGF0aCkge1xuICBjb25zdCBhcmdzID0gWyctaCcsICdtYW5pZmVzdCcsICdwcmludCcsIGxvY2FsQXBrXTtcbiAgbG9nLmRlYnVnKGBTdGFydGluZyAnJHthcGthbmFseXplclBhdGh9JyB3aXRoIGFyZ3MgJHtKU09OLnN0cmluZ2lmeShhcmdzKX1gKTtcbiAgY29uc3QgbWFuaWZlc3RYbWwgPSAoYXdhaXQgZXhlYyhhcGthbmFseXplclBhdGgsIGFyZ3MsIHtcbiAgICBzaGVsbDogdHJ1ZSxcbiAgICBjd2Q6IHBhdGguZGlybmFtZShhcGthbmFseXplclBhdGgpXG4gIH0pKS5zdGRvdXQ7XG4gIGNvbnN0IGRvYyA9IG5ldyB4bWxkb20uRE9NUGFyc2VyKCkucGFyc2VGcm9tU3RyaW5nKG1hbmlmZXN0WG1sKTtcbiAgY29uc3QgYXBrUGFja2FnZUF0dHJpYnV0ZSA9IHhwYXRoLnNlbGVjdDEoJy8vbWFuaWZlc3QvQHBhY2thZ2UnLCBkb2MpO1xuICBpZiAoIWFwa1BhY2thZ2VBdHRyaWJ1dGUpIHtcbiAgICB0aHJvdyBuZXcgRXJyb3IoYENhbm5vdCBwYXJzZSBwYWNrYWdlIG5hbWUgZnJvbSAke21hbmlmZXN0WG1sfWApO1xuICB9XG4gIGNvbnN0IGFwa1BhY2thZ2UgPSBhcGtQYWNrYWdlQXR0cmlidXRlLnZhbHVlO1xuICAvLyBMb29rIGZvciBhY3Rpdml0eSBvciBhY3Rpdml0eS1hbGlhcyB3aXRoXG4gIC8vIGFjdGlvbiA9PSBhbmRyb2lkLmludGVudC5hY3Rpb24uTUFJTiBhbmRcbiAgLy8gY2F0ZWdvcnkgPT0gYW5kcm9pZC5pbnRlbnQuY2F0ZWdvcnkuTEFVTkNIRVJcbiAgLy8gZGVzY2VuZGFudHNcbiAgY29uc3QgYXBrQWN0aXZpdHlBdHRyaWJ1dGUgPSB4cGF0aC5zZWxlY3QxKFxuICAgIFwiLy9hcHBsaWNhdGlvbi8qW3N0YXJ0cy13aXRoKG5hbWUoKSwgJ2FjdGl2aXR5JykgXCIgK1xuICAgIFwiYW5kIC4vL2FjdGlvbltAKltsb2NhbC1uYW1lKCk9J25hbWUnIGFuZCAuPSdhbmRyb2lkLmludGVudC5hY3Rpb24uTUFJTiddXSBcIiArXG4gICAgXCJhbmQgLi8vY2F0ZWdvcnlbQCpbbG9jYWwtbmFtZSgpPSduYW1lJyBhbmQgLj0nYW5kcm9pZC5pbnRlbnQuY2F0ZWdvcnkuTEFVTkNIRVInXV1dXCIgK1xuICAgIFwiL0AqW2xvY2FsLW5hbWUoKT0nbmFtZSddXCIsIGRvYyk7XG4gIGlmICghYXBrQWN0aXZpdHlBdHRyaWJ1dGUpIHtcbiAgICB0aHJvdyBuZXcgRXJyb3IoYENhbm5vdCBwYXJzZSBtYWluIGFjdGl2aXR5IG5hbWUgZnJvbSAke21hbmlmZXN0WG1sfWApO1xuICB9XG4gIGNvbnN0IGFwa0FjdGl2aXR5ID0gYXBrQWN0aXZpdHlBdHRyaWJ1dGUudmFsdWU7XG4gIHJldHVybiB7YXBrUGFja2FnZSwgYXBrQWN0aXZpdHl9O1xufVxuXG4vKipcbiAqIEV4dHJhY3QgcGFja2FnZSBhbmQgbWFpbiBhY3Rpdml0eSBuYW1lIGZyb20gYXBwbGljYXRpb24gbWFuaWZlc3QuXG4gKlxuICogQHBhcmFtIHtzdHJpbmd9IGxvY2FsQXBrIC0gVGhlIGZ1bGwgcGF0aCB0byBhcHBsaWNhdGlvbiBwYWNrYWdlLlxuICogQHJldHVybiB7QVBLSW5mb30gVGhlIHBhcnNlZCBhcHBsaWNhdGlvbiBpbmZvLlxuICogQHRocm93cyB7ZXJyb3J9IElmIHRoZXJlIHdhcyBhbiBlcnJvciB3aGlsZSBnZXR0aW5nIHRoZSBkYXRhIGZyb20gdGhlIGdpdmVuXG4gKiAgICAgICAgICAgICAgICAgYXBwbGljYXRpb24gcGFja2FnZS5cbiAqL1xubWFuaWZlc3RNZXRob2RzLnBhY2thZ2VBbmRMYXVuY2hBY3Rpdml0eUZyb21NYW5pZmVzdCA9IGFzeW5jIGZ1bmN0aW9uIChsb2NhbEFwaykge1xuICBjb25zdCBhcGtJbmZvR2V0dGVycyA9IFtcbiAgICBhc3luYyAoKSA9PiB7XG4gICAgICBjb25zdCBhcGthbmFseXplclBhdGggPSBhd2FpdCBnZXRBcGthbmFseXplckZvck9zKHRoaXMpO1xuICAgICAgcmV0dXJuIGF3YWl0IGV4dHJhY3RBcGtJbmZvV2l0aEFwa2FuYWx5emVyKGxvY2FsQXBrLCBhcGthbmFseXplclBhdGgpO1xuICAgIH0sXG4gICAgYXN5bmMgKCkgPT4ge1xuICAgICAgYXdhaXQgdGhpcy5pbml0QWFwdCgpO1xuICAgICAgcmV0dXJuIGF3YWl0IGV4dHJhY3RBcGtJbmZvV2l0aEFwa1Rvb2xzKGxvY2FsQXBrLFxuICAgICAgICB0aGlzLmJpbmFyaWVzLmFhcHQsIHRoaXMuamFyc1snYXBwaXVtX2Fwa190b29scy5qYXInXSwgdGhpcy50bXBEaXIpO1xuICAgIH0sXG4gIF07XG5cbiAgbGV0IHNhdmVkRXJyb3I7XG4gIGZvciAoY29uc3QgaW5mb0dldHRlciBvZiBhcGtJbmZvR2V0dGVycykge1xuICAgIHRyeSB7XG4gICAgICBjb25zdCB7YXBrUGFja2FnZSwgYXBrQWN0aXZpdHl9ID0gYXdhaXQgaW5mb0dldHRlcigpO1xuICAgICAgbG9nLmluZm8oYFBhY2thZ2UgbmFtZTogJyR7YXBrUGFja2FnZX0nYCk7XG4gICAgICBsb2cuaW5mbyhgTWFpbiBhY3Rpdml0eSBuYW1lOiAnJHthcGtBY3Rpdml0eX0nYCk7XG4gICAgICByZXR1cm4ge2Fwa1BhY2thZ2UsIGFwa0FjdGl2aXR5fTtcbiAgICB9IGNhdGNoIChlKSB7XG4gICAgICBpZiAoaW5mb0dldHRlciAhPT0gXy5sYXN0KGFwa0luZm9HZXR0ZXJzKSkge1xuICAgICAgICBsb2cuaW5mbyhgVXNpbmcgdGhlIGFsdGVybmF0aXZlIGFjdGl2aXR5IG5hbWUgZGV0ZWN0aW9uIG1ldGhvZCBgK1xuICAgICAgICAgICAgICAgICBgYmVjYXVzZSBvZjogJHtlLm1lc3NhZ2V9YCk7XG4gICAgICB9XG4gICAgICBzYXZlZEVycm9yID0gZTtcbiAgICB9XG4gIH1cbiAgbG9nLmVycm9yQW5kVGhyb3coYHBhY2thZ2VBbmRMYXVuY2hBY3Rpdml0eUZyb21NYW5pZmVzdCBmYWlsZWQuIGAgK1xuICAgICAgICAgICAgICAgICAgICBgT3JpZ2luYWwgZXJyb3I6ICR7c2F2ZWRFcnJvci5tZXNzYWdlfWAgK1xuICAgICAgICAgICAgICAgICAgICAoc2F2ZWRFcnJvci5zdGRlcnIgPyBgOyBTdGRFcnI6ICR7c2F2ZWRFcnJvci5zdGRlcnJ9YCA6ICcnKSk7XG59O1xuXG4vKipcbiAqIEV4dHJhY3QgdGFyZ2V0IFNESyB2ZXJzaW9uIGZyb20gYXBwbGljYXRpb24gbWFuaWZlc3QuXG4gKlxuICogQHBhcmFtIHtzdHJpbmd9IGxvY2FsQXBrIC0gVGhlIGZ1bGwgcGF0aCB0byBhcHBsaWNhdGlvbiBwYWNrYWdlLlxuICogQHJldHVybiB7bnVtYmVyfSBUaGUgdmVyc2lvbiBvZiB0aGUgdGFyZ2V0IFNESy5cbiAqIEB0aHJvd3Mge2Vycm9yfSBJZiB0aGVyZSB3YXMgYW4gZXJyb3Igd2hpbGUgZ2V0dGluZyB0aGUgZGF0YSBmcm9tIHRoZSBnaXZlblxuICogICAgICAgICAgICAgICAgIGFwcGxpY2F0aW9uIHBhY2thZ2UuXG4gKi9cbm1hbmlmZXN0TWV0aG9kcy50YXJnZXRTZGtWZXJzaW9uRnJvbU1hbmlmZXN0ID0gYXN5bmMgZnVuY3Rpb24gKGxvY2FsQXBrKSB7XG4gIHRyeSB7XG4gICAgYXdhaXQgdGhpcy5pbml0QWFwdCgpO1xuICAgIGxvZy5pbmZvKFwiRXh0cmFjdGluZyBwYWNrYWdlIGFuZCBsYXVuY2ggYWN0aXZpdHkgZnJvbSBtYW5pZmVzdFwiKTtcbiAgICBsZXQgYXJncyA9IFsnZHVtcCcsICdiYWRnaW5nJywgbG9jYWxBcGtdO1xuICAgIGxldCB7c3Rkb3V0fSA9IGF3YWl0IGV4ZWModGhpcy5iaW5hcmllcy5hYXB0LCBhcmdzKTtcbiAgICBsZXQgdGFyZ2V0U2RrVmVyc2lvbiA9IG5ldyBSZWdFeHAoL3RhcmdldFNka1ZlcnNpb246JyhbXiddKyknL2cpLmV4ZWMoc3Rkb3V0KTtcbiAgICBpZiAoIXRhcmdldFNka1ZlcnNpb24pIHtcbiAgICAgIHRocm93IG5ldyBFcnJvcihgdGFyZ2V0U2RrVmVyc2lvbiBpcyBub3Qgc3BlY2lmaWVkIGluIHRoZSBhcHBsaWNhdGlvbi5gKTtcbiAgICB9XG4gICAgcmV0dXJuIHBhcnNlSW50KHRhcmdldFNka1ZlcnNpb25bMV0sIDEwKTtcbiAgfSBjYXRjaCAoZSkge1xuICAgIGxvZy5lcnJvckFuZFRocm93KGBmZXRjaGluZyB0YXJnZXRTZGtWZXJzaW9uIGZyb20gbG9jYWwgQVBLIGZhaWxlZC4gT3JpZ2luYWwgZXJyb3I6ICR7ZS5tZXNzYWdlfWApO1xuICB9XG59O1xuXG4vKipcbiAqIEV4dHJhY3QgdGFyZ2V0IFNESyB2ZXJzaW9uIGZyb20gcGFja2FnZSBpbmZvcm1hdGlvbi5cbiAqXG4gKiBAcGFyYW0ge3N0cmluZ30gcGtnIC0gVGhlIGNsYXNzIG5hbWUgb2YgdGhlIHBhY2thZ2UgaW5zdGFsbGVkIG9uIHRoZSBkZXZpY2UgdW5kZXIgdGVzdC5cbiAqIEByZXR1cm4ge251bWJlcn0gVGhlIHZlcnNpb24gb2YgdGhlIHRhcmdldCBTREsuXG4gKi9cbm1hbmlmZXN0TWV0aG9kcy50YXJnZXRTZGtWZXJzaW9uVXNpbmdQS0cgPSBhc3luYyBmdW5jdGlvbiAocGtnKSB7XG4gIGxldCBzdGRvdXQgPSAgYXdhaXQgdGhpcy5zaGVsbChbJ2R1bXBzeXMnLCAncGFja2FnZScsIHBrZ10pO1xuICBsZXQgdGFyZ2V0U2RrVmVyc2lvbiA9IG5ldyBSZWdFeHAoL3RhcmdldFNkaz0oW15cXHNcXHNdKykvZykuZXhlYyhzdGRvdXQpO1xuICBpZiAodGFyZ2V0U2RrVmVyc2lvbiAmJiB0YXJnZXRTZGtWZXJzaW9uLmxlbmd0aCA+PSAyKSB7XG4gICAgdGFyZ2V0U2RrVmVyc2lvbiA9IHRhcmdldFNka1ZlcnNpb25bMV07XG4gIH0gZWxzZSB7XG4gICAgLy8gdGFyZ2V0U2RrIG5vdCBmb3VuZCBpbiB0aGUgZHVtcCwgYXNzaWduaW5nIDAgdG8gdGFyZ2V0U2RrVmVyc2lvblxuICAgIHRhcmdldFNka1ZlcnNpb24gPSAwO1xuICB9XG4gIHJldHVybiBwYXJzZUludCh0YXJnZXRTZGtWZXJzaW9uLCAxMCk7XG59O1xuXG5tYW5pZmVzdE1ldGhvZHMuY29tcGlsZU1hbmlmZXN0ID0gYXN5bmMgZnVuY3Rpb24gKG1hbmlmZXN0LCBtYW5pZmVzdFBhY2thZ2UsIHRhcmdldFBhY2thZ2UpIHtcbiAgbG9nLmRlYnVnKGBDb21waWxpbmcgbWFuaWZlc3QgJHttYW5pZmVzdH1gKTtcbiAgbGV0IHtwbGF0Zm9ybSwgcGxhdGZvcm1QYXRofSA9IGF3YWl0IGdldEFuZHJvaWRQbGF0Zm9ybUFuZFBhdGgoKTtcbiAgaWYgKCFwbGF0Zm9ybSkge1xuICAgIHRocm93IG5ldyBFcnJvcihcIlJlcXVpcmVkIHBsYXRmb3JtIGRvZXNuJ3QgZXhpc3QgKEFQSSBsZXZlbCA+PSAxNylcIik7XG4gIH1cbiAgbG9nLmRlYnVnKCdDb21waWxpbmcgbWFuaWZlc3QuJyk7XG4gIHRyeSB7XG4gICAgbGV0IGFyZ3MgPSBbJ3BhY2thZ2UnLCAnLU0nLCBtYW5pZmVzdCwgJy0tcmVuYW1lLW1hbmlmZXN0LXBhY2thZ2UnLFxuICAgICAgICAgICAgICAgIG1hbmlmZXN0UGFja2FnZSwgJy0tcmVuYW1lLWluc3RydW1lbnRhdGlvbi10YXJnZXQtcGFja2FnZScsXG4gICAgICAgICAgICAgICAgdGFyZ2V0UGFja2FnZSwgJy1JJywgcGF0aC5yZXNvbHZlKHBsYXRmb3JtUGF0aCwgJ2FuZHJvaWQuamFyJyksXG4gICAgICAgICAgICAgICAgJy1GJywgbWFuaWZlc3QgKyAnLmFwaycsICctZiddO1xuICAgIGF3YWl0IGV4ZWModGhpcy5iaW5hcmllcy5hYXB0LCBhcmdzKTtcbiAgICBsb2cuZGVidWcoXCJDb21waWxlZCBtYW5pZmVzdFwiKTtcbiAgfSBjYXRjaCAoZXJyKSB7XG4gICAgbG9nLmVycm9yQW5kVGhyb3coYEVycm9yIGNvbXBpbGluZyBtYW5pZmVzdC4gT3JpZ2luYWwgZXJyb3I6ICR7ZXJyLm1lc3NhZ2V9YCk7XG4gIH1cbn07XG5cbm1hbmlmZXN0TWV0aG9kcy5pbnNlcnRNYW5pZmVzdCA9IGFzeW5jIGZ1bmN0aW9uIChtYW5pZmVzdCwgc3JjQXBrLCBkc3RBcGspIHtcbiAgbG9nLmRlYnVnKGBJbnNlcnRpbmcgbWFuaWZlc3QsIHNyYzogJHtzcmNBcGt9IGRzdDogJHtkc3RBcGt9YCk7XG4gIHRyeSB7XG4gICAgYXdhaXQgdW56aXBGaWxlKGAke21hbmlmZXN0fS5hcGtgKTtcbiAgICBhd2FpdCBmcy5jb3B5RmlsZShzcmNBcGssIGRzdEFwayk7XG4gICAgbG9nLmRlYnVnKFwiVGVzdGluZyBuZXcgdG1wIGFwa1wiKTtcbiAgICBhd2FpdCBhc3NlcnRaaXBBcmNoaXZlKGRzdEFwayk7XG4gICAgbG9nLmRlYnVnKFwiTW92aW5nIG1hbmlmZXN0XCIpO1xuICAgIGlmIChzeXN0ZW0uaXNXaW5kb3dzKCkpIHtcbiAgICAgIGxldCBqYXZhID0gcGF0aC5yZXNvbHZlKHByb2Nlc3MuZW52LkpBVkFfSE9NRSwgJ2JpbicsICdqYXZhJyk7XG4gICAgICBsZXQgYXJncyA9IFsnLWphcicsICBwYXRoLnJlc29sdmUoaGVscGVySmFyUGF0aCwgJ21vdmVfbWFuaWZlc3QuamFyJyksXG4gICAgICAgICAgICAgICAgICBkc3RBcGssIG1hbmlmZXN0XTtcbiAgICAgIGF3YWl0IGV4ZWMoamF2YSwgYXJncyk7XG4gICAgfSBlbHNlIHtcbiAgICAgIC8vIEluc2VydCBjb21waWxlZCBtYW5pZmVzdCBpbnRvIC90bXAvYXBwUGFja2FnZS5jbGVhbi5hcGtcbiAgICAgIC8vIC1qID0ga2VlcCBvbmx5IHRoZSBmaWxlLCBub3QgdGhlIGRpcnNcbiAgICAgIC8vIC1tID0gbW92ZSBtYW5pZmVzdCBpbnRvIHRhcmdldCBhcGsuXG4gICAgICBhd2FpdCBleGVjKCd6aXAnLCBbJy1qJywgJy1tJywgZHN0QXBrLCBtYW5pZmVzdF0pO1xuICAgIH1cbiAgICBsb2cuZGVidWcoXCJJbnNlcnRlZCBtYW5pZmVzdC5cIik7XG4gIH0gY2F0Y2ggKGUpIHtcbiAgICBsb2cuZXJyb3JBbmRUaHJvdyhgRXJyb3IgaW5zZXJ0aW5nIG1hbmlmZXN0LiBPcmlnaW5hbCBlcnJvcjogJHtlLm1lc3NhZ2V9YCk7XG4gIH1cbn07XG5cbi8qKlxuICogQ2hlY2sgd2hldGhlciBwYWNrYWdlIG1hbmlmZXN0IGNvbnRhaW5zIEludGVybmV0IHBlcm1pc3Npb25zLlxuICpcbiAqIEBwYXJhbSB7c3RyaW5nfSBsb2NhbEFwayAtIFRoZSBmdWxsIHBhdGggdG8gYXBwbGljYXRpb24gcGFja2FnZS5cbiAqIEByZXR1cm4ge2Jvb2xlYW59IFRydWUgaWYgdGhlIG1hbmlmZXN0IHJlcXVpcmVzIEludGVybmV0IGFjY2VzcyBwZXJtaXNzaW9uLlxuICovXG5tYW5pZmVzdE1ldGhvZHMuaGFzSW50ZXJuZXRQZXJtaXNzaW9uRnJvbU1hbmlmZXN0ID0gYXN5bmMgZnVuY3Rpb24gKGxvY2FsQXBrKSB7XG4gIHRyeSB7XG4gICAgYXdhaXQgdGhpcy5pbml0QWFwdCgpO1xuICAgIGxvZy5kZWJ1ZyhcIkNoZWNraW5nIGlmIGhhcyBpbnRlcm5ldCBwZXJtaXNzaW9uIGZyb20gbWFuaWZlc3RcIik7XG4gICAgbGV0IHtzdGRvdXR9ID0gYXdhaXQgZXhlYyh0aGlzLmJpbmFyaWVzLmFhcHQsIFsnZHVtcCcsICdiYWRnaW5nJywgbG9jYWxBcGtdKTtcbiAgICByZXR1cm4gbmV3IFJlZ0V4cCgvdXNlcy1wZXJtaXNzaW9uOi4qJ2FuZHJvaWQucGVybWlzc2lvbi5JTlRFUk5FVCcvKS50ZXN0KHN0ZG91dCk7XG4gIH0gY2F0Y2ggKGUpIHtcbiAgICBsb2cuZXJyb3JBbmRUaHJvdyhgRXJyb3IgY2hlY2tpbmcgaW50ZXJuZXQgcGVybWlzc2lvbiBmb3IgbWFuaWZlc3QuIE9yaWdpbmFsIGVycm9yOiAke2UubWVzc2FnZX1gKTtcbiAgfVxufTtcblxuXG5leHBvcnQgZGVmYXVsdCBtYW5pZmVzdE1ldGhvZHM7XG4iXSwic291cmNlUm9vdCI6Ii4uLy4uLy4uIn0=

@@ -1,0 +1,451 @@
+'use strict';
+
+var _regeneratorRuntime = require('babel-runtime/regenerator')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+var _chai = require('chai');
+
+var _chai2 = _interopRequireDefault(_chai);
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _chaiAsPromised = require('chai-as-promised');
+
+var _chaiAsPromised2 = _interopRequireDefault(_chaiAsPromised);
+
+var _appiumSupport = require('appium-support');
+
+var _libBasedriverHelpers = require('../../lib/basedriver/helpers');
+
+var _libBasedriverHelpers2 = _interopRequireDefault(_libBasedriverHelpers);
+
+var _http = require('http');
+
+var _http2 = _interopRequireDefault(_http);
+
+var _finalhandler = require('finalhandler');
+
+var _finalhandler2 = _interopRequireDefault(_finalhandler);
+
+var _serveStatic = require('serve-static');
+
+var _serveStatic2 = _interopRequireDefault(_serveStatic);
+
+var _contentDisposition = require('content-disposition');
+
+var _contentDisposition2 = _interopRequireDefault(_contentDisposition);
+
+_chai2['default'].should();
+_chai2['default'].use(_chaiAsPromised2['default']);
+
+function getFixture(file) {
+  return _path2['default'].resolve(__dirname, '..', '..', '..', 'test', 'basedriver', 'fixtures', file);
+}
+
+describe('app download and configuration', function () {
+  describe('configureApp', function () {
+    it('should get the path for a local .app', function callee$2$0() {
+      var newAppPath, contents;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp(getFixture('FakeIOSApp.app'), '.app'));
+
+          case 2:
+            newAppPath = context$3$0.sent;
+
+            newAppPath.should.contain('FakeIOSApp.app');
+            context$3$0.next = 6;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+          case 6:
+            contents = context$3$0.sent;
+
+            contents.should.eql('this is not really an app\n');
+
+          case 8:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should get the path for a local .apk', function callee$2$0() {
+      var newAppPath, contents;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp(getFixture('FakeAndroidApp.apk'), '.apk'));
+
+          case 2:
+            newAppPath = context$3$0.sent;
+
+            newAppPath.should.contain('FakeAndroidApp.apk');
+            context$3$0.next = 6;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+          case 6:
+            contents = context$3$0.sent;
+
+            contents.should.eql('this is not really an apk\n');
+
+          case 8:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should unzip and get the path for a local .app.zip', function callee$2$0() {
+      var newAppPath, contents;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp(getFixture('FakeIOSApp.app.zip'), '.app'));
+
+          case 2:
+            newAppPath = context$3$0.sent;
+
+            newAppPath.should.contain('FakeIOSApp.app');
+            context$3$0.next = 6;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+          case 6:
+            contents = context$3$0.sent;
+
+            contents.should.eql('this is not really an app\n');
+
+          case 8:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should unzip and get the path for a local .ipa', function callee$2$0() {
+      var newAppPath, contents;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp(getFixture('FakeIOSApp.ipa'), '.app'));
+
+          case 2:
+            newAppPath = context$3$0.sent;
+
+            newAppPath.should.contain('FakeIOSApp.app');
+            context$3$0.next = 6;
+            return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+          case 6:
+            contents = context$3$0.sent;
+
+            contents.should.eql('this is not really an app\n');
+
+          case 8:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should fail for a bad zip file', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp(getFixture('BadZippedApp.zip'), '.app').should.be.rejectedWith('Error testing zip archive, are you sure this is a zip file?'));
+
+          case 2:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should fail if extensions do not match', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp(getFixture('FakeIOSApp.app'), '.wrong').should.be.rejectedWith(/did not have extension '.wrong'/));
+
+          case 2:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    it('should fail if zip file does not contain an app whose extension matches', function callee$2$0() {
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            context$3$0.next = 2;
+            return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp(getFixture('FakeIOSApp.app.zip'), '.wrong').should.be.rejectedWith(/could not find a .wrong bundle in it/));
+
+          case 2:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+    describe('should download an app from the web', function callee$2$0() {
+      var server;
+      return _regeneratorRuntime.async(function callee$2$0$(context$3$0) {
+        while (1) switch (context$3$0.prev = context$3$0.next) {
+          case 0:
+            server = undefined;
+
+            before(function () {
+              var dir = _path2['default'].resolve(__dirname, '..', '..', '..', 'test', 'basedriver', 'fixtures');
+              var serve = (0, _serveStatic2['default'])(dir, {
+                index: false,
+                setHeaders: function setHeaders(res, path) {
+                  res.setHeader('Content-Disposition', (0, _contentDisposition2['default'])(path));
+                }
+              });
+
+              server = _http2['default'].createServer(function (req, res) {
+                if (req.url.indexOf('missing') !== -1) {
+                  res.writeHead(404);
+                  res.end();
+                  return;
+                }
+                // for testing zip file content types
+                if (req.url.indexOf('mime-zip') !== -1) {
+                  res.setHeader('Content-Type', 'application/zip');
+                } else if (req.url.indexOf('mime-bip') !== 1) {
+                  res.setHeader('Content-Type', 'application/bip');
+                }
+                serve(req, res, (0, _finalhandler2['default'])(req, res));
+              });
+              server.listen(8000);
+            });
+            after(function () {
+              server.close();
+            });
+
+            it('should download zip file', function callee$3$0() {
+              var newAppPath, contents;
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeIOSApp.app.zip', '.app'));
+
+                  case 2:
+                    newAppPath = context$4$0.sent;
+
+                    newAppPath.should.contain('FakeIOSApp.app');
+                    context$4$0.next = 6;
+                    return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+                  case 6:
+                    contents = context$4$0.sent;
+
+                    contents.should.eql('this is not really an app\n');
+
+                  case 8:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should download zip file with query string', function callee$3$0() {
+              var newAppPath, contents;
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeIOSApp.app.zip?sv=abc&sr=def', '.app'));
+
+                  case 2:
+                    newAppPath = context$4$0.sent;
+
+                    newAppPath.should.contain('.app');
+                    context$4$0.next = 6;
+                    return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+                  case 6:
+                    contents = context$4$0.sent;
+
+                    contents.should.eql('this is not really an app\n');
+
+                  case 8:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should download an app file', function callee$3$0() {
+              var newAppPath, contents;
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeIOSApp.app', '.app'));
+
+                  case 2:
+                    newAppPath = context$4$0.sent;
+
+                    newAppPath.should.contain('.app');
+                    context$4$0.next = 6;
+                    return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+                  case 6:
+                    contents = context$4$0.sent;
+
+                    contents.should.eql('this is not really an app\n');
+
+                  case 8:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should download an apk file', function callee$3$0() {
+              var newAppPath, contents;
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeAndroidApp.apk', '.apk'));
+
+                  case 2:
+                    newAppPath = context$4$0.sent;
+
+                    newAppPath.should.contain('.apk');
+                    context$4$0.next = 6;
+                    return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+                  case 6:
+                    contents = context$4$0.sent;
+
+                    contents.should.eql('this is not really an apk\n');
+
+                  case 8:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should handle zip file that cannot be downloaded', function callee$3$0() {
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/missing/FakeIOSApp.app.zip', '.app').should.be.rejectedWith(/Problem downloading app from url/));
+
+                  case 2:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should recognize zip mime types and unzip the downloaded file', function callee$3$0() {
+              var newAppPath, contents;
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeAndroidApp.asd?mime-zip', '.apk'));
+
+                  case 2:
+                    newAppPath = context$4$0.sent;
+
+                    newAppPath.should.contain('FakeAndroidApp.apk');
+                    newAppPath.should.not.contain('.asd');
+                    context$4$0.next = 7;
+                    return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+                  case 7:
+                    contents = context$4$0.sent;
+
+                    contents.should.eql('this is not really an apk\n');
+
+                  case 9:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should recognize zip mime types and unzip the downloaded file with query string', function callee$3$0() {
+              var newAppPath, contents;
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeAndroidApp.asd?mime-zip&sv=abc&sr=def', '.apk'));
+
+                  case 2:
+                    newAppPath = context$4$0.sent;
+
+                    newAppPath.should.contain('FakeAndroidApp.apk');
+                    newAppPath.should.not.contain('.asd');
+                    context$4$0.next = 7;
+                    return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+                  case 7:
+                    contents = context$4$0.sent;
+
+                    contents.should.eql('this is not really an apk\n');
+
+                  case 9:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should treat an unknown mime type as an app', function callee$3$0() {
+              var newAppPath, contents;
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    context$4$0.next = 2;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeAndroidApp.apk?mime-bip', '.apk'));
+
+                  case 2:
+                    newAppPath = context$4$0.sent;
+
+                    newAppPath.should.contain('.apk');
+                    context$4$0.next = 6;
+                    return _regeneratorRuntime.awrap(_appiumSupport.fs.readFile(newAppPath, 'utf8'));
+
+                  case 6:
+                    contents = context$4$0.sent;
+
+                    contents.should.eql('this is not really an apk\n');
+
+                  case 8:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+            it('should handle server not available', function callee$3$0() {
+              return _regeneratorRuntime.async(function callee$3$0$(context$4$0) {
+                while (1) switch (context$4$0.prev = context$4$0.next) {
+                  case 0:
+                    server.close();
+                    context$4$0.next = 3;
+                    return _regeneratorRuntime.awrap(_libBasedriverHelpers2['default'].configureApp('http://localhost:8000/FakeIOSApp.app.zip', '.app').should.be.rejectedWith(/ECONNREFUSED/));
+
+                  case 3:
+                  case 'end':
+                    return context$4$0.stop();
+                }
+              }, null, this);
+            });
+
+          case 12:
+          case 'end':
+            return context$3$0.stop();
+        }
+      }, null, this);
+    });
+  });
+});
+
+// use a local server so there is no dependency on the internet
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInRlc3QvYmFzZWRyaXZlci9oZWxwZXJzLWUyZS1zcGVjcy5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7b0JBQWlCLE1BQU07Ozs7b0JBQ04sTUFBTTs7Ozs4QkFDSSxrQkFBa0I7Ozs7NkJBQzFCLGdCQUFnQjs7b0NBQ3JCLDhCQUE4Qjs7OztvQkFDM0IsTUFBTTs7Ozs0QkFDRSxjQUFjOzs7OzJCQUNmLGNBQWM7Ozs7a0NBQ1AscUJBQXFCOzs7O0FBR3BELGtCQUFLLE1BQU0sRUFBRSxDQUFDO0FBQ2Qsa0JBQUssR0FBRyw2QkFBZ0IsQ0FBQzs7QUFFekIsU0FBUyxVQUFVLENBQUUsSUFBSSxFQUFFO0FBQ3pCLFNBQU8sa0JBQUssT0FBTyxDQUFDLFNBQVMsRUFBRSxJQUFJLEVBQUUsSUFBSSxFQUFFLElBQUksRUFBRSxNQUFNLEVBQUUsWUFBWSxFQUNqRCxVQUFVLEVBQUUsSUFBSSxDQUFDLENBQUM7Q0FDdkM7O0FBRUQsUUFBUSxDQUFDLGdDQUFnQyxFQUFFLFlBQVk7QUFDckQsVUFBUSxDQUFDLGNBQWMsRUFBRSxZQUFZO0FBQ25DLE1BQUUsQ0FBQyxzQ0FBc0MsRUFBRTtVQUNyQyxVQUFVLEVBRVYsUUFBUTs7Ozs7NkNBRlcsa0NBQUUsWUFBWSxDQUFDLFVBQVUsQ0FBQyxnQkFBZ0IsQ0FBQyxFQUFFLE1BQU0sQ0FBQzs7O0FBQXZFLHNCQUFVOztBQUNkLHNCQUFVLENBQUMsTUFBTSxDQUFDLE9BQU8sQ0FBQyxnQkFBZ0IsQ0FBQyxDQUFDOzs2Q0FDdkIsa0JBQUcsUUFBUSxDQUFDLFVBQVUsRUFBRSxNQUFNLENBQUM7OztBQUFoRCxvQkFBUTs7QUFDWixvQkFBUSxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQUMsNkJBQTZCLENBQUMsQ0FBQzs7Ozs7OztLQUNwRCxDQUFDLENBQUM7QUFDSCxNQUFFLENBQUMsc0NBQXNDLEVBQUU7VUFDckMsVUFBVSxFQUVWLFFBQVE7Ozs7OzZDQUZXLGtDQUFFLFlBQVksQ0FBQyxVQUFVLENBQUMsb0JB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VSxFQUVWLFFBQVE7Ozs7O3FEQUZXLGtDQUFFLFlBQVksQ0FBQyxtREFBbUQsRUFBRSxNQUFNLENBQUM7OztBQUE5Riw4QkFBVTs7QUFDZCw4QkFBVSxDQUFDLE1BQU0sQ0FBQyxPQUFPLENBQUMsTUFBTSxDQUFDLENBQUM7O3FEQUNiLGtCQUFHLFFBQVEsQ0FBQyxVQUFVLEVBQUUsTUFBTSxDQUFDOzs7QUFBaEQsNEJBQVE7O0FBQ1osNEJBQVEsQ0FBQyxNQUFNLENBQUMsR0FBRyxDQUFDLDZCQUE2QixDQUFDLENBQUM7Ozs7Ozs7YUFDcEQsQ0FBQyxDQUFDO0FBQ0gsY0FBRSxDQUFDLG9DQUFvQyxFQUFFOzs7O0FBQ3ZDLDBCQUFNLENBQUMsS0FBSyxFQUFFLENBQUM7O3FEQUNULGtDQUFFLFlBQVksQ0FBQywwQ0FBMEMsRUFBRSxNQUFNLENBQUMsQ0FDckUsTUFBTSxDQUFDLEVBQUUsQ0FBQyxZQUFZLENBQUMsY0FBYyxDQUFDOzs7Ozs7O2FBQzFDLENBQUMsQ0FBQzs7Ozs7OztLQUNKLENBQUMsQ0FBQztHQUNKLENBQUMsQ0FBQztDQUNKLENBQUMsQ0FBQyIsImZpbGUiOiJ0ZXN0L2Jhc2Vkcml2ZXIvaGVscGVycy1lMmUtc3BlY3MuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgY2hhaSBmcm9tICdjaGFpJztcbmltcG9ydCBwYXRoIGZyb20gJ3BhdGgnO1xuaW1wb3J0IGNoYWlBc1Byb21pc2VkIGZyb20gJ2NoYWktYXMtcHJvbWlzZWQnO1xuaW1wb3J0IHsgZnMgfSBmcm9tICdhcHBpdW0tc3VwcG9ydCc7XG5pbXBvcnQgaCBmcm9tICcuLi8uLi9saWIvYmFzZWRyaXZlci9oZWxwZXJzJztcbmltcG9ydCBodHRwIGZyb20gJ2h0dHAnO1xuaW1wb3J0IGZpbmFsaGFuZGxlciBmcm9tICdmaW5hbGhhbmRsZXInO1xuaW1wb3J0IHNlcnZlU3RhdGljIGZyb20gJ3NlcnZlLXN0YXRpYyc7XG5pbXBvcnQgY29udGVudERpc3Bvc2l0aW9uIGZyb20gJ2NvbnRlbnQtZGlzcG9zaXRpb24nO1xuXG5cbmNoYWkuc2hvdWxkKCk7XG5jaGFpLnVzZShjaGFpQXNQcm9taXNlZCk7XG5cbmZ1bmN0aW9uIGdldEZpeHR1cmUgKGZpbGUpIHtcbiAgcmV0dXJuIHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsICcuLicsICcuLicsICcuLicsICd0ZXN0JywgJ2Jhc2Vkcml2ZXInLFxuICAgICAgICAgICAgICAgICAgICAgICdmaXh0dXJlcycsIGZpbGUpO1xufVxuXG5kZXNjcmliZSgnYXBwIGRvd25sb2FkIGFuZCBjb25maWd1cmF0aW9uJywgZnVuY3Rpb24gKCkge1xuICBkZXNjcmliZSgnY29uZmlndXJlQXBwJywgZnVuY3Rpb24gKCkge1xuICAgIGl0KCdzaG91bGQgZ2V0IHRoZSBwYXRoIGZvciBhIGxvY2FsIC5hcHAnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBsZXQgbmV3QXBwUGF0aCA9IGF3YWl0IGguY29uZmlndXJlQXBwKGdldEZpeHR1cmUoJ0Zha2VJT1NBcHAuYXBwJyksICcuYXBwJyk7XG4gICAgICBuZXdBcHBQYXRoLnNob3VsZC5jb250YWluKCdGYWtlSU9TQXBwLmFwcCcpO1xuICAgICAgbGV0IGNvbnRlbnRzID0gYXdhaXQgZnMucmVhZEZpbGUobmV3QXBwUGF0aCwgJ3V0ZjgnKTtcbiAgICAgIGNvbnRlbnRzLnNob3VsZC5lcWwoJ3RoaXMgaXMgbm90IHJlYWxseSBhbiBhcHBcXG4nKTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIGdldCB0aGUgcGF0aCBmb3IgYSBsb2NhbCAuYXBrJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgbGV0IG5ld0FwcFBhdGggPSBhd2FpdCBoLmNvbmZpZ3VyZUFwcChnZXRGaXh0dXJlKCdGYWtlQW5kcm9pZEFwcC5hcGsnKSwgJy5hcGsnKTtcbiAgICAgIG5ld0FwcFBhdGguc2hvdWxkLmNvbnRhaW4oJ0Zha2VBbmRyb2lkQXBwLmFwaycpO1xuICAgICAgbGV0IGNvbnRlbnRzID0gYXdhaXQgZnMucmVhZEZpbGUobmV3QXBwUGF0aCwgJ3V0ZjgnKTtcbiAgICAgIGNvbnRlbnRzLnNob3VsZC5lcWwoJ3RoaXMgaXMgbm90IHJlYWxseSBhbiBhcGtcXG4nKTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIHVuemlwIGFuZCBnZXQgdGhlIHBhdGggZm9yIGEgbG9jYWwgLmFwcC56aXAnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBsZXQgbmV3QXBwUGF0aCA9IGF3YWl0IGguY29uZmlndXJlQXBwKGdldEZpeHR1cmUoJ0Zha2VJT1NBcHAuYXBwLnppcCcpLCAnLmFwcCcpO1xuICAgICAgbmV3QXBwUGF0aC5zaG91bGQuY29udGFpbignRmFrZUlPU0FwcC5hcHAnKTtcbiAgICAgIGxldCBjb250ZW50cyA9IGF3YWl0IGZzLnJlYWRGaWxlKG5ld0FwcFBhdGgsICd1dGY4Jyk7XG4gICAgICBjb250ZW50cy5zaG91bGQuZXFsKCd0aGlzIGlzIG5vdCByZWFsbHkgYW4gYXBwXFxuJyk7XG4gICAgfSk7XG4gICAgaXQoJ3Nob3VsZCB1bnppcCBhbmQgZ2V0IHRoZSBwYXRoIGZvciBhIGxvY2FsIC5pcGEnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICBsZXQgbmV3QXBwUGF0aCA9IGF3YWl0IGguY29uZmlndXJlQXBwKGdldEZpeHR1cmUoJ0Zha2VJT1NBcHAuaXBhJyksICcuYXBwJyk7XG4gICAgICBuZXdBcHBQYXRoLnNob3VsZC5jb250YWluKCdGYWtlSU9TQXBwLmFwcCcpO1xuICAgICAgbGV0IGNvbnRlbnRzID0gYXdhaXQgZnMucmVhZEZpbGUobmV3QXBwUGF0aCwgJ3V0ZjgnKTtcbiAgICAgIGNvbnRlbnRzLnNob3VsZC5lcWwoJ3RoaXMgaXMgbm90IHJlYWxseSBhbiBhcHBcXG4nKTtcbiAgICB9KTtcbiAgICBpdCgnc2hvdWxkIGZhaWwgZm9yIGEgYmFkIHppcCBmaWxlJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgYXdhaXQgaC5jb25maWd1cmVBcHAoZ2V0Rml4dHVyZSgnQmFkWmlwcGVkQXBwLnppcCcpLCAnLmFwcCcpXG4gICAgICAgIC5zaG91bGQuYmUucmVqZWN0ZWRXaXRoKCdFcnJvciB0ZXN0aW5nIHppcCBhcmNoaXZlLCBhcmUgeW91IHN1cmUgdGhpcyBpcyBhIHppcCBmaWxlPycpO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgZmFpbCBpZiBleHRlbnNpb25zIGRvIG5vdCBtYXRjaCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGF3YWl0IGguY29uZmlndXJlQXBwKGdldEZpeHR1cmUoJ0Zha2VJT1NBcHAuYXBwJyksICcud3JvbmcnKVxuICAgICAgICAuc2hvdWxkLmJlLnJlamVjdGVkV2l0aCgvZGlkIG5vdCBoYXZlIGV4dGVuc2lvbiAnLndyb25nJy8pO1xuICAgIH0pO1xuICAgIGl0KCdzaG91bGQgZmFpbCBpZiB6aXAgZmlsZSBkb2VzIG5vdCBjb250YWluIGFuIGFwcCB3aG9zZSBleHRlbnNpb24gbWF0Y2hlcycsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIGF3YWl0IGguY29uZmlndXJlQXBwKGdldEZpeHR1cmUoJ0Zha2VJT1NBcHAuYXBwLnppcCcpLCAnLndyb25nJylcbiAgICAgICAgLnNob3VsZC5iZS5yZWplY3RlZFdpdGgoL2NvdWxkIG5vdCBmaW5kIGEgLndyb25nIGJ1bmRsZSBpbiBpdC8pO1xuICAgIH0pO1xuICAgIGRlc2NyaWJlKCdzaG91bGQgZG93bmxvYWQgYW4gYXBwIGZyb20gdGhlIHdlYicsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgIC8vIHVzZSBhIGxvY2FsIHNlcnZlciBzbyB0aGVyZSBpcyBubyBkZXBlbmRlbmN5IG9uIHRoZSBpbnRlcm5ldFxuICAgICAgbGV0IHNlcnZlcjtcbiAgICAgIGJlZm9yZShmdW5jdGlvbiAoKSB7XG4gICAgICAgIGxldCBkaXIgPSBwYXRoLnJlc29sdmUoX19kaXJuYW1lLCAnLi4nLCAnLi4nLCAnLi4nLCAndGVzdCcsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJ2Jhc2Vkcml2ZXInLCAnZml4dHVyZXMnKTtcbiAgICAgICAgbGV0IHNlcnZlID0gc2VydmVTdGF0aWMoZGlyLCB7XG4gICAgICAgICAgaW5kZXg6IGZhbHNlLFxuICAgICAgICAgIHNldEhlYWRlcnM6IChyZXMsIHBhdGgpID0+IHtcbiAgICAgICAgICAgIHJlcy5zZXRIZWFkZXIoJ0NvbnRlbnQtRGlzcG9zaXRpb24nLCBjb250ZW50RGlzcG9zaXRpb24ocGF0aCkpO1xuICAgICAgICAgIH1cbiAgICAgICAgfSk7XG5cbiAgICAgICAgc2VydmVyID0gaHR0cC5jcmVhdGVTZXJ2ZXIoZnVuY3Rpb24gKHJlcSwgcmVzKSB7XG4gICAgICAgICAgaWYgKHJlcS51cmwuaW5kZXhPZignbWlzc2luZycpICE9PSAtMSkge1xuICAgICAgICAgICAgcmVzLndyaXRlSGVhZCg0MDQpO1xuICAgICAgICAgICAgcmVzLmVuZCgpO1xuICAgICAgICAgICAgcmV0dXJuO1xuICAgICAgICAgIH1cbiAgICAgICAgICAvLyBmb3IgdGVzdGluZyB6aXAgZmlsZSBjb250ZW50IHR5cGVzXG4gICAgICAgICAgaWYgKHJlcS51cmwuaW5kZXhPZignbWltZS16aXAnKSAhPT0gLTEpIHtcbiAgICAgICAgICAgIHJlcy5zZXRIZWFkZXIoJ0NvbnRlbnQtVHlwZScsICdhcHBsaWNhdGlvbi96aXAnKTtcbiAgICAgICAgICB9IGVsc2UgaWYgKHJlcS51cmwuaW5kZXhPZignbWltZS1iaXAnKSAhPT0gMSkge1xuICAgICAgICAgICAgcmVzLnNldEhlYWRlcignQ29udGVudC1UeXBlJywgJ2FwcGxpY2F0aW9uL2JpcCcpO1xuICAgICAgICAgIH1cbiAgICAgICAgICBzZXJ2ZShyZXEsIHJlcywgZmluYWxoYW5kbGVyKHJlcSwgcmVzKSk7XG4gICAgICAgIH0pO1xuICAgICAgICBzZXJ2ZXIubGlzdGVuKDgwMDApO1xuICAgICAgfSk7XG4gICAgICBhZnRlcihmdW5jdGlvbiAoKSB7XG4gICAgICAgIHNlcnZlci5jbG9zZSgpO1xuICAgICAgfSk7XG5cbiAgICAgIGl0KCdzaG91bGQgZG93bmxvYWQgemlwIGZpbGUnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICAgIGxldCBuZXdBcHBQYXRoID0gYXdhaXQgaC5jb25maWd1cmVBcHAoJ2h0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9GYWtlSU9TQXBwLmFwcC56aXAnLCAnLmFwcCcpO1xuICAgICAgICBuZXdBcHBQYXRoLnNob3VsZC5jb250YWluKCdGYWtlSU9TQXBwLmFwcCcpO1xuICAgICAgICBsZXQgY29udGVudHMgPSBhd2FpdCBmcy5yZWFkRmlsZShuZXdBcHBQYXRoLCAndXRmOCcpO1xuICAgICAgICBjb250ZW50cy5zaG91bGQuZXFsKCd0aGlzIGlzIG5vdCByZWFsbHkgYW4gYXBwXFxuJyk7XG4gICAgICB9KTtcbiAgICAgIGl0KCdzaG91bGQgZG93bmxvYWQgemlwIGZpbGUgd2l0aCBxdWVyeSBzdHJpbmcnLCBhc3luYyBmdW5jdGlvbiAoKSB7XG4gICAgICAgIGxldCBuZXdBcHBQYXRoID0gYXdhaXQgaC5jb25maWd1cmVBcHAoJ2h0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9GYWtlSU9TQXBwLmFwcC56aXA/c3Y9YWJjJnNyPWRlZicsICcuYXBwJyk7XG4gICAgICAgIG5ld0FwcFBhdGguc2hvdWxkLmNvbnRhaW4oJy5hcHAnKTtcbiAgICAgICAgbGV0IGNvbnRlbnRzID0gYXdhaXQgZnMucmVhZEZpbGUobmV3QXBwUGF0aCwgJ3V0ZjgnKTtcbiAgICAgICAgY29udGVudHMuc2hvdWxkLmVxbCgndGhpcyBpcyBub3QgcmVhbGx5IGFuIGFwcFxcbicpO1xuICAgICAgfSk7XG4gICAgICBpdCgnc2hvdWxkIGRvd25sb2FkIGFuIGFwcCBmaWxlJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgICBsZXQgbmV3QXBwUGF0aCA9IGF3YWl0IGguY29uZmlndXJlQXBwKCdodHRwOi8vbG9jYWxob3N0OjgwMDAvRmFrZUlPU0FwcC5hcHAnLCAnLmFwcCcpO1xuICAgICAgICBuZXdBcHBQYXRoLnNob3VsZC5jb250YWluKCcuYXBwJyk7XG4gICAgICAgIGxldCBjb250ZW50cyA9IGF3YWl0IGZzLnJlYWRGaWxlKG5ld0FwcFBhdGgsICd1dGY4Jyk7XG4gICAgICAgIGNvbnRlbnRzLnNob3VsZC5lcWwoJ3RoaXMgaXMgbm90IHJlYWxseSBhbiBhcHBcXG4nKTtcbiAgICAgIH0pO1xuICAgICAgaXQoJ3Nob3VsZCBkb3dubG9hZCBhbiBhcGsgZmlsZScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IG5ld0FwcFBhdGggPSBhd2FpdCBoLmNvbmZpZ3VyZUFwcCgnaHR0cDovL2xvY2FsaG9zdDo4MDAwL0Zha2VBbmRyb2lkQXBwLmFwaycsICcuYXBrJyk7XG4gICAgICAgIG5ld0FwcFBhdGguc2hvdWxkLmNvbnRhaW4oJy5hcGsnKTtcbiAgICAgICAgbGV0IGNvbnRlbnRzID0gYXdhaXQgZnMucmVhZEZpbGUobmV3QXBwUGF0aCwgJ3V0ZjgnKTtcbiAgICAgICAgY29udGVudHMuc2hvdWxkLmVxbCgndGhpcyBpcyBub3QgcmVhbGx5IGFuIGFwa1xcbicpO1xuICAgICAgfSk7XG4gICAgICBpdCgnc2hvdWxkIGhhbmRsZSB6aXAgZmlsZSB0aGF0IGNhbm5vdCBiZSBkb3dubG9hZGVkJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgICBhd2FpdCBoLmNvbmZpZ3VyZUFwcCgnaHR0cDovL2xvY2FsaG9zdDo4MDAwL21pc3NpbmcvRmFrZUlPU0FwcC5hcHAuemlwJywgJy5hcHAnKVxuICAgICAgICAgIC5zaG91bGQuYmUucmVqZWN0ZWRXaXRoKC9Qcm9ibGVtIGRvd25sb2FkaW5nIGFwcCBmcm9tIHVybC8pO1xuICAgICAgfSk7XG4gICAgICBpdCgnc2hvdWxkIHJlY29nbml6ZSB6aXAgbWltZSB0eXBlcyBhbmQgdW56aXAgdGhlIGRvd25sb2FkZWQgZmlsZScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IG5ld0FwcFBhdGggPSBhd2FpdCBoLmNvbmZpZ3VyZUFwcCgnaHR0cDovL2xvY2FsaG9zdDo4MDAwL0Zha2VBbmRyb2lkQXBwLmFzZD9taW1lLXppcCcsICcuYXBrJyk7XG4gICAgICAgIG5ld0FwcFBhdGguc2hvdWxkLmNvbnRhaW4oJ0Zha2VBbmRyb2lkQXBwLmFwaycpO1xuICAgICAgICBuZXdBcHBQYXRoLnNob3VsZC5ub3QuY29udGFpbignLmFzZCcpO1xuICAgICAgICBsZXQgY29udGVudHMgPSBhd2FpdCBmcy5yZWFkRmlsZShuZXdBcHBQYXRoLCAndXRmOCcpO1xuICAgICAgICBjb250ZW50cy5zaG91bGQuZXFsKCd0aGlzIGlzIG5vdCByZWFsbHkgYW4gYXBrXFxuJyk7XG4gICAgICB9KTtcbiAgICAgIGl0KCdzaG91bGQgcmVjb2duaXplIHppcCBtaW1lIHR5cGVzIGFuZCB1bnppcCB0aGUgZG93bmxvYWRlZCBmaWxlIHdpdGggcXVlcnkgc3RyaW5nJywgYXN5bmMgZnVuY3Rpb24gKCkge1xuICAgICAgICBsZXQgbmV3QXBwUGF0aCA9IGF3YWl0IGguY29uZmlndXJlQXBwKCdodHRwOi8vbG9jYWxob3N0OjgwMDAvRmFrZUFuZHJvaWRBcHAuYXNkP21pbWUtemlwJnN2PWFiYyZzcj1kZWYnLCAnLmFwaycpO1xuICAgICAgICBuZXdBcHBQYXRoLnNob3VsZC5jb250YWluKCdGYWtlQW5kcm9pZEFwcC5hcGsnKTtcbiAgICAgICAgbmV3QXBwUGF0aC5zaG91bGQubm90LmNvbnRhaW4oJy5hc2QnKTtcbiAgICAgICAgbGV0IGNvbnRlbnRzID0gYXdhaXQgZnMucmVhZEZpbGUobmV3QXBwUGF0aCwgJ3V0ZjgnKTtcbiAgICAgICAgY29udGVudHMuc2hvdWxkLmVxbCgndGhpcyBpcyBub3QgcmVhbGx5IGFuIGFwa1xcbicpO1xuICAgICAgfSk7XG4gICAgICBpdCgnc2hvdWxkIHRyZWF0IGFuIHVua25vd24gbWltZSB0eXBlIGFzIGFuIGFwcCcsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgbGV0IG5ld0FwcFBhdGggPSBhd2FpdCBoLmNvbmZpZ3VyZUFwcCgnaHR0cDovL2xvY2FsaG9zdDo4MDAwL0Zha2VBbmRyb2lkQXBwLmFwaz9taW1lLWJpcCcsICcuYXBrJyk7XG4gICAgICAgIG5ld0FwcFBhdGguc2hvdWxkLmNvbnRhaW4oJy5hcGsnKTtcbiAgICAgICAgbGV0IGNvbnRlbnRzID0gYXdhaXQgZnMucmVhZEZpbGUobmV3QXBwUGF0aCwgJ3V0ZjgnKTtcbiAgICAgICAgY29udGVudHMuc2hvdWxkLmVxbCgndGhpcyBpcyBub3QgcmVhbGx5IGFuIGFwa1xcbicpO1xuICAgICAgfSk7XG4gICAgICBpdCgnc2hvdWxkIGhhbmRsZSBzZXJ2ZXIgbm90IGF2YWlsYWJsZScsIGFzeW5jIGZ1bmN0aW9uICgpIHtcbiAgICAgICAgc2VydmVyLmNsb3NlKCk7XG4gICAgICAgIGF3YWl0IGguY29uZmlndXJlQXBwKCdodHRwOi8vbG9jYWxob3N0OjgwMDAvRmFrZUlPU0FwcC5hcHAuemlwJywgJy5hcHAnKVxuICAgICAgICAgIC5zaG91bGQuYmUucmVqZWN0ZWRXaXRoKC9FQ09OTlJFRlVTRUQvKTtcbiAgICAgIH0pO1xuICAgIH0pO1xuICB9KTtcbn0pO1xuIl0sInNvdXJjZVJvb3QiOiIuLi8uLi8uLiJ9

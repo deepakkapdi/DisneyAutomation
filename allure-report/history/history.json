@@ -1,0 +1,42 @@
+{
+  "3b71cd13462c82791b007bce9916aacd" : {
+    "statistic" : {
+      "failed" : 0,
+      "broken" : 1,
+      "skipped" : 0,
+      "passed" : 0,
+      "unknown" : 0,
+      "total" : 1
+    },
+    "items" : [ {
+      "uid" : "4292cba64647b63",
+      "status" : "broken",
+      "statusDetails" : "element (\"android=new UiSelector().resourceId(\"com.disney.wdw.android:id/pulldown_image\")\") still not existing after 40000ms",
+      "time" : {
+        "start" : 1520339781242,
+        "stop" : 1520339871303,
+        "duration" : 90061
+      }
+    } ]
+  },
+  "1cb8e90dfae1a8dbba3e5625dddd052" : {
+    "statistic" : {
+      "failed" : 0,
+      "broken" : 1,
+      "skipped" : 0,
+      "passed" : 0,
+      "unknown" : 0,
+      "total" : 1
+    },
+    "items" : [ {
+      "uid" : "547aaac4c67cc159",
+      "status" : "broken",
+      "statusDetails" : "element (\"android=new UiSelector().resourceId(\"android:id/button2\")\") still not existing after 40000ms",
+      "time" : {
+        "start" : 1520339575440,
+        "stop" : 1520339781241,
+        "duration" : 205801
+      }
+    } ]
+  }
+}
